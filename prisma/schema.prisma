@@ -7,7 +7,10 @@ datasource db {
   provider = "postgresql"
 }
 
-// Better-Auth
+enum Role {
+  USER
+  ADMIN
+}
 
 model User {
   id            String    @id @default(cuid())
@@ -18,7 +21,7 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  role          String    @default("user") // "user" | "admin"
+  role          Role    @default(USER)
   banned        Boolean?  @default(false)
   banReason     String?
   banExpires    DateTime?

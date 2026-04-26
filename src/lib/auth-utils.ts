@@ -10,7 +10,7 @@ export async function getSession() {
 
 export async function getAdminSession() {
   const session = await getSession();
-  if (!session || session.user.role !== "admin") return null;
+  if (!session || session.user.role !== "ADMIN") return null;
   return session;
 }
 
@@ -24,7 +24,7 @@ export async function requireAdmin(): Promise<NextResponse | null> {
     );
   }
 
-  if (session.user.role !== "admin") {
+  if (session.user.role !== "ADMIN") {
     return NextResponse.json(
       { error: "Accès refusé — réservé aux administrateurs" },
       { status: 403 }

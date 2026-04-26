@@ -1,3 +1,6 @@
+-- CreateEnum
+CREATE TYPE "Role" AS ENUM ('USER', 'ADMIN');
+
 -- CreateTable
 CREATE TABLE "user" (
     "id" TEXT NOT NULL,
@@ -7,7 +10,7 @@ CREATE TABLE "user" (
     "image" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "role" TEXT NOT NULL DEFAULT 'user',
+    "role" "Role" NOT NULL DEFAULT 'USER',
     "banned" BOOLEAN DEFAULT false,
     "banReason" TEXT,
     "banExpires" TIMESTAMP(3),

@@ -17,7 +17,7 @@ export const auth = betterAuth({
 
   plugins: [
     admin({
-      defaultRole: "user",
+      defaultRole: "USER",
     }),
   ],
 
@@ -30,7 +30,7 @@ export const auth = betterAuth({
     additionalFields: {
       role: {
         type: "string",
-        defaultValue: "user",
+        defaultValue: "USER",
       },
     },
   },
