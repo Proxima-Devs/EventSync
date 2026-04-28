@@ -6,7 +6,7 @@ import { faHouse, faHeart, faCalendar, faTableCells, faUser, faDoorOpen, faArrow
 export default function Navbar(){
     
     return(
-        <div className="bg-black text-gray-400 w-60 h-140 pl-1 flex flex-col gap-5">
+        <div className="bg-black text-gray-400 w-70 h-140 pl-1 flex flex-col gap-5">
             <div className="flex flex-row items-center gap-3  pt-5">
                 <button className=" w-10 h-10 rounded-full ml-5 bg-[#00E5FF] font-bold text-black">E</button>
                 <h2 className="text-white font-bold text-xl ">EventSync</h2>
