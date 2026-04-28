@@ -1,5 +1,12 @@
 import { redirect } from "next/navigation";
+import Navbar from "../app/components/ui/NavBar"
 
 export default function RootPage() {
-  redirect("/login");
+  return(
+    <div>
+        <Navbar/>
+    </div>
+  )
+ // redirect("/login");
+
 }
