@@ -1,7 +1,19 @@
+"Use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+
+
 import Link from "next/link";
 
 
 export default function RegisterPage() {
+    const [username, setUsername] = useState("");
+    const [firstname, setFirstname] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [birthDate, setBirthDate] = useState("");
 
     return (
         <main className="min-h-screen bg-[#080a0c] flex items-center justify-center px-4 relative overflow-hidden">
@@ -26,6 +38,8 @@ export default function RegisterPage() {
                             <input
                                 type="text"
                                 placeholder="Tsutoru"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
                                 className="w-full bg-[#111318] border border-[#2a2a2a] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#444] focus:outline-none focus:border-[#00E5FF55] transition-all"
                             />
                         </div>
@@ -36,6 +50,8 @@ export default function RegisterPage() {
                             <input
                                 type="text"
                                 placeholder="Nomena"
+                                value={firstname}
+                                onChange={(e) => setFirstname(e.target.value)}
                                 className="w-full bg-[#111318] border border-[#2a2a2a] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#444] focus:outline-none focus:border-[#00E5FF55] transition-all"
                             />
                         </div>
@@ -46,6 +62,8 @@ export default function RegisterPage() {
                             <input
                                 type="email"
                                 placeholder="Nomena@example.com"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                                 className="w-full bg-[#111318] border border-[#2a2a2a] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#444] focus:outline-none focus:border-[#00E5FF55] transition-all"
                             />
                         </div>
@@ -56,6 +74,8 @@ export default function RegisterPage() {
                             <input
                                 type="password"
                                 placeholder="••••••••"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                                 className="w-full bg-[#111318] border border-[#2a2a2a] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#444] focus:outline-none focus:border-[#00E5FF55] transition-all"
                             />
                         </div>
@@ -66,6 +86,8 @@ export default function RegisterPage() {
                             <input
                                 type="password"
                                 placeholder="••••••••"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
                                 className="w-full bg-[#111318] border border-[#2a2a2a] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#444] focus:outline-none focus:border-[#00E5FF55] transition-all"
                             />
                         </div>
@@ -75,6 +97,8 @@ export default function RegisterPage() {
                             </label>
                             <input
                                 type="date"
+                                value={birthDate}
+                                onChange={(e) => setBirthDate(e.target.value)}
                                 className="w-full bg-[#111318] border border-[#2a2a2a] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#00E5FF55] transition-all"
                             />
                         </div>
