@@ -34,6 +34,11 @@ export default function LoginPage() {
                 className="w-full bg-[#111318] border border-[#2a2a2a] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#444] focus:outline-none focus:border-[#00E5FF55] transition-all"
             />
           </div>
+            <button
+            type="submit"
+             className="w-full bg-[#00E5FF] text-black font-bold py-2.5 rounded-lg hover:bg-[#00ffff] transition-colors mt-4">
+                Sign In
+            </button>
         </div>
       </div>
     </main>
