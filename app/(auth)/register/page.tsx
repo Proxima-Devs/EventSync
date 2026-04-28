@@ -136,6 +136,12 @@ export default function RegisterPage() {
                                 className="w-full bg-[#111318] border border-[#2a2a2a] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#00E5FF55] transition-all"
                             />
                         </div>
+                        {error && (
+                            <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2.5">
+                                <span className="text-red-400 text-xs">⚠</span>
+                                <p className="text-red-400 text-xs font-medium">{error}</p>
+                            </div>
+                        )}
                         <button
                             type="submit"
                             disabled={loading}
