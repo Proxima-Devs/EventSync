@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 
 
 import Link from "next/link";
+import router from "next/dist/shared/lib/router/router";
+import { authClient } from "@/lib/auth-client";
 
 
 export default function RegisterPage() {
@@ -14,6 +16,35 @@ export default function RegisterPage() {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [birthDate, setBirthDate] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+    const router = useRouter();
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (password !== confirmPassword) {
+            setError("Passwords do not match");
+            return;
+        }
+
+        setLoading(true);
+
+        const { data, error } = await authClient.signUp.email({
+            email,
+            password,
+            name: `${firstname}`,
+        });
+
+        if (error) {
+            setError(error.message ?? "Une erreur est survenue");
+            setLoading(false);
+            return;
+        }
+
+        router.push("/login");
+        setLoading(false);
+    };
 
     return (
         <main className="min-h-screen bg-[#080a0c] flex items-center justify-center px-4 relative overflow-hidden">
@@ -29,7 +60,10 @@ export default function RegisterPage() {
                     </h1>
                     <p className="text-[#555] text-sm mt-1">Create your account</p>
                 </div>
-                <div className="bg-[#0d0f12] border border-[#1a1a1a] rounded-2xl p-6 flex flex-col gap-4">
+                <form
+                    onSubmit={handleSubmit}
+                    className="bg-[#0d0f12] border border-[#1a1a1a] rounded-2xl p-6 flex flex-col gap-4"
+                >
                     <div className="flex gap-3">
                         <div className="flex-1">
                             <label className="block text-xs text-[#555] uppercase tracking-wider mb-1.5">
@@ -104,9 +138,10 @@ export default function RegisterPage() {
                         </div>
                         <button
                             type="submit"
-                            className="mt-2 w-full py-3 rounded-xl bg-[#00E5FF] text-black font-bold text-sm hover:bg-[#00ffff] transition-colors shadow-lg shadow-[#00E5FF22]"
+                            disabled={loading}
+                            className="mt-2 w-full py-3 rounded-xl bg-[#00E5FF] text-black font-bold text-sm hover:bg-[#00ffff] transition-colors shadow-lg shadow-[#00E5FF22] disabled:opacity-50"
                         >
-                            Create Account
+                            {loading ? "Creating account..." : "Create Account"}
                         </button>
                         <p className="text-center text-xs text-[#555]">
                             Already have an account?{" "}
@@ -118,8 +153,8 @@ export default function RegisterPage() {
                             </Link>
                         </p>
                     </div>
-                </div>
+                </form>
             </div>
-        </main>
+        </main >
     );
 }
