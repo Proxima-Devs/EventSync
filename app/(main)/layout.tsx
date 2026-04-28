@@ -1,3 +1,5 @@
+import Sidebar from "@/components/Sidebar";
+
 export default function MainLayout({
   children,
 }: {
@@ -5,7 +7,10 @@ export default function MainLayout({
 }) {
   return (
     <div className="min-h-screen bg-[#030507] text-white flex">
-      {children}
+      <Sidebar />
+      <div className="ml-[60px] flex-1">
+        {children}
+      </div>
     </div>
   );
 }
