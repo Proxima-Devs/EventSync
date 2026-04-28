@@ -4,6 +4,7 @@ import router from "next/dist/shared/lib/router/router";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
+import Link from "next/link";
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
@@ -71,6 +72,15 @@ export default function LoginPage() {
              className="w-full bg-[#00E5FF] text-black font-bold py-2.5 rounded-lg hover:bg-[#00ffff] transition-colors mt-4">
                 Sign In
             </button>
+            <p className="text-center text-xs text-[#555]">
+  Don't have an account?{" "}
+  <Link
+    href="/register"
+    className="text-[#00E5FF] hover:text-[#00ffff] font-bold transition-colors"
+  >
+    Sign up
+  </Link>
+</p>
         </div>
       </div>
     </main>
