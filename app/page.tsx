@@ -1,10 +1,5 @@
-import Image from "next/image";
-import Button from "./components/ui/Button";
-import EventCard from "./components/ui/EventCard";
+import { redirect } from "next/navigation";
 
-export default function Home() {
-  return (
-
-    <div></div>
-  );
+export default function RootPage() {
+  redirect("/login");
 }
