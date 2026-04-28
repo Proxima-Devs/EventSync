@@ -21,7 +21,7 @@ export default function RegisterPage() {
                             </label>
                             <input
                                 type="text"
-                                placeholder="john_doe"
+                                placeholder="Tsutoru"
                                 className="w-full bg-[#111318] border border-[#2a2a2a] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#444] focus:outline-none focus:border-[#00E5FF55] transition-all"
                             />
                         </div>
@@ -31,7 +31,7 @@ export default function RegisterPage() {
                             </label>
                             <input
                                 type="text"
-                                placeholder="John"
+                                placeholder="Nomena"
                                 className="w-full bg-[#111318] border border-[#2a2a2a] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#444] focus:outline-none focus:border-[#00E5FF55] transition-all"
                             />
                         </div>
