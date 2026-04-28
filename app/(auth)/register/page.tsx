@@ -55,6 +55,16 @@ export default function RegisterPage() {
                                 className="w-full bg-[#111318] border border-[#2a2a2a] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#444] focus:outline-none focus:border-[#00E5FF55] transition-all"
                             />
                         </div>
+                        <div>
+                            <label className="block text-xs text-[#555] uppercase tracking-wider mb-1.5">
+                                Confirm Password
+                            </label>
+                            <input
+                                type="password"
+                                placeholder="••••••••"
+                                className="w-full bg-[#111318] border border-[#2a2a2a] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#444] focus:outline-none focus:border-[#00E5FF55] transition-all"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
