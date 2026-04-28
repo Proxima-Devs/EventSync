@@ -18,6 +18,11 @@ export default function HomePage() {
                     <br />
                     <span className="text-[#00E5FF]">Event Experience</span>
                 </h1>
+                <p className="text-[#4a5568] max-w-xl mx-auto text-base mb-10 leading-relaxed">
+                    Discover the most exciting tech conferences, workshops, and meetups
+                    in Madagascar. Manage your schedule, connect with speakers, and never
+                    miss a beat.
+                </p>
             </section>
         </main>
     );
