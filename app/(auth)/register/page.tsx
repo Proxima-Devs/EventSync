@@ -74,6 +74,12 @@ export default function RegisterPage() {
                                 className="w-full bg-[#111318] border border-[#2a2a2a] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#00E5FF55] transition-all"
                             />
                         </div>
+                        <button
+                            type="submit"
+                            className="mt-2 w-full py-3 rounded-xl bg-[#00E5FF] text-black font-bold text-sm hover:bg-[#00ffff] transition-colors shadow-lg shadow-[#00E5FF22]"
+                        >
+                            Create Account
+                        </button>
                     </div>
                 </div>
             </div>
