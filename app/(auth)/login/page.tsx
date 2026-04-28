@@ -13,6 +13,8 @@ export default function LoginPage() {
           </h1>
           <p className="text-[#555] text-sm mt-1">Sign in to your account</p>
         </div>
+        <div className="bg-[#0d0f12] border border-[#1a1a1a] rounded-2x1 p-6 flex flex-col gap-4">
+        </div>
       </div>
     </main>
   );
