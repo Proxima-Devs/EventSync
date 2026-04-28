@@ -13,6 +13,8 @@ export default function RegisterPage() {
           </h1>
           <p className="text-[#555] text-sm mt-1">Create your account</p>
         </div>
+        <div className="bg-[#0d0f12] border border-[#1a1a1a] rounded-2xl p-6 flex flex-col gap-4">
+        </div>
       </div>
     </main>
   );
