@@ -51,3 +51,4 @@ export type PaginationMeta = {
   page: number;
   perPage: number;
 };
+
