@@ -80,6 +80,11 @@ export default function LoginPage() {
                                 <p className="text-red-400 text-xs font-medium">{error}</p>
                             </div>
                         )}
+                        <div className="flex items-center gap-3">
+                            <div className="flex-1 h-[1px] bg-[#1a1a1a]" />
+                            <span className="text-xs text-[#555]">or continue with</span>
+                            <div className="flex-1 h-[1px] bg-[#1a1a1a]" />
+                        </div>
                     </div>
                     <button
                         type="submit"
