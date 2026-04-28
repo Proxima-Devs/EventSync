@@ -1,10 +1,35 @@
 "use client";
 
+import router from "next/dist/shared/lib/router/router";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+    const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    const { data, error } = await authClient.signIn.email({
+    email,
+    password,
+  });
+
+  if (error) {
+    setError("Email ou mot de passe incorrect");
+    setLoading(false);
+    return;
+  }
+
+  router.push("/");
+  setLoading(false);
+
+  };
 
   return (
     <main className="min-h-screen bg-[#080a0c] flex items-center justify-center px-4 relative overflow-hidden">
