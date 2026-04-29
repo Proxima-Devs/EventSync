@@ -22,28 +22,26 @@ export default function EventManagment(){
                     </div>
                 </div>
                 <div className="border-t-1 border-gray-800 flex h-98 items-center justify-center">
-                    <div className=" w-220 h-65 pt-10 border-mist-800 bg-[#101010] border-1 flex flex-col ">
-                        <input type="text" className="border-mist-800 border-1 bg-black w-80 rounded-sm h-8 pl-5"/>
-                        <div>
-                            <table className="w-full border-1 border-[#080808] h-30">
-                                <thead className="bg-[#282828] h-15">
-                                    <tr className="flex flex-row gap-50 pl-10 ">
+                    <div className=" w-220 h-65 border-mist-800 bg-[#101010] border-1 flex flex-col ">
+                        <div className=" h-15 flex items-center pl-5 ">
+                            <input type="text" className="border-mist-800 border-1 bg-black w-80 rounded-sm h-8 pl-5" placeholder="Search ..."/>
+
+                        </div >
+                            <table className="w-full border-1 border-[#080808] h-10 rounded-xl">
+                                    <tr className="flex flex-row bg-[#282828] gap-50 pl-10 h-10 items-center rounded-t-xl">
                                         <td>Event name</td>
                                         <td>Slug</td>
                                         <td>Date</td>
                                         <td>Location</td>
                                     </tr>
-                                </thead>
-                                <tbody >
-                                    <tr>
-                                        <p>No result</p>
+                                    <tr className="h-25 rounded-xl">
+                                        <p className="text-center">No result</p>
                                     </tr>
-                                </tbody>
+
                             </table>
                         </div>
                     </div>
                 </div>
-            </div>
         </div>
     )
 
