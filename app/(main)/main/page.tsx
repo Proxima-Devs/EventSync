@@ -47,6 +47,14 @@ export default function HomePage() {
                     </button>
                 </div>
             </section>
+            <section className="px-8 pb-16">
+                <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                        <h2 className="text-2xl font-black">Featured Events</h2>
+                        <div className="h-[3px] w-10 bg-[#00E5FF] rounded-full" />
+                    </div>
+                </div>
+            </section>
         </main>
     );
 }
