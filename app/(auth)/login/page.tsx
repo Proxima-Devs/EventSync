@@ -206,7 +206,7 @@ export default function LoginPage() {
                 </div>
 
                 <p className="text-center text-[#2a3540] text-xs mt-6">
-                    Mettez des phrases car moi Jsp hehehe
+                    Made By Proxima-dev
                 </p>
             </div>
         </main>

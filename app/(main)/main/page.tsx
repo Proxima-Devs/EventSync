@@ -3,6 +3,10 @@
 import { useState } from "react";
 
 export default function HomePage() {
+    const [search, setSearch] = useState("");
+    const [submitted, setSubmitted] = useState("");
+
+
     return (
         <main className="flex-1 flex flex-col">
             <section className="relative flex flex-col items-center justify-center text-center px-6 pt-20 pb-16 overflow-hidden">
@@ -23,6 +27,25 @@ export default function HomePage() {
                     in Madagascar. Manage your schedule, connect with speakers, and never
                     miss a beat.
                 </p>
+                <div className="w-full max-w-xl flex rounded-full overflow-hidden border border-[#1e2530] bg-[#0d1117] shadow-xl shadow-[#00E5FF08]">
+                    <span className="flex items-center pl-5 text-[#555]">
+                        🔍
+                    </span>
+                    <input
+                        type="text"
+                        placeholder="Search events by title or keywords..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && setSubmitted(search)}
+                        className="flex-1 bg-transparent px-4 py-4 text-sm text-white placeholder-[#444] focus:outline-none"
+                    />
+                    <button
+                        onClick={() => setSubmitted(search)}
+                        className="px-6 py-4 bg-[#00E5FF] text-black font-bold text-sm hover:bg-[#00ffff] transition-colors"
+                    >
+                        Search
+                    </button>
+                </div>
             </section>
         </main>
     );
