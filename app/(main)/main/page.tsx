@@ -55,20 +55,12 @@ export default function HomePage() {
                         <div className="h-[3px] w-10 bg-[#00E5FF] rounded-full" />
                     </div>
                 </div>
-                <section className="px-8 pb-16">
-                    <div className="flex items-center justify-between mb-6">
-                        <div className="flex items-center gap-3">
-                            <h2 className="text-2xl font-black">Featured Events</h2>
-                            <div className="h-[3px] w-10 bg-[#00E5FF] rounded-full" />
-                        </div>
-                    </div>{/* Grid */}
-                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                        {/* TODO: remplacer par appel API */}
-                        <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] py-20 col-span-full text-center text-[#3a4550] italic text-sm">
-                            No events found.
-                        </div>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {/* TODO: remplacer par appel API */}
+                    <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] py-20 col-span-full text-center text-[#3a4550] italic text-sm">
+                        No events found.
                     </div>
-                </section>
+                </div>
             </section>
         </main>
     );
