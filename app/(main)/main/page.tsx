@@ -1,15 +1,57 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import EventCard from "../../components/EventCard";
+import EventSkeleton from "../../components/EventSkeleton";
+import { getEvents } from "../../Lib/api";
+
+type Event = {
+    id: number;
+    title: string;
+    description: string;
+    start_date: string;
+    end_date: string;
+    place: string;
+};
+
+const FILTERS = ["All", "Upcoming", "Past"];
 
 export default function HomePage() {
     const [search, setSearch] = useState("");
     const [submitted, setSubmitted] = useState("");
     const [activeFilter, setActiveFilter] = useState("All");
+    const [events, setEvents] = useState<Event[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
 
-    const FILTERS = ["All", "Upcoming", "Past"];
+    useEffect(() => {
+        const fetchEvents = async () => {
+            try {
+                setLoading(true);
+                const data = await getEvents();
+                setEvents(data);
+            } catch (err) {
+                setError("Failed to load events");
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchEvents();
+    }, []);
 
+    const filtered = events.filter((e) => {
+        const matchSearch =
+            submitted === "" ||
+            e.title.toLowerCase().includes(submitted.toLowerCase()) ||
+            e.place.toLowerCase().includes(submitted.toLowerCase());
+
+        const now = new Date();
+        const start = new Date(e.start_date);
+
+        if (activeFilter === "Upcoming") return matchSearch && start >= now;
+        if (activeFilter === "Past") return matchSearch && start < now;
+        return matchSearch;
+    });
 
     return (
         <main className="flex-1 flex flex-col">
@@ -48,15 +90,14 @@ export default function HomePage() {
                         Experience
                     </span>
                 </h1>
+
                 <p className="text-[#4a5568] max-w-xl mx-auto text-base mb-10 leading-relaxed">
                     Discover the most exciting tech conferences, workshops, and meetups
                     in Madagascar. Manage your schedule, connect with speakers, and never
                     miss a beat.
                 </p>
                 <div className="w-full max-w-xl flex rounded-full overflow-hidden border border-[#1e2530] bg-[#0d1117] shadow-xl shadow-[#00E5FF08]">
-                    <span className="flex items-center pl-5 text-[#555]">
-                        🔍
-                    </span>
+                    <span className="flex items-center pl-5 text-[#555]">🔍</span>
                     <input
                         type="text"
                         placeholder="Search events by title or keywords..."
@@ -79,27 +120,46 @@ export default function HomePage() {
                         <h2 className="text-2xl font-black">Featured Events</h2>
                         <div className="h-[3px] w-10 bg-[#00E5FF] rounded-full" />
                     </div>
-                    <div className="flex gap-2 mb-6">
-                        {FILTERS.map((filter) => (
-                            <button
-                                key={filter}
-                                onClick={() => setActiveFilter(filter)}
-                                className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition-all duration-200 ${activeFilter === filter
+                    <span className="text-[#4a5568] text-sm">
+                        {!loading && `${filtered.length} event${filtered.length > 1 ? "s" : ""}`}
+                    </span>
+                </div>
+                <div className="flex gap-2 mb-6">
+                    {FILTERS.map((filter) => (
+                        <button
+                            key={filter}
+                            onClick={() => setActiveFilter(filter)}
+                            className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition-all duration-200 ${activeFilter === filter
                                     ? "bg-[#00E5FF] border-[#00E5FF] text-black shadow-lg shadow-[#00E5FF33]"
                                     : "bg-transparent border-[#1e2530] text-[#4a5568] hover:text-white hover:border-[#00E5FF44]"
-                                    }`}
-                            >
-                                {filter}
-                            </button>
+                                }`}
+                        >
+                            {filter}
+                        </button>
+                    ))}
+                </div>
+
+                {loading ? (
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        {[...Array(6)].map((_, i) => (
+                            <EventSkeleton key={i} />
                         ))}
                     </div>
-                </div>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {/* TODO: remplacer par appel API */}
-                    <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] py-20 col-span-full text-center text-[#3a4550] italic text-sm">
+                ) : error ? (
+                    <div className="rounded-2xl border border-red-900 bg-red-500/10 py-12 text-center text-red-400 text-sm">
+                        {error}
+                    </div>
+                ) : filtered.length === 0 ? (
+                    <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] py-20 text-center text-[#3a4550] italic text-sm">
                         No events found.
                     </div>
-                </div>
+                ) : (
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        {filtered.map((event) => (
+                            <EventCard key={event.id} event={event} />
+                        ))}
+                    </div>
+                )}
             </section>
         </main>
     );
