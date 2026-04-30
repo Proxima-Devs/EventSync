@@ -34,7 +34,7 @@ export default function EventManagment(){
             <div>
                 <Navbar/>
             </div>
-            <div className="w-full border-1 border-gray-800">
+            <div className="w-full border-1 border-gray-800 ">
                 <div className="flex flex-row justify-between px-20 h-35 items-center ">
                     <div>
                         <h1 className="text-white text-5xl font-bold">Manage Events</h1>
@@ -47,49 +47,51 @@ export default function EventManagment(){
                         </button>
                     </div>
                 </div>
-                <div className="border-t-1 border-gray-800 flex h-98 items-center justify-center">
-                    <div className=" w-220 h-65 border-mist-800 bg-[#101010] border-1 flex flex-col ">
+                <div className="border-t border-mist-800 flex h-98 items-center justify-center text-white">
+                    <div className=" w-220 h-65 border-mist-800 bg-[#101010] border flex flex-col rounded-lg">
                         <div className=" h-15 flex items-center pl-5 ">
                             <input type="text"
-                                   className="border-mist-800 border-1 bg-black w-80 rounded-sm h-8 pl-5"
+                                   className="border-mist-800 border bg-black w-80 rounded-sm h-8 pl-5"
                                    placeholder="Search ..."
                                    value={search}
                                    onChange={(e) => setSearch(e.target.value)}
                             />
                         </div >
-                            <table className="w-full border-1 border-[#080808] h-10 rounded-xl">
-                                <thead>
-                                    <tr className="flex flex-row bg-[#282828] gap-50 pl-10 h-10 items-center rounded-t-xl">
-                                        <td>Event name</td>
-                                        <td>Slug</td>
-                                        <td>Date</td>
-                                        <td>Location</td>
-                                    </tr>
-                                </thead>
-                                <tbody>{
-                                    loading ? (
+                        <div className="overflow-x-auto rounded-xl border border-mist-700 shadow-sm">
+                            <table className="w-full text-sm text-left">
+                                <thead className="bg-[#282828] text-gray-500 uppercase text-xs tracking-wider">
                                 <tr>
-                                    <td className="text-center">
-                                        Loading ...
-                                    </td>
+                                    <td className="px-6 py-3 font-semibold">Event name</td>
+                                    <td className="px-6 py-3 font-semibold">Slug</td>
+                                    <td className="px-6 py-3 font-semibold">Date</td>
+                                    <td className="px-6 py-3 font-semibold">Location</td>
                                 </tr>
+                                </thead>
+                                <tbody className="h-30">{
+                                    loading ? (
+                                        <tr>
+                                            <td className="text-center">
+                                                Loading ...
+                                            </td>
+                                        </tr>
                                     ): filtered.length === 0 ? (
                                         <tr className="text-center">
                                             <td>No result</td>
                                         </tr>
                                     ) : (
-                                        filtered.map((event) => (
-                                            <tr key={event.id}>
-                                                <td className="">{event.title}</td>
-                                                <td>{event.slug}</td>
-                                                <td>{event.startDate}</td>
-                                                <td>{event.location}</td>
-                                            </tr>
-                                        ))
-
+                                            filtered.map((event) => (
+                                                <tr key={event.id}>
+                                                    <td >{event.title}</td>
+                                                    <td>{event.slug}</td>
+                                                    <td>{event.startDate}</td>
+                                                    <td>{event.location}</td>
+                                                </tr>
+                                            )
+                                        )
                                     )
                                 }</tbody>
                             </table>
+                          </div>
                         </div>
                     </div>
                 </div>
