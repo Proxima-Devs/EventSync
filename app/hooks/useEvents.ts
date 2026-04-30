@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 
+
 export interface Event {
     id: string
     userId: string
@@ -14,6 +15,7 @@ export interface Event {
 }
 
 export const useEvent = () => {
+
     
 
 }

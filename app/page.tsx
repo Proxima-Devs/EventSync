@@ -1,14 +1,10 @@
 import { redirect } from "next/navigation";
-import Navbar from "../app/components/ui/NavBar"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch, faStar } from "@fortawesome/free-solid-svg-icons";
+import Navbar from "./components/ui/NavBar";
 
 export default function RootPage() {
-  return(
-    <div className="flex flex-row">
-        <Navbar/>
-    </div>
-  )
- // redirect("/login");
+    return (
+        <div><Navbar /></div>
+    )
+//redirect("/login");
 
 }
