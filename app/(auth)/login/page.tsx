@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
+import error from "next/dist/api/error";
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
@@ -9,6 +12,9 @@ export default function LoginPage() {
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const [mounted, setMounted] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
+
+    const router = useRouter();
+
 
     useEffect(() => {
         setMounted(true);
@@ -30,7 +36,7 @@ export default function LoginPage() {
             ref={containerRef}
             className="min-h-screen bg-[#030507] flex items-center justify-center px-4 relative overflow-hidden"
         >
-            
+
             <div
                 className="pointer-events-none fixed inset-0 z-0 transition-opacity duration-300"
                 style={{
@@ -109,7 +115,10 @@ export default function LoginPage() {
                                 className={`flex flex-col gap-3 transition-all duration-500 ${mounted ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"}`}
                             >
                                 <button
-                                    onClick={() => { }}
+                                    onClick={() => authClient.signIn.social({
+                                        provider: "google",
+                                        callbackURL: "/main",
+                                    })}
                                     className="group relative w-full py-3.5 rounded-2xl bg-[#0d1117] border border-[#1e2530] text-white text-sm font-semibold hover:border-[#00E5FF44] hover:bg-[#0d1520] transition-all duration-300 flex items-center justify-center gap-3 overflow-hidden"
                                 >
                                     <div className="absolute inset-0 bg-gradient-to-r from-[#00E5FF08] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -123,7 +132,10 @@ export default function LoginPage() {
                                 </button>
 
                                 <button
-                                    onClick={() => { }}
+                                    onClick={() => authClient.signIn.social({
+                                        provider: "github",
+                                        callbackURL: "/main",
+                                    })}
                                     className="group relative w-full py-3.5 rounded-2xl bg-[#0d1117] border border-[#1e2530] text-white text-sm font-semibold hover:border-[#00E5FF44] hover:bg-[#0d1520] transition-all duration-300 flex items-center justify-center gap-3 overflow-hidden"
                                 >
                                     <div className="absolute inset-0 bg-gradient-to-r from-[#00E5FF08] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
