@@ -33,13 +33,14 @@ export default function LoginPage() {
         setTimeout(() => setLoading(false), 1500);
     };
 
-    {redirecting && <LoadingScreen />}
+
 
     return (
         <main
             ref={containerRef}
             className="min-h-screen bg-[#030507] flex items-center justify-center px-4 relative overflow-hidden"
         >
+            {redirecting && <LoadingScreen />}
 
             <div
                 className="pointer-events-none fixed inset-0 z-0 transition-opacity duration-300"
@@ -121,10 +122,9 @@ export default function LoginPage() {
                                 <button
                                     onClick={async () => {
                                         setRedirecting(true);
-                                        await authClient.signIn.social({
-                                            provider: "google",
-                                            callbackURL: "/main",
-                                        });
+                                        // Simule un délai de 2 secondes puis redirige
+                                        await new Promise((resolve) => setTimeout(resolve, 2000));
+                                        router.push("/main");
                                     }}
                                     className="group relative w-full py-3.5 rounded-2xl bg-[#0d1117] border border-[#1e2530] text-white text-sm font-semibold hover:border-[#00E5FF44] hover:bg-[#0d1520] transition-all duration-300 flex items-center justify-center gap-3 overflow-hidden"
                                 >
