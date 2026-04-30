@@ -6,6 +6,9 @@ import EventCard from "../../components/EventCard";
 export default function HomePage() {
     const [search, setSearch] = useState("");
     const [submitted, setSubmitted] = useState("");
+    const [activeFilter, setActiveFilter] = useState("All");
+
+    const FILTERS = ["All", "Upcoming", "Past"];
 
 
     return (
@@ -53,6 +56,20 @@ export default function HomePage() {
                     <div className="flex items-center gap-3">
                         <h2 className="text-2xl font-black">Featured Events</h2>
                         <div className="h-[3px] w-10 bg-[#00E5FF] rounded-full" />
+                    </div>
+                    <div className="flex gap-2 mb-6">
+                        {FILTERS.map((filter) => (
+                            <button
+                                key={filter}
+                                onClick={() => setActiveFilter(filter)}
+                                className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition-all duration-200 ${activeFilter === filter
+                                        ? "bg-[#00E5FF] border-[#00E5FF] text-black shadow-lg shadow-[#00E5FF33]"
+                                        : "bg-transparent border-[#1e2530] text-[#4a5568] hover:text-white hover:border-[#00E5FF44]"
+                                    }`}
+                            >
+                                {filter}
+                            </button>
+                        ))}
                     </div>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
