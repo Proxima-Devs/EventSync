@@ -22,9 +22,31 @@ export default function HomePage() {
                     <span>✦</span> MadaTechEvent
                 </div>
                 <h1 className="text-5xl md:text-6xl font-black leading-tight mb-4">
-                    Synchronize Your
+                    <span
+                        className="inline-block"
+                        style={{ animation: "slideInLeft 0.6s ease forwards", opacity: 0 }}
+                    >
+                        Synchronize
+                    </span>{" "}
+                    <span
+                        className="inline-block"
+                        style={{ animation: "slideInLeft 0.6s ease 0.2s forwards", opacity: 0 }}
+                    >
+                        Your
+                    </span>
                     <br />
-                    <span className="text-[#00E5FF]">Event Experience</span>
+                    <span
+                        className="text-[#00E5FF] inline-block"
+                        style={{ animation: "blurIn 0.8s ease 0.4s forwards", opacity: 0 }}
+                    >
+                        Event
+                    </span>{" "}
+                    <span
+                        className="text-[#00E5FF] inline-block"
+                        style={{ animation: "blurIn 0.8s ease 0.6s forwards", opacity: 0 }}
+                    >
+                        Experience
+                    </span>
                 </h1>
                 <p className="text-[#4a5568] max-w-xl mx-auto text-base mb-10 leading-relaxed">
                     Discover the most exciting tech conferences, workshops, and meetups
@@ -63,8 +85,8 @@ export default function HomePage() {
                                 key={filter}
                                 onClick={() => setActiveFilter(filter)}
                                 className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition-all duration-200 ${activeFilter === filter
-                                        ? "bg-[#00E5FF] border-[#00E5FF] text-black shadow-lg shadow-[#00E5FF33]"
-                                        : "bg-transparent border-[#1e2530] text-[#4a5568] hover:text-white hover:border-[#00E5FF44]"
+                                    ? "bg-[#00E5FF] border-[#00E5FF] text-black shadow-lg shadow-[#00E5FF33]"
+                                    : "bg-transparent border-[#1e2530] text-[#4a5568] hover:text-white hover:border-[#00E5FF44]"
                                     }`}
                             >
                                 {filter}
