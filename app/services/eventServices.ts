@@ -9,8 +9,12 @@ type EventResponses = {
 }
 
 export const eventService = {
-    getAllEvents: async (): Promise<EventResponses> => {
-        const res = await fetch(`${BASE_URL}/api/events`);
+    getAllEvents: async (page: number = 1, perPage: number = 10): Promise<EventResponses> => {
+        const params = new URLSearchParams({
+            page: String(page),
+            perPage: String(perPage),
+        });
+        const res = await fetch(`${BASE_URL}/api/events?${params}`);
         if(!res.ok) throw new Error("fetching error");
         return res.json();
     },

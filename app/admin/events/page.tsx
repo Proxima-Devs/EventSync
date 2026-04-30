@@ -3,31 +3,11 @@
 import Navbar from "../../components/ui/NavBar"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faPlus } from "@fortawesome/free-solid-svg-icons"
-import {eventService} from "../../services/eventServices";
-import {useEffect, useMemo, useState} from "react";
-import {EventPayload} from "@/types";
 
+import {useEvent} from "../../hooks/useEvents";
 
 export default function EventManagment(){
-    const [events, setEvents] = useState<EventPayload[]>([]);
-    const [loading, setLoading ] = useState<boolean>(true);
-    const [search, setSearch ] = useState("");
-
-    useEffect(() => {
-        eventService.getAllEvents().then((res) => {
-            setEvents(res.data);
-
-        })
-            .finally(() => setLoading(false));
-    }, []);
-
-   const filtered = useMemo(() => {
-
-       const q = search.toLowerCase();
-       return events.filter((e) => e.title.toLowerCase().includes(q))
-   },[search, events]);
-
-
+    const { filtered, loading, search, setSearch, page, perPage, totalPage } = useEvent();
 
     return (
         <div className="flex flex-row bg-black text-gray-500 ">
@@ -95,6 +75,7 @@ export default function EventManagment(){
                         </div>
                     </div>
                 </div>
+
         </div>
     )
 
