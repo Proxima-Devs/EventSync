@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { apiFetch } from "@/lib/api";
 import EventSkeleton from "@/components/EventSkeleton";
 import EventCard from "@/components/EventCard";
+import { motion } from "framer-motion";
+import { Search } from "lucide-react";
 
 type Event = {
   id: string;
@@ -62,6 +64,26 @@ export default function HomePage() {
   return (
     <main className="flex-1 flex flex-col">
       <section className="relative flex flex-col items-center justify-center text-center px-6 pt-20 pb-16 overflow-hidden">
+        <div className="absolute inset-0 bg-linear-to-b from-[#00E5FF1A] via-transparent to-transparent pointer-events-none" />
+
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <motion.div
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.5, 0.3],
+            }}
+            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+            className="absolute -top-1/4 -left-1/4 w-1/2 h-1/2 bg-[#00E5FF33] blur-[120px] rounded-full"
+          />
+          <motion.div
+            animate={{
+              scale: [1, 1.3, 1],
+              opacity: [0.2, 0.4, 0.2],
+            }}
+            transition={{ duration: 10, repeat: Infinity, ease: "linear", delay: 1 }}
+            className="absolute -bottom-1/4 -right-1/4 w-1/2 h-1/2 bg-[#00232743] blur-[120px] rounded-full"
+          />
+        </div>
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-175 h-100 rounded-full bg-[#00E5FF08] blur-[120px]" />
         </div>
@@ -92,7 +114,7 @@ export default function HomePage() {
         </p>
 
         <div className="w-full max-w-xl flex rounded-full overflow-hidden border border-[#1e2530] bg-[#0d1117] shadow-xl shadow-[#00E5FF08]">
-          <span className="flex items-center pl-5 text-[#555]">🔍</span>
+          <span className="flex items-center pl-5"><Search /></span>
           <input
             type="text"
             placeholder="Search events by title or location..."
@@ -126,11 +148,10 @@ export default function HomePage() {
             <button
               key={filter}
               onClick={() => setActiveFilter(filter)}
-              className={`cursor-pointer px-4 py-1.5 rounded-full text-sm font-semibold border transition-all duration-200 ${
-                activeFilter === filter
+              className={`cursor-pointer px-4 py-1.5 rounded-full text-sm font-semibold border transition-all duration-200 ${activeFilter === filter
                   ? "bg-[#00E5FF] border-[#00E5FF] text-black shadow-lg shadow-[#00E5FF33]"
                   : "bg-transparent border-[#1e2530] text-[#4a5568] hover:text-white hover:border-[#00E5FF44]"
-              }`}
+                }`}
             >
               {filter}
             </button>
