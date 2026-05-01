@@ -3,9 +3,10 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { apiFetch } from "@/lib/api";
 import { useFavorites } from "@/hooks/useFavorites";
-import Image from "next/image";
+import QuestionSection from "@/components/QuestionSection";
 
 type Speaker = {
   id: string;
@@ -75,7 +76,7 @@ export default function SessionDetailPage() {
   return (
     <main className="flex-1 px-8 py-12 max-w-3xl mx-auto w-full">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-[#4a5568] mb-8">
+      <div className="flex items-center gap-2 text-sm text-[#4a5568] mb-8 flex-wrap">
         <Link href="/" className="hover:text-[#00E5FF] transition-colors">
           Accueil
         </Link>
@@ -94,12 +95,11 @@ export default function SessionDetailPage() {
           Sessions
         </Link>
         <span>/</span>
-        <span className="text-white truncate max-w-45">{session.title}</span>
+        <span className="text-white truncate max-w-[180px]">{session.title}</span>
       </div>
 
       {/* Header card */}
       <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-8 mb-6">
-        {/* Badges + favori */}
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-2 flex-wrap">
             {session.isLive && (
@@ -126,10 +126,8 @@ export default function SessionDetailPage() {
           </button>
         </div>
 
-        {/* Titre */}
         <h1 className="text-3xl font-black mb-4 leading-tight">{session.title}</h1>
 
-        {/* Méta */}
         <div className="flex flex-wrap gap-4 text-sm text-[#4a5568] mb-6">
           <span>
             🕐 {formatTime(session.startTime)} → {formatTime(session.endTime)}
@@ -139,7 +137,6 @@ export default function SessionDetailPage() {
           )}
         </div>
 
-        {/* Description */}
         {session.description && (
           <p className="text-[#6b7280] leading-relaxed">{session.description}</p>
         )}
@@ -147,7 +144,7 @@ export default function SessionDetailPage() {
 
       {/* Intervenants */}
       {session.speakers.length > 0 && (
-        <div>
+        <div className="mb-6">
           <h2 className="text-xl font-black mb-4">Intervenants</h2>
           <div className="grid gap-3 md:grid-cols-2">
             {session.speakers.map((speaker) => (
@@ -190,19 +187,8 @@ export default function SessionDetailPage() {
       )}
 
       {/* Q&A */}
-      <div className="mt-6 rounded-2xl border border-[#1e2530] bg-[#0d1117] p-6">
-        {session.isLive ? (
-          <div>
-            <h2 className="text-lg font-black mb-4">💬 Questions en direct</h2>
-            {/* Intègre ton composant QuestionSection ici */}
-            {/* <QuestionSection sessionId={session.id} /> */}
-            <p className="text-[#4a5568] text-sm">Section Q&A active.</p>
-          </div>
-        ) : (
-          <div className="text-center py-6 text-[#3a4550] italic text-sm">
-            💬 Les questions seront disponibles lorsque la session sera en cours.
-          </div>
-        )}
+      <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-6">
+        <QuestionSection sessionId={session.id} isLive={session.isLive} />
       </div>
     </main>
   );
