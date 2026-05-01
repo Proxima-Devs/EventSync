@@ -103,7 +103,7 @@ export default function HomePage() {
           />
           <button
             onClick={() => setSubmitted(search)}
-            className="px-6 py-4 bg-[#00E5FF] text-black font-bold text-sm hover:bg-[#00ffff] transition-colors"
+            className="cursor-pointer px-6 py-4 bg-[#00E5FF] text-black font-bold text-sm hover:bg-[#00ffff] transition-colors"
           >
             Search
           </button>
@@ -126,7 +126,7 @@ export default function HomePage() {
             <button
               key={filter}
               onClick={() => setActiveFilter(filter)}
-              className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition-all duration-200 ${
+              className={`cursor-pointer px-4 py-1.5 rounded-full text-sm font-semibold border transition-all duration-200 ${
                 activeFilter === filter
                   ? "bg-[#00E5FF] border-[#00E5FF] text-black shadow-lg shadow-[#00E5FF33]"
                   : "bg-transparent border-[#1e2530] text-[#4a5568] hover:text-white hover:border-[#00E5FF44]"

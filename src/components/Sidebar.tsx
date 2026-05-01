@@ -46,14 +46,14 @@ function DeleteConfirmDialog({
                     <button
                         onClick={onCancel}
                         disabled={loading}
-                        className="px-4 py-2 rounded-xl text-sm font-semibold text-[#777] hover:text-[#aaa] hover:bg-white/4 transition-colors disabled:opacity-50"
+                        className="cursor-pointer px-4 py-2 rounded-xl text-sm font-semibold text-[#777] hover:text-[#aaa] hover:bg-white/4 transition-colors disabled:opacity-50"
                     >
                         Annuler
                     </button>
                     <button
                         onClick={onConfirm}
                         disabled={loading}
-                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/15 border border-red-500/30 text-red-400 text-sm font-semibold hover:bg-red-500/25 transition-colors disabled:opacity-50"
+                        className="cursor-pointer flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/15 border border-red-500/30 text-red-400 text-sm font-semibold hover:bg-red-500/25 transition-colors disabled:opacity-50"
                     >
                         {loading ? (
                             <>
@@ -119,7 +119,7 @@ function SettingsModal({
 
                     <button
                         onClick={onClose}
-                        className="absolute top-4 right-4 z-10 w-7 h-7 flex items-center justify-center rounded-lg text-[#444] hover:text-[#aaa] hover:bg-white/5 transition-colors"
+                        className="cursor-pointer absolute top-4 right-4 z-10 w-7 h-7 flex items-center justify-center rounded-lg text-[#444] hover:text-[#aaa] hover:bg-white/5 transition-colors"
                     >
                         <X size={15} />
                     </button>
@@ -132,7 +132,7 @@ function SettingsModal({
                             <button
                                 key={t}
                                 onClick={() => setTab(t)}
-                                className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors duration-150
+                                className={`cursor-pointer w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors duration-150
                                     ${tab === t
                                         ? "bg-[#00E5FF14] text-[#00E5FF]"
                                         : "text-[#666] hover:text-[#aaa] hover:bg-white/4"
@@ -181,7 +181,7 @@ function SettingsModal({
                                                 setDeleteError(null);
                                                 setShowDeleteConfirm(true);
                                             }}
-                                            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/10 border border-red-500/25 text-red-400 text-sm font-semibold hover:bg-red-500/20 transition-colors shrink-0"
+                                            className="cursor-pointer flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/10 border border-red-500/25 text-red-400 text-sm font-semibold hover:bg-red-500/20 transition-colors shrink-0"
                                         >
                                             <Trash2 size={14} />
                                             Supprimer
@@ -216,7 +216,7 @@ function SettingsModal({
                                             <button
                                                 key={opt.value}
                                                 onClick={() => setTheme(opt.value)}
-                                                className={`py-2.5 rounded-xl border text-xs font-bold transition-all
+                                                className={`cursor-pointer py-2.5 rounded-xl border text-xs font-bold transition-all
                                                     ${theme === opt.value
                                                         ? "border-[#00E5FF44] bg-[#00E5FF12] text-[#00E5FF]"
                                                         : "border-[#1e2226] bg-[#111316] text-[#666] hover:text-[#aaa] hover:border-[#333]"
@@ -243,7 +243,7 @@ function SettingsModal({
                                             <button
                                                 key={opt.value}
                                                 onClick={() => setLang(opt.value)}
-                                                className={`py-2.5 rounded-xl border text-sm font-bold transition-all
+                                                className={`cursor-pointer py-2.5 rounded-xl border text-sm font-bold transition-all
                                                     ${lang === opt.value
                                                         ? "border-[#00E5FF44] bg-[#00E5FF12] text-[#00E5FF]"
                                                         : "border-[#1e2226] bg-[#111316] text-[#666] hover:text-[#aaa] hover:border-[#333]"
@@ -307,14 +307,14 @@ function UserPopup({
             <div className="p-1">
                 <button
                     onClick={onSettings}
-                    className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-[#aaa] hover:text-[#eee] hover:bg-white/4 transition-colors"
+                    className="cursor-pointer flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-[#aaa] hover:text-[#eee] hover:bg-white/4 transition-colors"
                 >
                     <Settings size={15} className="shrink-0" />
                     Paramètres
                 </button>
                 <button
                     onClick={onLogout}
-                    className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-[#aaa] hover:text-red-400 hover:bg-red-400/[0.07] transition-colors"
+                    className="cursor-pointer flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-[#aaa] hover:text-red-400 hover:bg-red-400/[0.07] transition-colors"
                 >
                     <LogOut size={15} className="shrink-0" />
                     Déconnexion
@@ -365,7 +365,7 @@ export default function Sidebar() {
                     <span
                         className={`
                             font-[Lavishly_Yours] text-3xl text-[#00E5FF] whitespace-nowrap
-                            overflow-hidden select-none
+                            select-none
                             transition-all duration-300 ease-in-out
                             ${expanded ? "max-w-40 opacity-100 mr-auto" : "max-w-0 opacity-0 mr-0"}
                         `}

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
+import { Inbox } from "lucide-react";
 
 export default function LoginPage() {
     const { data: session } = authClient.useSession();
@@ -109,7 +110,7 @@ export default function LoginPage() {
                                 {/* Google */}
                                 <button
                                     onClick={() => authClient.signIn.social({ provider: "google", callbackURL: "/admin/dashboard" })}
-                                    className="group relative w-full py-3.5 rounded-2xl bg-[#0d1117] border border-[#1e2530] text-white text-sm font-semibold hover:border-[#00E5FF44] hover:bg-[#0d1520] transition-all duration-300 flex items-center justify-center gap-3 overflow-hidden"
+                                    className="cursor-pointer group relative w-full py-3.5 rounded-2xl bg-[#0d1117] border border-[#1e2530] text-white text-sm font-semibold hover:border-[#00E5FF44] hover:bg-[#0d1520] transition-all duration-300 flex items-center justify-center gap-3 overflow-hidden"
                                 >
                                     <div className="absolute inset-0 bg-linear-to-r from-[#00E5FF08] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                                     <svg width="18" height="18" viewBox="0 0 24 24" className="relative z-10">
@@ -124,7 +125,7 @@ export default function LoginPage() {
                                 {/* GitHub */}
                                 <button
                                     onClick={() => authClient.signIn.social({ provider: "github", callbackURL: "/admin/dashboard" })}
-                                    className="group relative w-full py-3.5 rounded-2xl bg-[#0d1117] border border-[#1e2530] text-white text-sm font-semibold hover:border-[#00E5FF44] hover:bg-[#0d1520] transition-all duration-300 flex items-center justify-center gap-3 overflow-hidden"
+                                    className="cursor-pointer group relative w-full py-3.5 rounded-2xl bg-[#0d1117] border border-[#1e2530] text-white text-sm font-semibold hover:border-[#00E5FF44] hover:bg-[#0d1520] transition-all duration-300 flex items-center justify-center gap-3 overflow-hidden"
                                 >
                                     <div className="absolute inset-0 bg-linear-to-r from-[#00E5FF08] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="white" className="relative z-10">
@@ -141,7 +142,7 @@ export default function LoginPage() {
 
                                 <button
                                     onClick={() => setStep("email")}
-                                    className="group relative w-full py-3.5 rounded-2xl bg-[#00E5FF] text-black text-sm font-bold hover:bg-[#00ffff] transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-[#00E5FF33] hover:shadow-[#00E5FF55] hover:scale-[1.02]"
+                                    className="cursor-pointer group relative w-full py-3.5 rounded-2xl bg-[#00E5FF] text-black text-sm font-bold hover:bg-[#00ffff] transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-[#00E5FF33] hover:shadow-[#00E5FF55] hover:scale-[1.02]"
                                 >
                                     <span>✉</span>
                                     Continue with Email
@@ -152,7 +153,7 @@ export default function LoginPage() {
 
                         {/* ── Email / Magic Link step ── */}
                         {step === "email" && (
-                            <div className="flex flex-col gap-4 animate-in slide-in-from-right duration-300">
+                            <div className="cursor-pointer flex flex-col gap-4 animate-in slide-in-from-right duration-300">
                                 <button
                                     onClick={() => { setStep("oauth"); setSent(false); setError(""); setEmail(""); }}
                                     className="flex items-center gap-2 text-[#4a5568] hover:text-[#00E5FF] text-xs transition-colors w-fit"
@@ -162,7 +163,7 @@ export default function LoginPage() {
 
                                 {sent ? (
                                     <div className="flex flex-col items-center gap-3 py-4 text-center">
-                                        <span className="text-3xl">📬</span>
+                                        <Inbox className="text-[#00E5FF]"/>
                                         <p className="text-white text-sm font-semibold">Check your inbox</p>
                                         <p className="text-[#4a5568] text-xs leading-relaxed">
                                             We sent a magic link to <span className="text-[#00E5FF]">{email}</span>.
@@ -192,7 +193,7 @@ export default function LoginPage() {
                                         <button
                                             onClick={handleMagicLink}
                                             disabled={loading || !email}
-                                            className="w-full py-3.5 rounded-2xl bg-[#00E5FF] text-black font-bold text-sm hover:bg-[#00ffff] transition-all duration-300 shadow-lg shadow-[#00E5FF33] disabled:opacity-40 disabled:cursor-not-allowed hover:scale-[1.02] hover:shadow-[#00E5FF55]"
+                                            className="cursor-pointer w-full py-3.5 rounded-2xl bg-[#00E5FF] text-black font-bold text-sm hover:bg-[#00ffff] transition-all duration-300 shadow-lg shadow-[#00E5FF33] disabled:opacity-40 disabled:cursor-not-allowed hover:scale-[1.02] hover:shadow-[#00E5FF55]"
                                         >
                                             {loading ? (
                                                 <span className="flex items-center justify-center gap-2">
