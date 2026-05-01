@@ -27,5 +27,5 @@ export const useEvent = () => {
         return events.filter((e) => e.title.toLowerCase().includes(q))
     },[search, events]);
 
-    return {filtered, loading, search, setSearch, page, perPage, totalPage};
+    return {filtered, loading, search, setSearch, page, setPage, totalPage};
 }

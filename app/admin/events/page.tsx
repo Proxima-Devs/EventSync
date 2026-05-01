@@ -5,9 +5,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faPlus } from "@fortawesome/free-solid-svg-icons"
 
 import {useEvent} from "../../hooks/useEvents";
+import {Pagination} from "../../components/ui/Pagination";
 
 export default function EventManagment(){
-    const { filtered, loading, search, setSearch, page, perPage, totalPage } = useEvent();
+    const { filtered, loading, search, setSearch, page,setPage, totalPage } = useEvent();
 
     return (
         <div className="flex flex-row bg-black text-gray-500 ">
@@ -27,7 +28,7 @@ export default function EventManagment(){
                         </button>
                     </div>
                 </div>
-                <div className="border-t border-mist-800 flex h-98 items-center justify-center text-white">
+                <div className="border-t border-mist-800 flex h-98 items-center justify-center flex-col text-white">
                     <div className=" w-220 h-65 border-mist-800 bg-[#101010] border flex flex-col rounded-lg">
                         <div className=" h-15 flex items-center pl-5 ">
                             <input type="text"
@@ -61,7 +62,7 @@ export default function EventManagment(){
                                     ) : (
                                             filtered.map((event) => (
                                                 <tr key={event.id}>
-                                                    <td >{event.title}</td>
+                                                    <td className="p-3">{event.title}</td>
                                                     <td>{event.slug}</td>
                                                     <td>{event.startDate}</td>
                                                     <td>{event.location}</td>
@@ -72,6 +73,7 @@ export default function EventManagment(){
                                 }</tbody>
                             </table>
                           </div>
+                        <Pagination page={page} totalPages={totalPage} onPageChange={setPage}></Pagination>
                         </div>
                     </div>
                 </div>
