@@ -19,7 +19,7 @@ export const auth = betterAuth({
     },
   },
   plugins: [
-    admin({ defaultRole: "user" }),
+    admin({ defaultRole: "USER" }),
     magicLink({
       sendMagicLink: async ({ email, url }) => {
         await sendEmail({
@@ -63,8 +63,11 @@ export const auth = betterAuth({
     updateAge: 60 * 60 * 24,
   },
   user: {
+    deleteUser: {
+      enabled: true,
+    },
     additionalFields: {
-      role: { type: "string", defaultValue: "user" },
+      role: { type: "string", defaultValue: "USER" },
     },
   },
 });
