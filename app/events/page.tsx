@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { apiFetch } from "@/lib/api";
-import EventSkeleton from "../components/EventSkeleton";
-import EventCard from "../components/EventCard";
+import EventSkeleton from "@/components/EventSkeleton";
+import EventCard from "@/components/EventCard";
 
 type Event = {
   id: string;
