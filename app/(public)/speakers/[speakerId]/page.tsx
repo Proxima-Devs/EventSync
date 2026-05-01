@@ -106,6 +106,7 @@ export default function SpeakerPage() {
                             alt={speaker.fullName}
                             width={96}
                             height={96}
+                            unoptimized
                             className="w-24 h-24 rounded-full object-cover shrink-0 ring-2 ring-[#00E5FF33]"
                         />
                     ) : (

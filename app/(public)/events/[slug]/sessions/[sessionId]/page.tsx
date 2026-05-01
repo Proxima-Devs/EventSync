@@ -162,6 +162,7 @@ export default function SessionDetailPage() {
                     alt={speaker.fullName}
                     width={56}
                     height={56}
+                    unoptimized
                     className="rounded-full object-cover shrink-0 ring-2 ring-[#1e2530] group-hover:ring-[#00E5FF33] transition-all"
                   />
                 ) : (
