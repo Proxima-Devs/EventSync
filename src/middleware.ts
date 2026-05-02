@@ -8,7 +8,7 @@ export async function middleware(request: NextRequest) {
     const sessionCookie = getSessionCookie(request);
 
     if (!sessionCookie) {
-      const loginUrl = new URL("/api/auth/signin", request.url);
+      const loginUrl = new URL("/api/auth/login", request.url);
       loginUrl.searchParams.set("callbackUrl", pathname);
       return NextResponse.redirect(loginUrl);
     }
