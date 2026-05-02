@@ -1,7 +1,7 @@
 "use client"
 import Sidebar from "../../components/Sidebar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faPencil, faTrash } from "@fortawesome/free-solid-svg-icons";
 
 import {useEvent} from "../../hooks/useEvents";
 import {Pagination} from "../../components/ui/Pagination";
@@ -39,7 +39,7 @@ export default function EventManagment(){
                         </div >
                         <div className="overflow-x-auto rounded-xl border border-mist-700 shadow-sm">
                             <table className="w-full text-sm text-left">
-                                <thead className="bg-[#282828] text-gray-500 uppercase text-xs tracking-wider">
+                                <thead className="bg-[#282828] text-gray-500 uppercase text-xs tracking-wider w-full">
                                 <tr>
                                     <td className="px-6 py-3 font-semibold">Event name</td>
                                     <td className="px-6 py-3 font-semibold">Slug</td>
@@ -65,6 +65,10 @@ export default function EventManagment(){
                                                     <td>{event.slug}</td>
                                                     <td>{event.startDate}</td>
                                                     <td>{event.location}</td>
+                                                    <td className="flex gap-3">
+                                                        <button className="text-red-600 text-lg"><FontAwesomeIcon icon={faTrash}/></button>
+                                                        <button className="text-cyan-500 text-lg"><FontAwesomeIcon icon={faPencil}/></button>
+                                                    </td>
                                                 </tr>
                                             )
                                         )
