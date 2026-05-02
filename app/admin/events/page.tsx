@@ -1,8 +1,7 @@
 "use client"
-
-import Navbar from "../../components/ui/NavBar"
+import Sidebar from "../../components/Sidebar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faPlus } from "@fortawesome/free-solid-svg-icons"
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 import {useEvent} from "../../hooks/useEvents";
 import {Pagination} from "../../components/ui/Pagination";
@@ -13,10 +12,10 @@ export default function EventManagment(){
     return (
         <div className="flex flex-row bg-black text-gray-500 ">
             <div>
-                <Navbar/>
+                <Sidebar/>
             </div>
             <div className="w-full border-1 border-gray-800 ">
-                <div className="flex flex-row justify-between px-20 h-35 items-center ">
+                <div className="flex flex-row justify-between px-30 h-40 items-center ">
                     <div>
                         <h1 className="text-white text-5xl font-bold">Manage Events</h1>
                         <p>Add, edit, or remove events from platform</p>
@@ -24,7 +23,7 @@ export default function EventManagment(){
                     <div>
                         <button className="flex flex-row items-center bg-[#00E5FF] text-black font-bold w-40 h-8 justify-center gap-3 rounded-lg">
                             <FontAwesomeIcon icon={faPlus}/>
-                            <p>New Event</p> 
+                            <p>New Event</p>
                         </button>
                     </div>
                 </div>

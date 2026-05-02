@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import EventCard from "../../components/EventCard";
 import EventSkeleton from "../../components/EventSkeleton";
-import { getEvents } from "../../Lib/api";
+import { getEvents } from "../../Lib/api"
 
 type Event = {
     id: number;
