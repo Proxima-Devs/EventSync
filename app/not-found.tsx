@@ -1,19 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { Player } from "@lottiefiles/react-lottie-player";
+import dynamic from "next/dynamic";
+
+const Player = dynamic(
+  () => import("@lottiefiles/react-lottie-player").then((mod) => mod.Player),
+  { ssr: false }
+);
 
 export default function NotFound() {
   return (
     <main className="min-h-screen bg-[#030507] flex flex-col items-center justify-center px-4 relative overflow-hidden">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-[#00E5FF05] blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-125 h-125 rounded-full bg-[#00E5FF05] blur-[120px] pointer-events-none" />
 
-      <Player
-        autoplay
-        loop
-        src="/Error 404.json"
-        style={{ width: 320, height: 320 }}
-      />
+      <div style={{ width: 320, height: 320 }}>
+        <Player
+          autoplay
+          loop
+          src="/Error 404.json"
+          style={{ width: "100%", height: "100%" }}
+        />
+      </div>
 
       <h1 className="text-2xl font-black text-white mb-2">
         Page not found

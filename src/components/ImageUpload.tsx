@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { useRef, useState } from "react";
 
 interface Props {
@@ -38,10 +39,12 @@ export default function ImageUpload({ value, onChange }: Props) {
 
       {/* Prévisualisation */}
       {value && (
-        <img
+        <Image
           src={value}
           alt="Aperçu"
-          style={{ width: 80, height: 80, borderRadius: "50%", objectFit: "cover", border: "2px solid #e5e7eb" }}
+          width={80}
+          height={80}
+          style={{ borderRadius: "50%", objectFit: "cover", border: "2px solid #e5e7eb" }}
         />
       )}
 
