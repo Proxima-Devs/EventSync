@@ -35,6 +35,24 @@ export async function GET(request: NextRequest) {
   }
 }
 
+export async function DELETE(request: NextRequest) {
+  const guard = await requireAdmin();
+  if (guard) return guard;
+
+  try {
+    const { id } = await request.json();
+
+    await prisma.event.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("[DELETE /api/events]", error);
+    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
+  }
+}
+
 // ── POST /api/events
 // Admin — crée un événement
 export async function POST(request: NextRequest) {
