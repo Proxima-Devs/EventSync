@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import {NextRequest, NextResponse} from "next/server";
 import prisma from "@/lib/prisma";
 
 /**
@@ -40,5 +40,80 @@ export async function GET() {
   } catch (error) {
     console.error("[GET /api/sessions/live]", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+
+    const {
+      title,
+      startTime,
+      endTime,
+      eventId,
+      roomId,
+      speakerIds,
+    } = body;
+
+    // ── VALIDATION MINIMALE
+    if (!title || !startTime || !endTime || !eventId || !roomId) {
+      return NextResponse.json(
+          { error: "Champs manquants" },
+          { status: 400 }
+      );
+    }
+
+    if (new Date(startTime) >= new Date(endTime)) {
+      return NextResponse.json(
+          { error: "startTime doit être avant endTime" },
+          { status: 400 }
+      );
+    }
+
+    // ── CREATE SESSION
+    const session = await prisma.eventSession.create({
+      data: {
+        title,
+        startTime: new Date(startTime),
+        endTime: new Date(endTime),
+
+        event: {
+          connect: { id: eventId },
+        },
+
+        room: {
+          connect: { id: roomId },
+        },
+
+        // speakers relation (many-to-many)
+        speakers: speakerIds?.length
+            ? {
+              create: speakerIds.map((id: string) => ({
+                speaker: { connect: { id } },
+              })),
+            }
+            : undefined,
+      },
+
+      include: {
+        event: true,
+        room: true,
+        speakers: {
+          include: {
+            speaker: true,
+          },
+        },
+      },
+    });
+
+    return NextResponse.json(session, { status: 201 });
+  } catch (error) {
+    console.error("[POST /api/sessions]", error);
+
+    return NextResponse.json(
+        { error: "Erreur serveur" },
+        { status: 500 }
+    );
   }
 }
