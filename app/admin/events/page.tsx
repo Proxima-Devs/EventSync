@@ -5,6 +5,7 @@ import { faPlus, faPencil, faTrash } from "@fortawesome/free-solid-svg-icons";
 
 import {useEvent} from "../../hooks/useEvents";
 import {Pagination} from "../../components/ui/Pagination";
+import Link from "next/link";
 
 export default function EventManagment(){
     const { filtered, loading, search, setSearch, page,setPage, totalPage } = useEvent();
@@ -21,10 +22,13 @@ export default function EventManagment(){
                         <p>Add, edit, or remove events from platform</p>
                     </div>
                     <div>
-                        <button className="flex flex-row items-center bg-[#00E5FF] text-black font-bold w-40 h-8 justify-center gap-3 rounded-lg">
-                            <FontAwesomeIcon icon={faPlus}/>
-                            <p>New Event</p>
-                        </button>
+                        <Link href="/admin/events/new">
+                            <button className="flex flex-row items-center bg-[#00E5FF] text-black font-bold w-40 h-8 justify-center gap-3 rounded-lg">
+                                <FontAwesomeIcon icon={faPlus}/>
+                                <p>New Event</p>
+                            </button>
+                        </Link>
+
                     </div>
                 </div>
                 <div className="border-t border-mist-800 flex h-98 items-center justify-center flex-col text-white">
