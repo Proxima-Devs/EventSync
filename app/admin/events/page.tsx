@@ -1,5 +1,5 @@
 "use client"
-import Sidebar from "../../components/Sidebar";
+import Sidebar from "../../../src/components/Sidebar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faPlus, faPencil, faTrash } from "@fortawesome/free-solid-svg-icons";
 

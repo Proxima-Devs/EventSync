@@ -1,6 +1,6 @@
-import Sidebar from "../components/Sidebar";
-import Navbar from "../components/Sidebar";
-import Footer from "../components/Fotter";
+import Sidebar from "../../src/components/Sidebar";
+import Navbar from "../components/ui/NavBar";
+import Footer from "../../src/components/Footer";
 
 export default function MainLayout({
   children,
