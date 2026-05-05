@@ -2,54 +2,9 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-import {
-  Calendar,
-  Mic,
-  Building2,
-  MessageSquare,
-  Radio,
-  LayoutDashboard,
-  TrendingUp,
-  X,
-  Plus,
-  ArrowUpRight,
-  Clock,
-  Users,
-} from "lucide-react";
+import { Calendar, Mic, Building2, MessageSquare, Radio, LayoutDashboard, TrendingUp, X, Plus, ArrowUpRight, Clock, Users } from "lucide-react";
+import { EventPayload, Stats } from "@/types";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface Stats {
-  totals: {
-    events: number;
-    sessions: number;
-    speakers: number;
-    rooms: number;
-    questions: number;
-  };
-  live: { activeSessions: number };
-  upcoming: { events: number };
-  recentQuestions: {
-    id: string;
-    content: string;
-    upvotes: number;
-    session: {
-      title: string;
-      event: { title: string; slug: string };
-    };
-  }[];
-}
-
-interface EventPayload {
-  title: string;
-  description?: string;
-  startDate: string;
-  endDate: string;
-  location?: string;
-  coverImage?: string;
-}
-
-// ─── Skeleton ─────────────────────────────────────────────────────────────────
 
 function StatCardSkeleton() {
   return (
@@ -209,7 +164,7 @@ function CreateEventModal({
         style={{ animation: "slideUp 0.2s ease" }}
       >
         {/* Glow top */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#00E5FF40] to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-[#00E5FF40] to-transparent" />
 
         <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#1e2530]">
           <div>
@@ -523,7 +478,7 @@ export default function DashboardPage() {
           <div className="lg:col-span-2 flex flex-col gap-4">
             {/* Live Sessions */}
             <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-6 relative overflow-hidden">
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,#00E5FF06_0%,transparent_70%)]" />
+              <div className="pointer-events-none absolute inset-0 bg-[radial-linear(ellipse_at_bottom_right,#00E5FF06_0%,transparent_70%)]" />
               <div className="flex items-center gap-2 mb-4">
                 <Radio size={14} className="text-[#00E5FF]" />
                 <h2 className="text-sm font-black text-white tracking-tight">En direct</h2>
@@ -576,7 +531,7 @@ export default function DashboardPage() {
                 </div>
                 <div className="w-full h-1.5 rounded-full bg-[#1e2530] overflow-hidden">
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-[#00E5FF] to-[#0066ff] transition-all duration-700"
+                    className="h-full rounded-full bg-linear-to-r from-[#00E5FF] to-[#0066ff] transition-all duration-700"
                     style={{ width: stats ? `${Math.min(100, (stats.totals.questions / 200) * 100)}%` : "0%" }}
                   />
                 </div>
@@ -589,7 +544,7 @@ export default function DashboardPage() {
                 </div>
                 <div className="w-full h-1.5 rounded-full bg-[#1e2530] overflow-hidden">
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-[#00E5FF] to-[#0066ff] transition-all duration-700"
+                    className="h-full rounded-full bg-linear-to-r from-[#00E5FF] to-[#0066ff] transition-all duration-700"
                     style={{ width: stats ? `${Math.min(100, (stats.totals.sessions / 50) * 100)}%` : "0%" }}
                   />
                 </div>

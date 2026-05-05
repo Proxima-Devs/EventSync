@@ -51,3 +51,25 @@ export type PaginationMeta = {
   page: number;
   perPage: number;
 };
+
+
+export interface Stats {
+  totals: {
+    events: number;
+    sessions: number;
+    speakers: number;
+    rooms: number;
+    questions: number;
+  };
+  live: { activeSessions: number };
+  upcoming: { events: number };
+  recentQuestions: {
+    id: string;
+    content: string;
+    upvotes: number;
+    session: {
+      title: string;
+      event: { title: string; slug: string };
+    };
+  }[];
+}
