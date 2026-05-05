@@ -552,9 +552,9 @@ function EventRow({
           <ExternalLink size={13} />
         </Link>
         <Link
-          href={`/admin/events/${event.id}/edit`}
+          href={`/admin/events/${event.id}`}
           className="w-8 h-8 rounded-xl border border-[#1e2530] flex items-center justify-center text-[#3a4a5a] hover:text-white hover:border-[#2e3a4a] transition-all duration-200 group/btn"
-          title="Gérer les sessions"
+          title="Gérer l'événement et les sessions"
         >
           <ChevronRight size={14} className="group-hover/btn:translate-x-0.5 transition-transform" />
         </Link>
