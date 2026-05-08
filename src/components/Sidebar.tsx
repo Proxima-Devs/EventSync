@@ -8,14 +8,26 @@ import { authClient } from "@/lib/auth-client";
 import Image from "next/image";
 import Link from "next/link";
 
-const NAV = [
-    { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
-    { href: "/admin/speakers", icon: Users, label: "Speakers" },
-    { href: "/admin/events", icon: Calendar, label: "Events" },
-    { href: "/admin/rooms", icon: Building2, label: "Rooms" },
-    { href: "/favorites", icon: Heart, label: "Favorites" },
-    { href: "/", icon: Home, label: "Home" },
-];
+type NavItem = { href: string; icon: React.ElementType; label: string };
+
+function getNavItems(role?: string | null): NavItem[] {
+    if (role === "ADMIN") {
+        return [
+            { href: "/admin/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+            { href: "/", icon: Home, label: "Home" },
+            { href: "/favorites", icon: Heart, label: "Favorites" },
+            { href: "/admin/events", icon: Calendar, label: "Events" },
+            { href: "/admin/speakers", icon: Users, label: "Speakers" },
+            { href: "/admin/rooms", icon: Building2, label: "Rooms" },
+        ];
+    }
+    return [
+        { href: "/", icon: Calendar, label: "Events" },
+        { href: "/favorites", icon: Heart, label: "Favorites" },
+        { href: "/speakers", icon: Users, label: "Speakers" },
+    ];
+
+}
 
 function DeleteConfirmDialog({
     onConfirm,
@@ -335,6 +347,8 @@ export default function Sidebar() {
 
     const user = session?.user;
     const isLoggedIn = !!user;
+    const role = (user as { role?: string } | undefined)?.role ?? null;
+    const navItems = getNavItems(role);
 
     const initials = user?.name
         ? user.name
@@ -381,7 +395,7 @@ export default function Sidebar() {
                 </div>
 
                 <nav className="flex flex-col gap-0.5 flex-1 px-2 py-2 overflow-visible">
-                    {NAV.map((item) => {
+                    {navItems.map((item) => {
                         const active = pathname === item.href;
                         const Icon = item.icon;
                         return (

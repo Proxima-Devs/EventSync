@@ -1,20 +1,19 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 
 const STORAGE_KEY = "eventsync_favorites";
 
 export function useFavorites() {
-  const [favorites, setFavorites] = useState<string[]>([]);
-
-  useEffect(() => {
+  const [favorites, setFavorites] = useState<string[]>(() => {
+    if (typeof window === "undefined") return [];
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) setFavorites(JSON.parse(stored));
+      return stored ? JSON.parse(stored) : [];
     } catch {
-      // localStorage indisponible (SSR ou navigation privée)
+      return [];
     }
-  }, []);
+  });
 
   const toggle = useCallback((sessionId: string) => {
     setFavorites((prev) => {
