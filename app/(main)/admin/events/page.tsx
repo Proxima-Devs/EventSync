@@ -673,20 +673,20 @@ export default function AdminEventsPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-end gap-4 mb-8">
           <div className="flex-1">
-            <div className="flex items-center gap-3 mb-1">
-              <div className="w-8 h-8 rounded-xl bg-[#00E5FF15] border border-[#00E5FF30] flex items-center justify-center">
-                <Calendar size={16} className="text-[#00E5FF]" />
+  
+            <div >
+              <div className="flex flex-row gap-4 ">
+                <div className="w-8 h-8 rounded-xl mt-2  flex items-center justify-center">
+                  <Calendar size={30} className="text-[#00E5FF] " />
+                </div>
+                <h1 className="font-black text-5xl">Liste des evenements </h1>                
               </div>
-              <h1 className="text-3xl font-black text-white tracking-tight">
-                Événements
-                {!loading && events.length > 0 && (
-                  <span className="ml-3 text-base font-normal text-[#3a4a5a]">{events.length}</span>
-                )}
-              </h1>
-            </div>
-            <p className="text-sm text-[#4a5568] ml-11">
+
+              <p className="text-lg text-[#4a5568]">
               Gérez, modifiez et planifiez tous vos événements.
             </p>
+            </div>
+
           </div>
 
           <button
@@ -709,16 +709,22 @@ export default function AdminEventsPage() {
               </span>
             </div>
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#1e2530] bg-[#0d1117]">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#edce00]" />
               <span className="text-xs text-[#3a4a5a] font-semibold">
                 {upcomingCount} à venir
               </span>
             </div>
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#1e2530] bg-[#0d1117]">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#3a4a5a]" />
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
               <span className="text-xs text-[#3a4a5a] font-semibold">
-                {events.length - liveCount - upcomingCount} terminés
+                {events.length - liveCount - upcomingCount} tous
               </span>
+            </div>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#1e2530] bg-[#0d1117]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#3a4a5a]"/>
+                  <span className="text-xs text-[#3a4a5a] font-semibold">
+                      {events.length} total
+                  </span>
             </div>
 
             {/* Search */}
