@@ -113,7 +113,7 @@ export default function SessionsPage() {
                   </span>
                 )}
               </div>
-              <p className="font-bold">{session.title}</p>
+              <p className="font-bold ">{session.title}</p>
               {session.speakers.length > 0 && (
                 <p className="text-xs text-[#4a5568] mt-1">
                   {session.speakers.map((s) => s.fullName).join(", ")}

@@ -147,7 +147,7 @@ export default function QuestionSection({ sessionId, isLive }: Props) {
 
   return (
     <div>
-      <h2 className="text-lg font-black mb-5">
+      <h2 className="text-lg text-white font-black mb-5">
         💬 {isLive ? "Questions en direct" : "Questions"}
       </h2>
 
