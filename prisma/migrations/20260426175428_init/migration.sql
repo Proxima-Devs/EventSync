@@ -170,3 +170,4 @@ ALTER TABLE "session_speaker" ADD CONSTRAINT "session_speaker_speakerId_fkey" FO
 
 -- AddForeignKey
 ALTER TABLE "question" ADD CONSTRAINT "question_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "event_session"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
