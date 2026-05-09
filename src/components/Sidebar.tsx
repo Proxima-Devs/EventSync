@@ -435,7 +435,7 @@ export default function Sidebar() {
                             className="group relative flex items-center w-full rounded-xl px-2.5 py-2 gap-2.5 text-[#888] hover:text-[#ccc] hover:bg-white/4 transition-colors duration-200 cursor-pointer"
                         >
                             {user.image ? (
-                                <Image src={user.image} alt={user.name ?? "User"} width={32} height={32} unoptimized className="rounded-full object-cover shrink-0 ring-1 ring-white/10" />
+                                <Image src={user.image} alt={user.name} width={32} height={32} className="rounded-full object-cover shrink-0 ring-1 ring-white/10" />
                             ) : (
                                 <div className="w-8 h-8 rounded-full shrink-0 flex items-center justify-center bg-linear-to-br from-[#00E5FF] to-[#0066ff] text-black text-xs font-bold ring-1 ring-white/10">
                                     {initials}
