@@ -1,22 +1,16 @@
-import Sidebar from "../../src/components/Sidebar";
-import Navbar from "../components/ui/NavBar";
-import Footer from "../../src/components/Footer";
+import Footer from "@/components/Footer";
+import Sidebar from "@/components/Sidebar";
+import SidebarAwareMain from "@/components/sidebar-aware-main";
+import { SidebarProvider } from "@/components/sidebar-context";
 
-export default function MainLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-[#030507] text-white flex flex-col">
+    <SidebarProvider>
       <Sidebar />
-      <div className="ml-[60px] flex-1 flex flex-col pt-14">
-        <Navbar />
-        <div className="flex-1">
-          {children}
-        </div>
+      <SidebarAwareMain>
+        {children}
         <Footer />
-      </div>
-    </div>
+      </SidebarAwareMain>
+    </SidebarProvider>
   );
 }

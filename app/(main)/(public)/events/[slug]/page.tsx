@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faClock } from "@fortawesome/free-solid-svg-icons";
 
 type Speaker = { id: string; fullName: string; photo?: string | null };
 type Session = {
@@ -87,9 +89,13 @@ export default function EventDetailPage() {
           <Link
             key={session.id}
             href={`/events/${slug}/sessions/${session.id}`}
-            className="block rounded-2xl border border-[#1e2530] bg-[#0d1117] p-5 hover:border-[#00E5FF44] transition-colors"
+            className="block rounded-2xl border border-[#1e2530] bg-[#0d1117] p-5 hover:border-[#00E5FF44] transition-colors flex flex-row"
           >
-            <div className="flex items-center gap-2 mb-1">
+            <div className="w-12 h-12 border-1 bg-gray-900/[0.3] border-gray-800 rounded-xl mt-3 flex items-center justify-center">
+              <FontAwesomeIcon icon={faClock} className="text-lg text-gray-800"/>
+            </div>
+            <div className="px-5">
+                         <div className="flex items-center gap-2 mb-1">
               {session.isLive && (
                 <span className="text-xs bg-red-500 text-white px-2 py-0.5 rounded-full font-bold animate-pulse">
                   LIVE
@@ -112,12 +118,13 @@ export default function EventDetailPage() {
                 </span>
               )}
             </div>
-            <p className="font-bold">{session.title}</p>
+            <p className="font-bold text-white">{session.title}</p>
             {session.speakers.length > 0 && (
               <p className="text-xs text-[#4a5568] mt-1">
                 {session.speakers.map((s) => s.fullName).join(", ")}
               </p>
             )}
+            </div>
           </Link>
         ))}
       </div>
