@@ -1,3 +1,4 @@
+-- Active: 1775829249217@@127.0.0.1@5432@eventsync
 -- CreateEnum
 CREATE TYPE "Role" AS ENUM ('USER', 'ADMIN');
 
@@ -170,4 +171,3 @@ ALTER TABLE "session_speaker" ADD CONSTRAINT "session_speaker_speakerId_fkey" FO
 
 -- AddForeignKey
 ALTER TABLE "question" ADD CONSTRAINT "question_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "event_session"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-

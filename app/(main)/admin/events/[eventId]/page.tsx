@@ -1170,12 +1170,11 @@ export default function EventDetailPage() {
           <div className="lg:col-span-2">
             {/* Sessions header */}
             <div className="flex items-center justify-between mb-5">
-              <div className="flex items-center gap-2">
-                <Radio size={15} className="text-[#00E5FF]" />
-                <h2 className="text-lg font-black text-white tracking-tight">
+             <div className="flex items-center gap-2"> 
+                <Radio size={25} className="text-[#00E5FF]" />
+                <h2 className="text-3xl font-black tracking-tight">
                   Sessions
-                  <span className="ml-2 text-sm font-normal text-[#3a4a5a]">{event.sessions.length}</span>
-                </h2>
+               </h2>
               </div>
               <button
                 onClick={openCreateSession}
@@ -1204,7 +1203,6 @@ export default function EventDetailPage() {
               </div>
             )}
 
-            {/* Grid */}
 
           </div>
         </div>
