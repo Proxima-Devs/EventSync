@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
+import ToggleSwitch from "@/components/ToggleSwith";
 import Link from "next/link";
 import {
   Calendar,
@@ -910,6 +911,7 @@ export default function EventDetailPage() {
   const [allRooms, setAllRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
   const [pageError, setPageError] = useState("");
+  const [ isOn, setIsOn ] = useState(false);
 
   // Modals
   const [editEventOpen, setEditEventOpen] = useState(false);
@@ -1006,6 +1008,7 @@ export default function EventDetailPage() {
   }
 
   return (
+    
     <>
       <EditEventModal
         open={editEventOpen}
@@ -1037,15 +1040,16 @@ export default function EventDetailPage() {
           <ChevronRight size={13} />
           <span className="text-white truncate max-w-50">{event.title}</span>
         </div>
+        <ToggleSwitch isOn={isOn} setIsOn={setIsOn}/>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* ── Left: Event details ── */}
           <div className="lg:col-span-1 flex flex-col gap-4">
             {/* Event card */}
             <div
-              className="relative rounded-2xl border border-[#1e2530] bg-[#0d1117] mt-20 w-260 overflow-hidden"
+              className="relative rounded-2xl border border-[#1e2530] bg-[#0d1117] mt-20 w-100 overflow-hidden"
               style={{ boxShadow: "0 0 0 1px #00E5FF0a, 0 0 30px #07282c08" }}
-            >
+            > 
               {/* Cover image */}
               {event.coverImage ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -1072,6 +1076,7 @@ export default function EventDetailPage() {
                 {event.description && (
                   <p className="text-sm text-[#4a5568] leading-relaxed mb-4">{event.description}</p>
                 )}
+
 
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2 text-xs text-[#3a4a5a]">
@@ -1112,6 +1117,18 @@ export default function EventDetailPage() {
                 </div>
               </div>
             </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 w-300 h-60 gap-4">
+              <AnimatePresence initial={false}>
+                {sortedSessions.map((session) => (
+                  <SessionCard
+                    key={session.id}
+                    session={session}
+                    onEdit={openEditSession}
+                    onDelete={(s) => setDeletingSession(s)}
+                  />
+                ))}
+              </AnimatePresence>
+            </div>
             <div className="flex flex-row w-400 gap-3"> 
               <div className=" w-100 flex grid">
                 <div className="grid grid-cols-2 gap-3">
@@ -1149,18 +1166,6 @@ export default function EventDetailPage() {
             </div>
               </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 w-300 h-60 gap-4">
-              <AnimatePresence initial={false}>
-                {sortedSessions.map((session) => (
-                  <SessionCard
-                    key={session.id}
-                    session={session}
-                    onEdit={openEditSession}
-                    onDelete={(s) => setDeletingSession(s)}
-                  />
-                ))}
-              </AnimatePresence>
-            </div>
             </div>
               </div>          
  
