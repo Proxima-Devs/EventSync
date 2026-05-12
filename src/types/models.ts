@@ -71,6 +71,13 @@ export interface SessionSpeaker {
   speaker:   Speaker
 }
 
+export interface QuestionReply {
+  id:         string
+  content:    string
+  authorName: string | null
+  createdAt:  string
+}
+
 export interface Question {
   id:         string
   content:    string
@@ -79,4 +86,5 @@ export interface Question {
   isHidden:   boolean
   sessionId:  string
   createdAt:  string
+  replies:    QuestionReply[]
 }

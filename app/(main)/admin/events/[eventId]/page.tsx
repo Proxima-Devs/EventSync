@@ -185,25 +185,25 @@ function SessionModal({
   const [form, setForm] = useState<SessionFormData>(EMPTY_SESSION);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [prevOpen, setPrevOpen] = useState(open);
+  const [prevEditingSession, setPrevEditingSession] = useState(editingSession);
 
-  useEffect(() => {
+  if (open !== prevOpen || editingSession !== prevEditingSession) {
+    setPrevOpen(open);
+    setPrevEditingSession(editingSession);
     if (open) {
-      if (editingSession) {
-        setForm({
-          title: editingSession.title,
-          description: editingSession.description ?? "",
-          startTime: toDatetimeLocal(editingSession.startTime),
-          endTime: toDatetimeLocal(editingSession.endTime),
-          capacity: editingSession.capacity?.toString() ?? "",
-          roomId: editingSession.room?.id ?? "",
-          speakerIds: editingSession.speakers.map((s) => s.id),
-        });
-      } else {
-        setForm(EMPTY_SESSION);
-      }
+      setForm(editingSession ? {
+        title: editingSession.title,
+        description: editingSession.description ?? "",
+        startTime: toDatetimeLocal(editingSession.startTime),
+        endTime: toDatetimeLocal(editingSession.endTime),
+        capacity: editingSession.capacity?.toString() ?? "",
+        roomId: editingSession.room?.id ?? "",
+        speakerIds: editingSession.speakers.map((s) => s.id),
+      } : EMPTY_SESSION);
       setError("");
     }
-  }, [open, editingSession]);
+  }
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -418,11 +418,10 @@ function SessionModal({
                             key={sp.id}
                             type="button"
                             onClick={() => toggleSpeaker(sp.id)}
-                            className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-all duration-150 ${
-                              checked
-                                ? "bg-[#00E5FF08] hover:bg-[#00E5FF10]"
-                                : "hover:bg-[#ffffff04]"
-                            }`}
+                            className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-all duration-150 ${checked
+                              ? "bg-[#00E5FF08] hover:bg-[#00E5FF10]"
+                              : "hover:bg-[#ffffff04]"
+                              }`}
                           >
                             {/* Avatar */}
                             <div className="w-7 h-7 rounded-full bg-[#1e2530] border border-[#2a3a4a] flex items-center justify-center text-[10px] font-black text-[#3a4a5a] shrink-0 overflow-hidden">
@@ -434,9 +433,8 @@ function SessionModal({
                               )}
                             </div>
                             <span
-                              className={`flex-1 text-sm font-semibold transition-colors ${
-                                checked ? "text-white" : "text-[#4a5568]"
-                              }`}
+                              className={`flex-1 text-sm font-semibold transition-colors ${checked ? "text-white" : "text-[#4a5568]"
+                                }`}
                             >
                               {sp.fullName}
                             </span>
@@ -626,7 +624,12 @@ function EditEventModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
+  const [prevOpen, setPrevOpen] = useState(open);
+  const [prevEvent, setPrevEvent] = useState(event);
+
+  if (open !== prevOpen || event !== prevEvent) {
+    setPrevOpen(open);
+    setPrevEvent(event);
     if (open) {
       setForm({
         title: event.title,
@@ -638,7 +641,7 @@ function EditEventModal({
       });
       setError("");
     }
-  }, [open, event]);
+  }
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -846,9 +849,9 @@ function SessionCard({
           </span>
         )}
 
-        {session._count.questions > 0 && (
+        {(session._count?.questions ?? 0) > 0 && (
           <span className="inline-flex items-center gap-1 text-[10px] px-2 py-1 rounded-full border border-[#00E5FF20] bg-[#00E5FF08] text-[#00E5FF] font-semibold">
-            💬 {session._count.questions} question{session._count.questions !== 1 ? "s" : ""}
+            💬 {session._count?.questions ?? 0} question{(session._count?.questions ?? 0) !== 1 ? "s" : ""}
           </span>
         )}
       </div>
@@ -941,7 +944,9 @@ export default function EventDetailPage() {
   }, [eventId]);
 
   useEffect(() => {
-    load();
+    (async () => {
+      await load();
+    })();
   }, [load]);
 
   const openCreateSession = () => {
@@ -1112,59 +1117,59 @@ export default function EventDetailPage() {
                 </div>
               </div>
             </div>
-            <div className="flex flex-row w-400 gap-3"> 
-              <div className=" w-100 flex grid">
+            <div className="flex flex-row w-400 gap-3">
+              <div className=" w-100  grid">
                 <div className="grid grid-cols-2 gap-3">
                   <div className=" flex gap-3 flex-col">
-                  <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-4 text-center">
-                    <div className="text-2xl font-black text-[#00E5FF]">{event.sessions.length}</div>
-                  <div className="text-[10px] text-[#3a4a5a] font-semibold uppercase tracking-widest mt-0.5">Sessions
+                    <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-4 text-center">
+                      <div className="text-2xl font-black text-[#00E5FF]">{event.sessions.length}</div>
+                      <div className="text-[10px] text-[#3a4a5a] font-semibold uppercase tracking-widest mt-0.5">Sessions
+                      </div>
+                    </div>
+                    <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-4 text-center">
+                      <div className="text-2xl font-black text-white">
+                        {event.sessions.filter((s) => s.isLive).length}
+                      </div>
+                      <div className="text-[10px] text-[#3a4a5a] font-semibold uppercase tracking-widest mt-0.5 flex items-center justify-center gap-1">
+                        {event.sessions.some((s) => s.isLive) && (
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#00E5FF] animate-pulse" />
+                        )}
+                        Live
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-4 text-center">
-                  <div className="text-2xl font-black text-white">
-                    {event.sessions.filter((s) => s.isLive).length}
-                  </div>
-                  <div className="text-[10px] text-[#3a4a5a] font-semibold uppercase tracking-widest mt-0.5 flex items-center justify-center gap-1">
-                  {event.sessions.some((s) => s.isLive) && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#00E5FF] animate-pulse" />
-                  )}
-                  Live
+                  <div className="flex flex-col gap-3">
+                    <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-4 text-center">
+                      <div className="text-2xl font-black text-white">
+                        {[...new Set(event.sessions.flatMap((s) => s.speakers.map((sp) => sp.id)))].length}
+                      </div>
+                      <div className="text-[10px] text-[#3a4a5a] font-semibold uppercase tracking-widest mt-0.5">Speakers</div>
+                    </div>
+                    <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-4 text-center">
+                      <div className="text-2xl font-black text-white">
+                        {event.sessions.reduce((sum, s) => sum + (s._count?.questions ?? 0), 0)}
+                      </div>
+                      <div className="text-[10px] text-[#3a4a5a] font-semibold uppercase tracking-widest mt-0.5">Questions</div>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div className="flex flex-col gap-3">
-                <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-4 text-center">
-                <div className="text-2xl font-black text-white">
-                  {[...new Set(event.sessions.flatMap((s) => s.speakers.map((sp) => sp.id)))].length}
-                </div>
-                <div className="text-[10px] text-[#3a4a5a] font-semibold uppercase tracking-widest mt-0.5">Speakers</div>
-              </div>
-              <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-4 text-center">
-                <div className="text-2xl font-black text-white">
-                  {event.sessions.reduce((sum, s) => sum + s._count.questions, 0)}
-                </div>
-                <div className="text-[10px] text-[#3a4a5a] font-semibold uppercase tracking-widest mt-0.5">Questions</div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 w-300 h-60 gap-4">
+                <AnimatePresence initial={false}>
+                  {sortedSessions.map((session) => (
+                    <SessionCard
+                      key={session.id}
+                      session={session}
+                      onEdit={openEditSession}
+                      onDelete={(s) => setDeletingSession(s)}
+                    />
+                  ))}
+                </AnimatePresence>
               </div>
             </div>
-              </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 w-300 h-60 gap-4">
-              <AnimatePresence initial={false}>
-                {sortedSessions.map((session) => (
-                  <SessionCard
-                    key={session.id}
-                    session={session}
-                    onEdit={openEditSession}
-                    onDelete={(s) => setDeletingSession(s)}
-                  />
-                ))}
-              </AnimatePresence>
-            </div>
-            </div>
-              </div>          
- 
- 
+
+
 
           {/* ── Right: Sessions ── */}
           <div className="lg:col-span-2">

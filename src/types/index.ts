@@ -41,6 +41,11 @@ export interface QuestionPayload {
   authorName?: string;
 }
 
+export interface CommentPayload {
+  content: string;
+  authorName?: string;
+}
+
 export type ApiError = {
   error: string;
   details?: unknown;
