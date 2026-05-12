@@ -62,7 +62,12 @@ export default function HomePage() {
   });
 
   return (
-    <main className="flex-1 flex flex-col">
+    <motion.main
+      className="flex-1 flex flex-col"
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+    >
       <section className="relative flex flex-col items-center justify-center text-center px-6 pt-20 pb-16 overflow-hidden">
         <div className="absolute inset-0 bg-linear-to-b from-[#00E5FF1A] via-transparent to-transparent pointer-events-none" />
 
@@ -173,13 +178,13 @@ export default function HomePage() {
             No events found.
           </div>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {filtered.map((event) => (
               <EventCard key={event.id} event={event} />
             ))}
           </div>
         )}
       </section>
-    </main>
+    </motion.main>
   );
 }
