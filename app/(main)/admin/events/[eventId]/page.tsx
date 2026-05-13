@@ -24,6 +24,7 @@ import {
   CheckSquare,
   Square,
 } from "lucide-react";
+import SessionCardSchedule from "@/components/SessionSchedule";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -500,9 +501,7 @@ function SessionModal({
     </AnimatePresence>
   );
 }
-
 // ─── Delete Session Modal ─────────────────────────────────────────────────────
-
 function DeleteSessionModal({
   session,
   onClose,
@@ -971,8 +970,6 @@ export default function EventDetailPage() {
   return (
     
     <>
-
-
       <main className="flex-1 px-8 py-12 max-w-6xl mx-auto w-full">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-[#4a5568] mb-8 flex-wrap">
@@ -983,7 +980,7 @@ export default function EventDetailPage() {
           <span className="text-white truncate max-w-50">{event.title}</span>
         </div>
         <ToggleSwitch isOn={isOn} setIsOn={setIsOn}/>
-        {isOn? <></> : <ListEventBySessionsPage/> }
+        {isOn? <PlanningPage/> : <ListEventBySessionsPage/> }
 
       </main>
     </>
@@ -1115,7 +1112,6 @@ export default function EventDetailPage() {
         onDeleted={handleSessionDeleted}
       />
 
-
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* ── Left: Event details ── */}
           <div className="lg:col-span-1 flex flex-col gap-4">
@@ -1146,11 +1142,9 @@ export default function EventDetailPage() {
                   {event.title}
                 </h1>
                 <p className="text-xs font-mono text-[#2a3a4a] mb-3">{event.slug}</p>
-
                 {event.description && (
                   <p className="text-sm text-[#4a5568] leading-relaxed mb-4">{event.description}</p>
                 )}
-
 
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2 text-xs text-[#3a4a5a]">
@@ -1242,9 +1236,6 @@ export default function EventDetailPage() {
           </div>
             </div>
               </div>          
- 
- 
-
           {/* ── Right: Sessions ── */}
           <div className="lg:col-span-2">
             {/* Sessions header */}
@@ -1281,17 +1272,16 @@ export default function EventDetailPage() {
                 </button>
               </div>
             )}
-
-
           </div>
         </div>
-
       </div>
-      
+  )}
 
+  function PlanningPage(){
+    const { eventId } = useParams<{ eventId: string }>();
 
+    return(
+      <SessionCardSchedule eventId={eventId}/>
     )
-
-
   }
 }
