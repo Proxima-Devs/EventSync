@@ -1280,7 +1280,7 @@ export default function EventDetailPage() {
   function PlanningPage(){
     const { eventId } = useParams<{ eventId: string }>();
 
-    return(
+    return(    
       <SessionCardSchedule eventId={eventId}/>
     )
   }
