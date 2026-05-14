@@ -1,6 +1,3 @@
-
-import { useEffect, useState } from "react";
-
 interface Speaker {
   id: string;
   fullName: string;
@@ -27,35 +24,18 @@ interface Session {
 
 
 
-export default function SessionCardSchedule({ eventId }: { eventId: string }){
-    const [ session, setSession ] = useState<Session[] | []>([]);
-    const [ loading, setLoading ] = useState(true);
-    const [ error, setError ] = useState<string | null>(null);
+export default function SessionCardSchedule(
+  { session,
+    selectedRoom } : {
+    session: Session[],
+     selectedRoom: string | null
+}){
 
-    useEffect(() => {
+  const timeSlots = [...new Set(
+  session.map(s => s.startTime.substring(11, 16))
+)].sort();
 
-      const fetchSession = async () => {
-        try{
-          const response = await fetch(`/api/events/${eventId}/sessions`);
-          if(!response.ok) throw new Error("Internal Servor Error");
-          const data = await response.json(); 
-          
-          setSession(data);
-
-        }catch(err){
-          setError("Session charge failed");
-
-        }finally{
-          setLoading(false);
-        }
-      }
-      fetchSession()
-
-    }, [eventId]);
-
-    const timeSlots = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "17:00", "18:00"];
-
- const getSessionAtTime = (time: string, roomName: string) => {
+  const getSessionAtTime = (time: string, roomName: string) => {
   return session.find(session => {
     let sessionStart = "";
     if (session.startTime.includes('T')) {
@@ -73,17 +53,17 @@ export default function SessionCardSchedule({ eventId }: { eventId: string }){
 };
 
     const rooms = [...new Set(session.map(s => s.room?.name).filter(Boolean) as string[])];
-    if(loading) return <div>Chargement de l'emploi du temps</div>
-    if(error) return <div>{error}</div>
+    const filterRooms = selectedRoom ? rooms.filter(r => r === selectedRoom) : rooms;
+
     if (!session.length) return <div>Session not found</div>
 
     return (
-      <div className="mt-10 bg-gray-100">
+  
         <table>
           <thead >
             <tr >
               <th className="text-grey-700 px-10 text-lg font-extralight">Heure</th>
-              {rooms.map(room => (
+              {filterRooms.map(room => (
               <th className="bg-gray-200 px-10 py-3 text-lg w-300 font-extralight border-5 border-gray-100 mx-3 rounded-2xl " key={room}>
                 {room}</th>
           ))}
@@ -94,7 +74,7 @@ export default function SessionCardSchedule({ eventId }: { eventId: string }){
             timeSlots.map(time => (
               <tr key={time} className=" py-6">
                 <td className="font-medium h-30 text-center">{time}</td>
-                {rooms.map((roomName, i) => {
+                {filterRooms.map((roomName, i) => {
 
                   const sessionTime = getSessionAtTime(time, roomName)
                
@@ -105,11 +85,12 @@ export default function SessionCardSchedule({ eventId }: { eventId: string }){
                           <h1 className="font-bold">{sessionTime.title}</h1>
                           <p className="text-sm ">{sessionTime.startTime.substring(11,16)}-{sessionTime.endTime.substring(11,16)}</p>
                           <p className="text-[12px] font-bold text-blue-700">{sessionTime.speakers.map(s => s.fullName).join(", ")}</p>
-
                         </div>
-
                       ):
-                      (<div></div>)}</td>
+                      (<div>
+
+                      </div>
+                      )}</td>
                   );
                 })
                 }
@@ -119,8 +100,6 @@ export default function SessionCardSchedule({ eventId }: { eventId: string }){
           </tbody>
 
         </table>
-
-      </div>
     )
 }
 

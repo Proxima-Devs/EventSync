@@ -1279,9 +1279,63 @@ export default function EventDetailPage() {
 
   function PlanningPage(){
     const { eventId } = useParams<{ eventId: string }>();
+    const [ session, setSession ] = useState<Session[] | []>([]);
+    const [ loading, setLoading ] = useState(true);
+    const [ error, setError ] = useState<string | null>(null);
+    const [ selectedRoom, setSelectedRoom ] = useState<string | null>(null)
+
+
+    useEffect(() => {
+      const fetchSession = async () => {
+        try{
+          const response = await fetch(`/api/events/${eventId}/sessions`);
+          if(!response.ok) throw new Error("Internal Servor Error");
+          const data = await response.json(); 
+          
+          setSession(data);
+          console.log(data);
+          
+
+        }catch(err){
+          setError("Session charge failed");
+
+        }finally{
+          setLoading(false);
+        }
+      }
+      fetchSession()
+
+    }, [eventId]);
+
+    const rooms = [...new Set(session.flatMap(s => s.room ? [s.room.name] : []))]
+
+    if(loading) return <div>Chargement de l'emploi du temps</div>
+    if(error) return <div>{error}</div>
+    if(!rooms) return <div></div>
 
     return(    
-      <SessionCardSchedule eventId={eventId}/>
+      <div className="mt-3 rounded-lg bg-gray-100">
+        <div className="flex flex-row justify-between p-5">
+          <div></div>
+          <div className="flex gap-3">
+            <button className="bg-blue-700 h-13 rounded-xl text-white font-bold w-35" onClick={() => setSelectedRoom(null)}>Toutes les salles</button>
+            {
+              rooms.map(r => (
+                <button 
+                className="w-35 rounded-xl border-gray-300 border-1 h-13 font-bold " 
+                key={r}
+                onClick={() => setSelectedRoom(r)}
+                >
+                  {r}
+                  </button>
+              ))
+            }
+          </div>
+
+        </div>
+        <SessionCardSchedule session={session} selectedRoom={selectedRoom}/>
+      </div>
+
     )
   }
 }
