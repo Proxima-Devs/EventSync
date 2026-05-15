@@ -187,25 +187,25 @@ function SessionModal({
   const [form, setForm] = useState<SessionFormData>(EMPTY_SESSION);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [prevOpen, setPrevOpen] = useState(open);
+  const [prevEditingSession, setPrevEditingSession] = useState(editingSession);
 
-  useEffect(() => {
+  if (open !== prevOpen || editingSession !== prevEditingSession) {
+    setPrevOpen(open);
+    setPrevEditingSession(editingSession);
     if (open) {
-      if (editingSession) {
-        setForm({
-          title: editingSession.title,
-          description: editingSession.description ?? "",
-          startTime: toDatetimeLocal(editingSession.startTime),
-          endTime: toDatetimeLocal(editingSession.endTime),
-          capacity: editingSession.capacity?.toString() ?? "",
-          roomId: editingSession.room?.id ?? "",
-          speakerIds: editingSession.speakers.map((s) => s.id),
-        });
-      } else {
-        setForm(EMPTY_SESSION);
-      }
+      setForm(editingSession ? {
+        title: editingSession.title,
+        description: editingSession.description ?? "",
+        startTime: toDatetimeLocal(editingSession.startTime),
+        endTime: toDatetimeLocal(editingSession.endTime),
+        capacity: editingSession.capacity?.toString() ?? "",
+        roomId: editingSession.room?.id ?? "",
+        speakerIds: editingSession.speakers.map((s) => s.id),
+      } : EMPTY_SESSION);
       setError("");
     }
-  }, [open, editingSession]);
+  }
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -420,11 +420,10 @@ function SessionModal({
                             key={sp.id}
                             type="button"
                             onClick={() => toggleSpeaker(sp.id)}
-                            className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-all duration-150 ${
-                              checked
-                                ? "bg-[#00E5FF08] hover:bg-[#00E5FF10]"
-                                : "hover:bg-[#ffffff04]"
-                            }`}
+                            className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-all duration-150 ${checked
+                              ? "bg-[#00E5FF08] hover:bg-[#00E5FF10]"
+                              : "hover:bg-[#ffffff04]"
+                              }`}
                           >
                             {/* Avatar */}
                             <div className="w-7 h-7 rounded-full bg-[#1e2530] border border-[#2a3a4a] flex items-center justify-center text-[10px] font-black text-[#3a4a5a] shrink-0 overflow-hidden">
@@ -436,9 +435,8 @@ function SessionModal({
                               )}
                             </div>
                             <span
-                              className={`flex-1 text-sm font-semibold transition-colors ${
-                                checked ? "text-white" : "text-[#4a5568]"
-                              }`}
+                              className={`flex-1 text-sm font-semibold transition-colors ${checked ? "text-white" : "text-[#4a5568]"
+                                }`}
                             >
                               {sp.fullName}
                             </span>
@@ -626,7 +624,12 @@ function EditEventModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
+  const [prevOpen, setPrevOpen] = useState(open);
+  const [prevEvent, setPrevEvent] = useState(event);
+
+  if (open !== prevOpen || event !== prevEvent) {
+    setPrevOpen(open);
+    setPrevEvent(event);
     if (open) {
       setForm({
         title: event.title,
@@ -638,7 +641,7 @@ function EditEventModal({
       });
       setError("");
     }
-  }, [open, event]);
+  }
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -846,9 +849,9 @@ function SessionCard({
           </span>
         )}
 
-        {session._count.questions > 0 && (
+        {(session._count?.questions ?? 0) > 0 && (
           <span className="inline-flex items-center gap-1 text-[10px] px-2 py-1 rounded-full border border-[#00E5FF20] bg-[#00E5FF08] text-[#00E5FF] font-semibold">
-            💬 {session._count.questions} question{session._count.questions !== 1 ? "s" : ""}
+            💬 {session._count?.questions ?? 0} question{(session._count?.questions ?? 0) !== 1 ? "s" : ""}
           </span>
         )}
       </div>
@@ -1025,7 +1028,9 @@ export default function EventDetailPage() {
   }, [eventId]);
 
   useEffect(() => {
-    load();
+    (async () => {
+      await load();
+    })();
   }, [load]);
 
   const openCreateSession = () => {

@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { isSessionLive } from "@/lib/auth-utils";
+import { getSession, isSessionLive } from "@/lib/auth-utils";
 import type { QuestionPayload } from "@/types";
 
 type Params = { params: Promise<{ sessionId: string }> };
 
-// ── GET /api/sessions/[sessionId]/questions 
-// Public — liste des questions triées par upvotes desc
-// Paramètre: ?includeHidden=true (admin uniquement, à sécuriser côté client)
 export async function GET(request: NextRequest, { params }: Params) {
   try {
     const { sessionId } = await params;
@@ -20,10 +17,27 @@ export async function GET(request: NextRequest, { params }: Params) {
       return NextResponse.json({ error: "Session introuvable" }, { status: 404 });
     }
 
+    const currentSession = await getSession();
+    const userUpvotedQuestionIds = currentSession
+      ? (await prisma.questionUpvote.findMany({
+          where: {
+            userId: currentSession.user.id,
+            question: { sessionId },
+          },
+          select: { questionId: true },
+        })).map((item) => item.questionId)
+      : [];
+
     const questions = await prisma.question.findMany({
       where: {
         sessionId,
-        isHidden: false, // on ne montre pas les questions masquées en public
+        isHidden: false,
+      },
+      include: {
+        replies: {
+          orderBy: { createdAt: "asc" },
+          select: { id: true, content: true, authorName: true, createdAt: true },
+        },
       },
       orderBy: [
         { upvotes: "desc" },
@@ -34,6 +48,7 @@ export async function GET(request: NextRequest, { params }: Params) {
     return NextResponse.json({
       isLive: isSessionLive(session.startTime, session.endTime),
       questions,
+      upvotedQuestionIds: userUpvotedQuestionIds,
     });
   } catch (error) {
     console.error("[GET /api/sessions/[sessionId]/questions]", error);
