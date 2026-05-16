@@ -102,12 +102,12 @@ export default function EventCard({ event, index = 0 }: { event: Event; index?: 
               {event.description ?? "Aucune description disponible."}
             </p>
 
-            <div className="mt-4 pt-3 border-t border-[#1a2030] flex items-center justify-between text-lg text-[#3a4550]">
-              <span className="flex items-center gap-1.5">
+            <div className="mt-4 pt-3 border-t border-[#1a2030] flex flex-col gap-2 text-lg text-[#3a4550]">
+              <span className="flex items-center gap-2">
                 <MapPin size={11} className="text-[#00E5FF66]" />
-                <span className="truncate max-w-30">{event.location ?? "Lieu non précisé"}</span>
+                <span className="line-clamp-1">{event.location ?? "Lieu non précisé"}</span>
               </span>
-              <span className="flex items-center gap-1.5 shrink-0">
+              <span className="flex items-center gap-2 shrink-0">
                 <Calendar size={11} className="text-[#00E5FF66]" />
                 {isMultiDay
                   ? `${formatDate(event.startDate)} → ${formatDate(event.endDate)}`
