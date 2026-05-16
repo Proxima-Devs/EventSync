@@ -3,7 +3,12 @@
 import { useEffect, useState, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
-import { Calendar, MapPin, Layers, Pencil, Trash2, Plus, X, ExternalLink, CalendarDays, Search, AlertTriangle, ChevronRight } from "lucide-react";
+import Image from "next/image";
+import {
+  Calendar, MapPin, Layers, Pencil, Trash2, Plus, X,
+  ExternalLink, Search, AlertTriangle,
+  ChevronRight, Settings2,
+} from "lucide-react";
 
 // ─── Types ───
 
@@ -60,38 +65,54 @@ function isOngoing(start: string, end: string) {
   return new Date(start) <= now && new Date(end) >= now;
 }
 
-// ─── Skeleton ───
+// ─── Status Badge ───
 
-function EventRowSkeleton() {
+function StatusBadge({ start, end }: { start: string; end: string }) {
+  if (isOngoing(start, end)) {
+    return (
+      <span className="inline-flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full border border-[#00E5FF30] bg-[#00E5FF10] text-[#00E5FF] font-bold uppercase tracking-widest">
+        <span className="w-1.5 h-1.5 rounded-full bg-[#00E5FF] animate-pulse" />
+        Live
+      </span>
+    );
+  }
+  if (isUpcoming(start)) {
+    return (
+      <span className="inline-flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full border border-emerald-900/40 bg-emerald-500/10 text-emerald-400 font-bold uppercase tracking-widest">
+        À venir
+      </span>
+    );
+  }
   return (
-    <div className="animate-pulse flex items-center gap-4 px-6 py-5 border-b border-[#1e2530]">
-      <div className="w-10 h-10 rounded-xl bg-[#1e2530] shrink-0" />
-      <div className="flex-1 space-y-2">
-        <div className="h-3.5 w-1/3 bg-[#1e2530] rounded-lg" />
-        <div className="h-2.5 w-1/4 bg-[#1e2530] rounded-lg" />
-      </div>
-      <div className="h-3 w-24 bg-[#1e2530] rounded-lg hidden sm:block" />
-      <div className="h-3 w-16 bg-[#1e2530] rounded-lg hidden md:block" />
-      <div className="flex gap-2 ml-auto">
-        <div className="w-8 h-8 bg-[#1e2530] rounded-xl" />
-        <div className="w-8 h-8 bg-[#1e2530] rounded-xl" />
-        <div className="w-8 h-8 bg-[#1e2530] rounded-xl" />
+    <span className="inline-flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full border border-[#1e2530] bg-[#ffffff05] text-[#3a4a5a] font-bold uppercase tracking-widest">
+      Terminé
+    </span>
+  );
+}
+
+// ─── Card Skeleton ───
+
+function CardSkeleton() {
+  return (
+    <div className="animate-pulse rounded-2xl border border-[#1e2530] bg-[#0d1117] overflow-hidden">
+      <div className="h-44 w-full bg-[#1e2530]" />
+      <div className="p-5 space-y-3">
+        <div className="h-4 w-2/3 bg-[#1e2530] rounded-lg" />
+        <div className="h-3 w-full bg-[#1e2530] rounded-lg" />
+        <div className="h-3 w-1/2 bg-[#1e2530] rounded-lg" />
+        <div className="h-px w-full bg-[#1e2530] rounded" />
+        <div className="flex gap-2 pt-1">
+          <div className="h-8 flex-1 bg-[#1e2530] rounded-xl" />
+          <div className="h-8 flex-1 bg-[#1e2530] rounded-xl" />
+        </div>
       </div>
     </div>
   );
 }
 
-// ─── Input component ───
+// ─── Field ───
 
-function Field({
-  label,
-  required,
-  children,
-}: {
-  label: string;
-  required?: boolean;
-  children: React.ReactNode;
-}) {
+function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-1.5">
       <label className="text-xs font-semibold uppercase tracking-widest text-[#3a4a5a]">
@@ -109,10 +130,7 @@ const inputClass =
 // ─── Event Form Modal ───
 
 function EventModal({
-  open,
-  onClose,
-  onSaved,
-  editingEvent,
+  open, onClose, onSaved, editingEvent,
 }: {
   open: boolean;
   onClose: () => void;
@@ -121,36 +139,27 @@ function EventModal({
 }) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const isEdit = !!editingEvent;
-
   const [form, setForm] = useState<EventFormData>(EMPTY_FORM);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Sync form when editing
   useEffect(() => {
-    const updateForm = () => {
-      if (editingEvent) {
-        setForm(prevForm => ({
-          ...prevForm,
-          title: editingEvent.title,
-          description: editingEvent.description ?? "",
-          startDate: toDatetimeLocal(editingEvent.startDate),
-          endDate: toDatetimeLocal(editingEvent.endDate),
-          location: editingEvent.location ?? "",
-          coverImage: editingEvent.coverImage ?? "",
-        }));
-      } else {
-        setForm(EMPTY_FORM);
-      }
-    };
-
-    updateForm();
+    if (editingEvent) {
+      setForm({
+        title: editingEvent.title,
+        description: editingEvent.description ?? "",
+        startDate: toDatetimeLocal(editingEvent.startDate),
+        endDate: toDatetimeLocal(editingEvent.endDate),
+        location: editingEvent.location ?? "",
+        coverImage: editingEvent.coverImage ?? "",
+      });
+    } else {
+      setForm(EMPTY_FORM);
+    }
   }, [editingEvent, open]);
 
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     if (open) document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
   }, [open, onClose]);
@@ -161,7 +170,6 @@ function EventModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-
     if (!form.title || !form.startDate || !form.endDate) {
       setError("Titre, date de début et date de fin sont obligatoires.");
       return;
@@ -170,12 +178,10 @@ function EventModal({
       setError("La date de début doit être antérieure à la date de fin.");
       return;
     }
-
     setLoading(true);
     try {
       const url = isEdit ? `/api/events/${editingEvent!.id}` : "/api/events";
       const method = isEdit ? "PUT" : "POST";
-
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
@@ -188,10 +194,8 @@ function EventModal({
           coverImage: form.coverImage || undefined,
         }),
       });
-
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Erreur serveur");
-
       onSaved(data);
       onClose();
     } catch (err: unknown) {
@@ -219,26 +223,16 @@ function EventModal({
             exit={{ opacity: 0, y: 16, scale: 0.97 }}
             transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
             className="relative w-full max-w-lg rounded-2xl border border-[#1e2530] bg-[#0a0e14] overflow-hidden"
-            style={{
-              boxShadow:
-                "0 0 0 1px #00E5FF18, 0 0 40px #00E5FF18, 0 0 80px #00E5FF08, 0 32px 64px rgba(0,0,0,0.6)",
-            }}
+            style={{ boxShadow: "0 0 0 1px #00E5FF18, 0 0 40px #00E5FF18, 0 0 80px #00E5FF08, 0 32px 64px rgba(0,0,0,0.6)" }}
           >
-            {/* Top neon line */}
             <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-[#00E5FF60] to-transparent" />
-            {/* Corner glow */}
             <div className="pointer-events-none absolute -top-20 -left-20 w-64 h-64 bg-[#00E5FF08] rounded-full blur-3xl" />
 
-            {/* Header */}
             <div className="relative flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#1e2530]">
               <div>
                 <div className="flex items-center gap-2 mb-0.5">
                   <div className="w-6 h-6 rounded-lg bg-[#00E5FF15] border border-[#00E5FF30] flex items-center justify-center">
-                    {isEdit ? (
-                      <Pencil size={12} className="text-[#00E5FF]" />
-                    ) : (
-                      <Plus size={12} className="text-[#00E5FF]" strokeWidth={3} />
-                    )}
+                    {isEdit ? <Pencil size={12} className="text-[#00E5FF]" /> : <Plus size={12} className="text-[#00E5FF]" strokeWidth={3} />}
                   </div>
                   <h2 className="text-base font-black text-white tracking-tight">
                     {isEdit ? "Modifier l'événement" : "Nouvel événement"}
@@ -256,66 +250,28 @@ function EventModal({
               </button>
             </div>
 
-            {/* Form */}
             <form onSubmit={handleSubmit} className="relative px-6 py-5 flex flex-col gap-4">
               <Field label="Titre" required>
-                <input
-                  className={inputClass}
-                  value={form.title}
-                  onChange={(e) => set("title", e.target.value)}
-                  placeholder="Ex : DevConf Paris 2026"
-                />
+                <input className={inputClass} value={form.title} onChange={(e) => set("title", e.target.value)} placeholder="Ex : DevConf Paris 2026" />
               </Field>
-
               <Field label="Description">
-                <textarea
-                  className={`${inputClass} resize-none`}
-                  rows={3}
-                  value={form.description}
-                  onChange={(e) => set("description", e.target.value)}
-                  placeholder="Décrivez l'événement…"
-                />
+                <textarea className={`${inputClass} resize-none`} rows={3} value={form.description} onChange={(e) => set("description", e.target.value)} placeholder="Décrivez l'événement…" />
               </Field>
-
               <div className="grid grid-cols-2 gap-3">
                 <Field label="Début" required>
-                  <input
-                    className={inputClass}
-                    type="datetime-local"
-                    value={form.startDate}
-                    onChange={(e) => set("startDate", e.target.value)}
-                  />
+                  <input className={inputClass} type="datetime-local" value={form.startDate} onChange={(e) => set("startDate", e.target.value)} />
                 </Field>
                 <Field label="Fin" required>
-                  <input
-                    className={inputClass}
-                    type="datetime-local"
-                    value={form.endDate}
-                    onChange={(e) => set("endDate", e.target.value)}
-                  />
+                  <input className={inputClass} type="datetime-local" value={form.endDate} onChange={(e) => set("endDate", e.target.value)} />
                 </Field>
               </div>
-
               <Field label="Lieu">
-                <input
-                  className={inputClass}
-                  value={form.location}
-                  onChange={(e) => set("location", e.target.value)}
-                  placeholder="Ex : Grande Halle, Paris"
-                />
+                <input className={inputClass} value={form.location} onChange={(e) => set("location", e.target.value)} placeholder="Ex : Grande Halle, Paris" />
               </Field>
-
               <Field label="Image de couverture (URL)">
-                <input
-                  className={inputClass}
-                  type="url"
-                  value={form.coverImage}
-                  onChange={(e) => set("coverImage", e.target.value)}
-                  placeholder="https://…"
-                />
+                <input className={inputClass} type="url" value={form.coverImage} onChange={(e) => set("coverImage", e.target.value)} placeholder="https://…" />
               </Field>
 
-              {/* Error */}
               <AnimatePresence>
                 {error && (
                   <motion.div
@@ -330,13 +286,8 @@ function EventModal({
                 )}
               </AnimatePresence>
 
-              {/* Actions */}
               <div className="flex gap-3 pt-1">
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="flex-1 py-2.5 rounded-xl border border-[#1e2530] text-sm text-[#4a5568] hover:text-white hover:border-[#2e3a4a] transition-all duration-200 font-semibold"
-                >
+                <button type="button" onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-[#1e2530] text-sm text-[#4a5568] hover:text-white hover:border-[#2e3a4a] transition-all duration-200 font-semibold">
                   Annuler
                 </button>
                 <button
@@ -358,11 +309,7 @@ function EventModal({
 
 // ─── Delete Confirm Modal ───
 
-function DeleteModal({
-  event,
-  onClose,
-  onDeleted,
-}: {
+function DeleteModal({ event, onClose, onDeleted }: {
   event: Event | null;
   onClose: () => void;
   onDeleted: (id: string) => void;
@@ -372,9 +319,7 @@ function DeleteModal({
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     if (event) document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
   }, [event, onClose]);
@@ -414,22 +359,17 @@ function DeleteModal({
             exit={{ opacity: 0, scale: 0.96, y: 8 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="relative w-full max-w-sm rounded-2xl border border-red-900/40 bg-[#0a0e14] overflow-hidden"
-            style={{
-              boxShadow: "0 0 0 1px #ff444418, 0 0 40px #ff444412, 0 32px 64px rgba(0,0,0,0.6)",
-            }}
+            style={{ boxShadow: "0 0 0 1px #ff444418, 0 0 40px #ff444412, 0 32px 64px rgba(0,0,0,0.6)" }}
           >
             <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-red-500/50 to-transparent" />
-
             <div className="px-6 pt-6 pb-5">
               <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-900/40 flex items-center justify-center mb-4">
                 <Trash2 size={18} className="text-red-400" />
               </div>
               <h2 className="text-base font-black text-white mb-1">Supprimer l'événement ?</h2>
               <p className="text-sm text-[#4a5568] leading-relaxed">
-                <span className="text-[#ccc] font-semibold">{event.title}</span> et toutes ses sessions seront
-                définitivement supprimés.
+                <span className="text-[#ccc] font-semibold">{event.title}</span> et toutes ses sessions seront définitivement supprimés.
               </p>
-
               {error && (
                 <div className="mt-3 flex items-center gap-2 text-sm text-red-400 bg-red-500/10 border border-red-900/40 rounded-xl px-3 py-2">
                   <AlertTriangle size={13} className="shrink-0" />
@@ -437,12 +377,8 @@ function DeleteModal({
                 </div>
               )}
             </div>
-
             <div className="flex gap-3 px-6 pb-6">
-              <button
-                onClick={onClose}
-                className="flex-1 py-2.5 rounded-xl border border-[#1e2530] text-sm text-[#4a5568] hover:text-white hover:border-[#2e3a4a] transition-all duration-200 font-semibold"
-              >
+              <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-[#1e2530] text-sm text-[#4a5568] hover:text-white hover:border-[#2e3a4a] transition-all duration-200 font-semibold">
                 Annuler
               </button>
               <button
@@ -460,119 +396,158 @@ function DeleteModal({
   );
 }
 
-// ─── Status Badge ───
+// ─── Admin Event Card ───
 
-function StatusBadge({ start, end }: { start: string; end: string }) {
-  if (isOngoing(start, end)) {
-    return (
-      <span className="inline-flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full border border-[#00E5FF30] bg-[#00E5FF10] text-[#00E5FF] font-bold uppercase tracking-widest">
-        <span className="w-1.5 h-1.5 rounded-full bg-[#00E5FF] animate-pulse" />
-        Live
-      </span>
-    );
-  }
-  if (isUpcoming(start)) {
-    return (
-      <span className="inline-flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full border border-emerald-900/40 bg-emerald-500/10 text-emerald-400 font-bold uppercase tracking-widest">
-        À venir
-      </span>
-    );
-  }
-  return (
-    <span className="inline-flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full border border-[#1e2530] bg-[#ffffff05] text-[#3a4a5a] font-bold uppercase tracking-widest">
-      Terminé
-    </span>
-  );
-}
-
-// ─── Event Row ───
-
-function EventRow({
+function AdminEventCard({
   event,
+  index,
   onEdit,
   onDelete,
 }: {
   event: Event;
+  index: number;
   onEdit: (ev: Event) => void;
   onDelete: (ev: Event) => void;
 }) {
+  const day = new Date(event.startDate).getDate();
+  const month = new Date(event.startDate).toLocaleDateString("fr-FR", { month: "short" });
+  const isMultiDay = event.startDate.slice(0, 10) !== event.endDate.slice(0, 10);
+  const ongoing = isOngoing(event.startDate, event.endDate);
+  const upcoming = isUpcoming(event.startDate);
+
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, y: 8 }}
+      initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, x: -16 }}
-      transition={{ duration: 0.2 }}
-      className="group flex items-center gap-4 px-6 py-4 border-b border-[#1e2530] hover:bg-[#ffffff03] transition-colors"
+      exit={{ opacity: 0, scale: 0.96 }}
+      transition={{ duration: 0.35, delay: index * 0.05, ease: [0.22, 1, 0.36, 1] }}
+      className="group relative rounded-2xl border border-[#1e2530] bg-[#0b0f18] overflow-hidden shadow-lg shadow-black/30 flex flex-col"
     >
-      {/* Icon */}
-      <div className="w-10 h-10 rounded-xl bg-[#ffffff06] border border-[#1e2530] flex items-center justify-center shrink-0 group-hover:border-[#00E5FF22] transition-colors">
-        <CalendarDays size={16} className="text-[#3a4a5a] group-hover:text-[#00E5FF] transition-colors" />
-      </div>
+      {/* ── Cover Image ── */}
+      <div className="relative h-44 w-full overflow-hidden bg-[#0d1117] shrink-0">
+        {event.coverImage ? (
+          <Image
+            src={event.coverImage}
+            alt={event.title}
+            fill
+            unoptimized
+            sizes="(max-width: 768px) 100vw, 50vw"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center relative overflow-hidden">
+            <div className="absolute inset-0 bg-linear-to-br from-[#00E5FF08] via-[#0d1117] to-[#001a1e]" />
+            <svg className="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <pattern id={`grid-admin-${event.id}`} width="32" height="32" patternUnits="userSpaceOnUse">
+                  <path d="M 32 0 L 0 0 0 32" fill="none" stroke="#00E5FF" strokeWidth="0.5" />
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill={`url(#grid-admin-${event.id})`} />
+            </svg>
+            <span className="relative text-[#00E5FF15] text-7xl font-black select-none tracking-tighter">
+              {event.title.slice(0, 2).toUpperCase()}
+            </span>
+          </div>
+        )}
 
-      {/* Info */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-0.5">
-          <span className="font-bold text-[#eee] truncate text-sm">{event.title}</span>
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-linear-to-t from-[#0b0f18] via-[#0b0f1850] to-transparent" />
+
+        {/* Date badge */}
+        <div className="absolute top-3 left-3 flex flex-col items-center justify-center w-12 h-12 rounded-xl bg-[#0b0f18cc] border border-[#00E5FF33] backdrop-blur-sm">
+          <span className="text-lg font-black text-[#00E5FF] leading-none">{day}</span>
+          <span className="text-[9px] text-[#00E5FF88] uppercase tracking-widest">{month}</span>
+        </div>
+
+        {/* Status badge */}
+        <div className="absolute top-3 right-3">
           <StatusBadge start={event.startDate} end={event.endDate} />
         </div>
-        <div className="flex items-center gap-3 flex-wrap">
-          <span className="text-[11px] text-[#3a4a5a] font-mono">{event.slug}</span>
-          {event.location && (
-            <span className="flex items-center gap-1 text-[11px] text-[#3a4a5a]">
-              <MapPin size={10} />
-              {event.location}
-            </span>
-          )}
+
+
+      </div>
+
+      {/* ── Content ── */}
+      <div className="flex flex-col flex-1 p-4 gap-3">
+        {/* Title */}
+        <div>
+          <h3 className="text-white font-bold text-lg leading-snug line-clamp-1">
+            {event.title}
+          </h3>
+          <p className="text-[#3a4a5a] text-xs font-mono mt-0.5">{event.slug}</p>
+        </div>
+
+        {/* Description */}
+        <p className="text-[#4a5568] text-sm line-clamp-2 leading-relaxed flex-1">
+          {event.description ?? "Aucune description disponible."}
+        </p>
+
+        {/* Meta */}
+        <div className="flex flex-col gap-1.5 text-xs text-[#3a4550]">
+          <span className="flex items-center gap-2">
+            <MapPin size={11} className="text-[#00E5FF55] shrink-0" />
+            <span className="truncate">{event.location ?? "Lieu non précisé"}</span>
+          </span>
+          <span className="flex items-center gap-2">
+            <Calendar size={11} className="text-[#00E5FF55] shrink-0" />
+            {isMultiDay
+              ? `${formatDate(event.startDate)} → ${formatDate(event.endDate)}`
+              : formatDate(event.startDate)}
+          </span>
+          <span className="flex items-center gap-2">
+            <Layers size={11} className="text-[#00E5FF55] shrink-0" />
+            {event._count.sessions} session{event._count.sessions !== 1 ? "s" : ""}
+          </span>
+        </div>
+
+        {/* Divider */}
+        <div className="h-px bg-[#1a2030]" />
+
+        {/* ── Action Buttons ── */}
+        <div className="grid grid-cols-2 gap-2">
+          {/* Voir le programme */}
+          <Link
+            href={`/events/${event.slug}`}
+            target="_blank"
+            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-[#00E5FF30] bg-[#00E5FF08] text-[#00E5FF] text-xs font-bold hover:bg-[#00E5FF18] hover:border-[#00E5FF55] transition-all duration-200"
+          >
+            <ExternalLink size={12} />
+            Voir le programme
+          </Link>
+
+          {/* Gérer l'événement */}
+          <Link
+            href={`/admin/events/${event.id}`}
+            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-[#1e2530] bg-[#ffffff05] text-[#aaa] text-xs font-bold hover:bg-[#ffffff0d] hover:border-[#2e3a4a] hover:text-white transition-all duration-200"
+          >
+            <Settings2 size={12} />
+            Gérer
+          </Link>
+        </div>
+
+        {/* Bottom edit/delete row */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => onEdit(event)}
+            className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg border border-[#1e2530] text-[#3a4a5a] text-[11px] font-semibold hover:text-white hover:border-[#2e3a4a] hover:bg-[#ffffff06] transition-all duration-200"
+          >
+            <Pencil size={11} />
+            Modifier
+          </button>
+          <button
+            onClick={() => onDelete(event)}
+            className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg border border-[#1e2530] text-[#3a4a5a] text-[11px] font-semibold hover:text-red-400 hover:border-red-900/50 hover:bg-red-500/05 transition-all duration-200"
+          >
+            <Trash2 size={11} />
+            Supprimer
+          </button>
         </div>
       </div>
 
-      {/* Dates */}
-      <div className="hidden sm:flex flex-col items-end gap-0.5 shrink-0">
-        <span className="text-xs text-[#4a5568]">{formatDate(event.startDate)}</span>
-        <span className="text-[10px] text-[#2a3a4a]">→ {formatDate(event.endDate)}</span>
-      </div>
-
-      {/* Sessions count */}
-      <div className="hidden md:flex items-center gap-1.5 shrink-0">
-        <Layers size={12} className="text-[#3a4a5a]" />
-        <span className="text-xs text-[#3a4a5a] font-semibold">
-          {event._count.sessions} session{event._count.sessions !== 1 ? "s" : ""}
-        </span>
-      </div>
-
-      {/* Actions */}
-      <div className="flex items-center gap-2 shrink-0">
-        <Link
-          href={`/events/${event.slug}`}
-          target="_blank"
-          className="w-8 h-8 rounded-xl border border-[#1e2530] flex items-center justify-center text-[#3a4a5a] hover:text-[#00E5FF] hover:border-[#00E5FF33] transition-all duration-200"
-          title="Voir la page publique"
-        >
-          <ExternalLink size={13} />
-        </Link>
-        <Link
-          href={`/admin/events/${event.id}`}
-          className="w-8 h-8 rounded-xl border border-[#1e2530] flex items-center justify-center text-[#3a4a5a] hover:text-white hover:border-[#2e3a4a] transition-all duration-200 group/btn"
-          title="Gérer l'événement et les sessions"
-        >
-          <ChevronRight size={14} className="group-hover/btn:translate-x-0.5 transition-transform" />
-        </Link>
-        <button
-          onClick={() => onEdit(event)}
-          className="w-8 h-8 rounded-xl border border-[#1e2530] flex items-center justify-center text-[#3a4a5a] hover:text-white hover:border-[#2e3a4a] transition-all duration-200"
-          title="Modifier"
-        >
-          <Pencil size={13} />
-        </button>
-        <button
-          onClick={() => onDelete(event)}
-          className="w-8 h-8 rounded-xl border border-[#1e2530] flex items-center justify-center text-[#3a4a5a] hover:text-red-400 hover:border-red-900/50 transition-all duration-200"
-          title="Supprimer"
-        >
-          <Trash2 size={13} />
-        </button>
-      </div>
+      {/* Neon bottom line on hover */}
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-[#00E5FF] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
     </motion.div>
   );
 }
@@ -585,7 +560,7 @@ export default function AdminEventsPage() {
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
 
-  // Modal state
+  const [filter, setFilter] = useState<"all" | "live" | "upcoming" | "past">("all");
   const [modalOpen, setModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [deletingEvent, setDeletingEvent] = useState<Event | null>(null);
@@ -602,25 +577,14 @@ export default function AdminEventsPage() {
         setLoading(false);
       }
     };
-
     fetchData();
   }, []);
 
-  const openCreate = () => {
-    setEditingEvent(null);
-    setModalOpen(true);
-  };
-
-  const openEdit = (ev: Event) => {
-    setEditingEvent(ev);
-    setModalOpen(true);
-  };
+  const openCreate = () => { setEditingEvent(null); setModalOpen(true); };
+  const openEdit = (ev: Event) => { setEditingEvent(ev); setModalOpen(true); };
 
   const handleSaved = (saved: Event) => {
-    const normalized: Event = {
-      ...saved,
-      _count: saved._count ?? { sessions: 0 },
-    };
+    const normalized: Event = { ...saved, _count: saved._count ?? { sessions: 0 } };
     setEvents((prev) => {
       const exists = prev.find((e) => e.id === normalized.id);
       if (exists) return prev.map((e) => (e.id === normalized.id ? { ...e, ...normalized } : e));
@@ -628,11 +592,14 @@ export default function AdminEventsPage() {
     });
   };
 
-  const handleDeleted = (id: string) => {
-    setEvents((prev) => prev.filter((e) => e.id !== id));
-  };
+  const handleDeleted = (id: string) => setEvents((prev) => prev.filter((e) => e.id !== id));
 
   const filtered = events.filter((e) => {
+    // Tab filter
+    if (filter === "live" && !isOngoing(e.startDate, e.endDate)) return false;
+    if (filter === "upcoming" && !isUpcoming(e.startDate)) return false;
+    if (filter === "past" && (isOngoing(e.startDate, e.endDate) || isUpcoming(e.startDate))) return false;
+    // Search filter
     const q = search.trim().toLowerCase();
     if (!q) return true;
     return (
@@ -642,30 +609,19 @@ export default function AdminEventsPage() {
     );
   });
 
-  // Counts
   const liveCount = events.filter((e) => isOngoing(e.startDate, e.endDate)).length;
   const upcomingCount = events.filter((e) => isUpcoming(e.startDate)).length;
+  const pastCount = events.length - liveCount - upcomingCount;
 
   return (
     <>
-      <EventModal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        onSaved={handleSaved}
-        editingEvent={editingEvent}
-      />
-      <DeleteModal
-        event={deletingEvent}
-        onClose={() => setDeletingEvent(null)}
-        onDeleted={handleDeleted}
-      />
+      <EventModal open={modalOpen} onClose={() => setModalOpen(false)} onSaved={handleSaved} editingEvent={editingEvent} />
+      <DeleteModal event={deletingEvent} onClose={() => setDeletingEvent(null)} onDeleted={handleDeleted} />
 
       <main className="flex-1 px-8 py-12 max-w-6xl mx-auto w-full">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-[#4a5568] mb-8">
-          <Link href="/admin" className="hover:text-[#00E5FF] transition-colors">
-            Admin
-          </Link>
+          <Link href="/admin" className="hover:text-[#00E5FF] transition-colors">Admin</Link>
           <ChevronRight size={13} />
           <span className="text-white">Événements</span>
         </div>
@@ -673,25 +629,18 @@ export default function AdminEventsPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-end gap-4 mb-8">
           <div className="flex-1">
-  
-            <div >
-              <div className="flex flex-row gap-4 ">
-                <div className="w-8 h-8 rounded-xl mt-2  flex items-center justify-center">
-                  <Calendar size={30} className="text-[#00E5FF] " />
-                </div>
-                <h1 className="font-black text-5xl">Liste des evenements </h1>                
+            <div className="flex flex-row gap-4">
+              <div className="w-8 h-8 rounded-xl mt-2 flex items-center justify-center">
+                <Calendar size={30} className="text-[#00E5FF]" />
               </div>
-
-              <p className="text-lg text-[#4a5568]">
-              Gérez, modifiez et planifiez tous vos événements.
-            </p>
+              <h1 className="font-black text-5xl">Liste des événements</h1>
             </div>
-
+            <p className="text-lg text-[#4a5568] mt-1">Gérez, modifiez et planifiez tous vos événements.</p>
           </div>
 
           <button
             onClick={openCreate}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#00E5FF] text-black text-sm font-black tracking-wide hover:bg-[#00cfea] active:scale-95 transition-all duration-200"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#00E5FF] text-black text-sm font-black tracking-wide hover:bg-[#00cfea] active:scale-95 transition-all duration-200 shrink-0"
             style={{ boxShadow: "0 0 24px #00E5FF30" }}
           >
             <Plus size={15} strokeWidth={3} />
@@ -699,33 +648,53 @@ export default function AdminEventsPage() {
           </button>
         </div>
 
-        {/* Mini stats bar */}
+        {/* Filter tabs + Search */}
         {!loading && events.length > 0 && (
-          <div className="flex items-center gap-4 mb-6 flex-wrap">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#1e2530] bg-[#0d1117]">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#00E5FF] animate-pulse" />
-              <span className="text-xs text-[#3a4a5a] font-semibold">
-                {liveCount} live
-              </span>
-            </div>
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#1e2530] bg-[#0d1117]">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#edce00]" />
-              <span className="text-xs text-[#3a4a5a] font-semibold">
-                {upcomingCount} à venir
-              </span>
-            </div>
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#1e2530] bg-[#0d1117]">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              <span className="text-xs text-[#3a4a5a] font-semibold">
-                {events.length - liveCount - upcomingCount} tous
-              </span>
-            </div>
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#1e2530] bg-[#0d1117]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#3a4a5a]"/>
-                  <span className="text-xs text-[#3a4a5a] font-semibold">
-                      {events.length} total
+          <div className="flex items-center gap-3 mb-7 flex-wrap">
+            {/* Filter tabs */}
+            {(
+              [
+                { key: "all",      label: "Tous",      count: events.length,   dot: "#3a4a5a" },
+                { key: "live",     label: "Live",      count: liveCount,       dot: "#00E5FF", pulse: true },
+                { key: "upcoming", label: "À venir",   count: upcomingCount,   dot: "#34d399" },
+                { key: "past",     label: "Passés",    count: pastCount,       dot: "#2a3a4a" },
+              ] as const
+            ).map(({ key, label, count, dot, pulse }) => {
+              const active = filter === key;
+              return (
+                <button
+                  key={key}
+                  onClick={() => setFilter(key)}
+                  className={[
+                    "relative flex items-center gap-2 px-4 py-2 rounded-xl border text-xs font-bold transition-all duration-200",
+                    active
+                      ? "border-[#00E5FF44] bg-[#00E5FF12] text-white"
+                      : "border-[#1e2530] bg-[#0d1117] text-[#3a4a5a] hover:border-[#2e3a4a] hover:text-[#8a9aaa]",
+                  ].join(" ")}
+                >
+                  <span
+                    className={["w-1.5 h-1.5 rounded-full shrink-0", pulse ? "animate-pulse" : ""].join(" ")}
+                    style={{ backgroundColor: active ? dot : dot }}
+                  />
+                  {label}
+                  <span
+                    className={[
+                      "ml-0.5 text-[10px] font-black tabular-nums",
+                      active ? "text-[#00E5FF]" : "text-[#2a3a4a]",
+                    ].join(" ")}
+                  >
+                    {count}
                   </span>
-            </div>
+                  {active && (
+                    <motion.span
+                      layoutId="filter-pill"
+                      className="absolute inset-0 rounded-xl border border-[#00E5FF33] pointer-events-none"
+                      transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                    />
+                  )}
+                </button>
+              );
+            })}
 
             {/* Search */}
             <div className="relative ml-auto">
@@ -741,70 +710,61 @@ export default function AdminEventsPage() {
           </div>
         )}
 
-        {/* Table */}
-        <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] overflow-hidden">
-          {/* Table header */}
-          <div className="flex items-center gap-4 px-6 py-3 border-b border-[#1e2530] bg-[#060a0f]">
-            <div className="w-10 shrink-0" />
-            <span className="flex-1 text-[10px] font-bold uppercase tracking-widest text-[#2a3a4a]">Événement</span>
-            <span className="hidden sm:block w-32 text-right text-[10px] font-bold uppercase tracking-widest text-[#2a3a4a]">Dates</span>
-            <span className="hidden md:block w-24 text-right text-[10px] font-bold uppercase tracking-widest text-[#2a3a4a]">Sessions</span>
-            <span className="w-34 shrink-0" />
+        {/* Loading skeletons */}
+        {loading && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {Array.from({ length: 4 }).map((_, i) => <CardSkeleton key={i} />)}
           </div>
+        )}
 
-          {/* Loading */}
-          {loading && (
-            <>
-              {Array.from({ length: 5 }).map((_, i) => (
-                <EventRowSkeleton key={i} />
-              ))}
-            </>
-          )}
+        {/* Error */}
+        {error && (
+          <div className="flex items-center justify-center gap-2 text-red-400 text-sm py-20">
+            <AlertTriangle size={16} />
+            {error}
+          </div>
+        )}
 
-          {/* Error */}
-          {error && (
-            <div className="px-6 py-10 flex items-center justify-center gap-2 text-red-400 text-sm">
-              <AlertTriangle size={16} />
-              {error}
+        {/* Empty state */}
+        {!loading && !error && events.length === 0 && (
+          <div className="py-24 text-center">
+            <div className="w-16 h-16 rounded-2xl bg-[#0d1117] border border-[#1e2530] flex items-center justify-center mx-auto mb-4">
+              <Calendar size={28} className="text-[#1e2530]" />
             </div>
-          )}
+            <p className="text-[#3a4a5a] italic text-sm mb-5">Aucun événement pour le moment.</p>
+            <button
+              onClick={openCreate}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#00E5FF15] border border-[#00E5FF30] text-[#00E5FF] text-sm font-bold hover:bg-[#00E5FF20] transition-all"
+            >
+              <Plus size={13} />
+              Créer le premier événement
+            </button>
+          </div>
+        )}
 
-          {/* Empty */}
-          {!loading && !error && events.length === 0 && (
-            <div className="py-20 text-center">
-              <Calendar size={28} className="mx-auto text-[#1e2530] mb-3" />
-              <p className="text-[#3a4a5a] italic text-sm mb-4">Aucun événement pour le moment.</p>
-              <button
-                onClick={openCreate}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#00E5FF15] border border-[#00E5FF30] text-[#00E5FF] text-sm font-bold hover:bg-[#00E5FF20] transition-all"
-              >
-                <Plus size={13} />
-                Créer le premier
-              </button>
-            </div>
-          )}
+        {/* No search results */}
+        {!loading && !error && events.length > 0 && filtered.length === 0 && (
+          <div className="py-16 text-center">
+            <p className="text-[#3a4a5a] italic text-sm">Aucun résultat pour «&nbsp;{search}&nbsp;».</p>
+          </div>
+        )}
 
-          {/* No results */}
-          {!loading && !error && events.length > 0 && filtered.length === 0 && (
-            <div className="py-12 text-center">
-              <p className="text-[#3a4a5a] italic text-sm">
-                Aucun résultat pour «&nbsp;{search}&nbsp;».
-              </p>
-            </div>
-          )}
-
-          {/* Rows */}
+        {/* ── 2-Column Card Grid ── */}
+        {!loading && !error && filtered.length > 0 && (
           <AnimatePresence initial={false}>
-            {filtered.map((ev) => (
-              <EventRow
-                key={ev.id}
-                event={ev}
-                onEdit={openEdit}
-                onDelete={(e) => setDeletingEvent(e)}
-              />
-            ))}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {filtered.map((ev, i) => (
+                <AdminEventCard
+                  key={ev.id}
+                  event={ev}
+                  index={i}
+                  onEdit={openEdit}
+                  onDelete={(e) => setDeletingEvent(e)}
+                />
+              ))}
+            </div>
           </AnimatePresence>
-        </div>
+        )}
       </main>
     </>
   );
