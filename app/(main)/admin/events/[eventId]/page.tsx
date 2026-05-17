@@ -802,9 +802,9 @@ function SessionCard({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.97 }}
       transition={{ duration: 0.2 }}
-      className="group relative rounded-2xl border border-[#1e2530] bg-[#0d1117] p-5 hover:border-[#00E5FF22] transition-all duration-300 overflow-hidden"
+      className="group relative rounded-2xl border border-[#1e2530] bg-[#0d1117] p-5 hover:border-[#00E5FF22] transition-all duration-300 overflow-hidden mt-3"
     >
-      <div className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-[radial-gradient(ellipse_at_top_left,#00E5FF06_0%,transparent_60%)]" />
+      <div className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-[radial-gradient(ellipse_at_top_left,#00E5FF06_0%,transparent_60%)] m-5" />
 
       {/* Live badge */}
       {session.isLive && (
@@ -1122,7 +1122,7 @@ export default function EventDetailPage() {
           <div className="lg:col-span-1 flex flex-col gap-4">
             {/* Event card */}
             <div
-              className="relative rounded-2xl border border-[#1e2530] bg-[#0d1117] mt-20 w-100 overflow-hidden"
+              className="relative rounded-2xl border border-[#1e2530] bg-[#0d1117] mt-20 overflow-hidden"
               style={{ boxShadow: "0 0 0 1px #00E5FF0a, 0 0 30px #07282c08" }}
             > 
               {/* Cover image */}
@@ -1190,59 +1190,41 @@ export default function EventDetailPage() {
                 </div>
               </div>
             </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 w-300 h-60 gap-4">
-              <AnimatePresence initial={false}>
-                {sortedSessions.map((session) => (
-                  <SessionCard
-                    key={session.id}
-                    session={session}
-                    onEdit={openEditSession}
-                    onDelete={(s) => setDeletingSession(s)}
-                  />
-                ))}
-              </AnimatePresence>
-            </div>
-            <div className="flex flex-row w-400 gap-3"> 
-              <div className=" w-100 flex grid">
-                <div className="grid grid-cols-2 gap-3">
-                  <div className=" flex gap-3 flex-col">
-                  <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-4 text-center">
-                    <div className="text-2xl font-black text-[#00E5FF]">{event.sessions.length}</div>
-                  <div className="text-[10px] text-[#3a4a5a] font-semibold uppercase tracking-widest mt-0.5">Sessions
-                  </div>
-                </div>
-                <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-4 text-center">
-                  <div className="text-2xl font-black text-white">
-                    {event.sessions.filter((s) => s.isLive).length}
-                  </div>
-                  <div className="text-[10px] text-[#3a4a5a] font-semibold uppercase tracking-widest mt-0.5 flex items-center justify-center gap-1">
-                  {event.sessions.some((s) => s.isLive) && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#00E5FF] animate-pulse" />
-                  )}
-                  Live
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-col gap-3">
-                <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-4 text-center">
-                <div className="text-2xl font-black text-white">
-                  {[...new Set(event.sessions.flatMap((s) => s.speakers.map((sp) => sp.id)))].length}
-                </div>
-                <div className="text-[10px] text-[#3a4a5a] font-semibold uppercase tracking-widest mt-0.5">Speakers</div>
-              </div>
+            {/* grille contenant les listes des sessions */}
+            <div className="grid grid-cols-2 gap-3">
               <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-4 text-center">
-                <div className="text-2xl font-black text-white">
-                  {event.sessions.reduce((sum, s) => sum + s._count.questions, 0)}
-                </div>
-                <div className="text-[10px] text-[#3a4a5a] font-semibold uppercase tracking-widest mt-0.5">Questions</div>
+                <div className="text-2xl font-black text-[#00E5FF]">{event.sessions.length}</div>
+                <div className="text-[10px] text-[#3a4a5a] font-semibold uppercase tracking-widest mt-0.5">Sessions</div>
+              </div>
+            <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-4 text-center">
+              <div className="text-2xl font-black text-white">
+                {event.sessions.filter((s) => s.isLive).length}
+              </div>
+              <div className="text-[10px] text-[#3a4a5a] font-semibold uppercase tracking-widest mt-0.5 flex items-center justify-center gap-1">
+                {event.sessions.some((s) => s.isLive) && (
+                <span className="w-1.5 h-1.5 rounded-full bg-[#00E5FF] animate-pulse" />
+              )}
+              Live
               </div>
             </div>
+
+            <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-4 text-center">
+              <div className="text-2xl font-black text-white">
+              {[...new Set(event.sessions.flatMap((s) => s.speakers.map((sp) => sp.id)))].length}
               </div>
+              <div className="text-[10px] text-[#3a4a5a] font-semibold uppercase tracking-widest mt-0.5">Speakers</div>
+            </div>
+
+            <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-4 text-center">
+              <div className="text-2xl font-black text-white">
+                {event.sessions.reduce((sum, s) => sum + s._count.questions, 0)}
+              </div>
+              <div className="text-[10px] text-[#3a4a5a] font-semibold uppercase tracking-widest mt-0.5">Questions</div>
+            </div>
           </div>
-            </div>
               </div>          
           {/* ── Right: Sessions ── */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 mt-20">
             {/* Sessions header */}
             <div className="flex items-center justify-between mb-5">
              <div className="flex items-center gap-2"> 
@@ -1277,7 +1259,17 @@ export default function EventDetailPage() {
                 </button>
               </div>
             )}
-          </div>
+              <AnimatePresence initial={false}>
+                {sortedSessions.map((session) => (
+                  <SessionCard
+                    key={session.id}
+                    session={session}
+                    onEdit={openEditSession}
+                    onDelete={(s) => setDeletingSession(s)}
+                  />
+                ))}
+              </AnimatePresence>
+          </div> 
         </div>
       </div>
   )}
