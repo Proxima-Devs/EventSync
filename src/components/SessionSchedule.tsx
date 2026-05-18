@@ -1,3 +1,7 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faStar } from "@fortawesome/free-solid-svg-icons";
+import { strict } from "assert";
+
 interface Speaker {
   id: string;
   fullName: string;
@@ -26,9 +30,11 @@ interface Session {
 
 export default function SessionCardSchedule(
   { session,
-    selectedRoom } : {
+    selectedRoom, toggle, isFavorite } : {
     session: Session[],
-     selectedRoom: string | null
+     selectedRoom: string | null, 
+     toggle: (sessionId: string) => void, 
+     isFavorite: (sessionId: string) => boolean
 }){
 
   const timeSlots = [...new Set(
@@ -81,10 +87,18 @@ export default function SessionCardSchedule(
                   return (
                     <td key={`${time}-${roomName}-${i}`}>{
                       sessionTime ? (
-                        <div className="border-1 border-[#3A4A5A] text-white rounded-lg px-5 py-2">
-                          <h1 className="font-bold">{sessionTime.title}</h1>
-                          <p className="text-sm text-[#3A4A5A]">{sessionTime.startTime.substring(11,16)}-{sessionTime.endTime.substring(11,16)}</p>
-                          <p className="text-[12px] font-bold text-[#00EEFF]">{sessionTime.speakers.map(s => s.fullName).join(", ")}</p>
+                        <div className="border-1 border-[#3A4A5A] text-white rounded-lg px-5 py-2 flex flex-row justify-between m-5">
+                          <div>
+                            <h1 className="font-bold">{sessionTime.title}</h1>
+                            <p className="text-sm text-[#3A4A5A]">{sessionTime.startTime.substring(11,16)}-{sessionTime.endTime.substring(11,16)}</p>
+                            <p className="text-[12px] font-bold text-[#00EEFF]">{sessionTime.speakers.map(s => s.fullName).join(", ")}</p>   
+                          </div>
+                          <div>
+                            <button onClick={() => toggle(sessionTime.id)}>{
+                                isFavorite(sessionTime.id) ? <FontAwesomeIcon icon={faStar} className="text-yellow-500"/> : <FontAwesomeIcon icon={faStar} className="text-gray-400"/>
+                              }
+                            </button>
+                          </div>
                         </div>
                       ):
                       (<div>

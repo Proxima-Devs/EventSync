@@ -1277,10 +1277,11 @@ export default function EventDetailPage() {
 
   function PlanningPage(){
     const { eventId } = useParams<{ eventId: string }>();
-    const [ session, setSession ] = useState<Session[] | []>([]);
+    const [ session, setSession ] = useState<Session[]>([]);
     const [ loading, setLoading ] = useState(true);
     const [ error, setError ] = useState<string | null>(null);
-    const [ selectedRoom, setSelectedRoom ] = useState<string | null>(null)
+    const [ selectedRoom, setSelectedRoom ] = useState<string | null>(null);
+    const { toggle, isFavorite } = useFavorites();
 
 
     useEffect(() => {
@@ -1309,7 +1310,7 @@ export default function EventDetailPage() {
 
     if(loading) return <div>Chargement de l'emploi du temps</div>
     if(error) return <div>{error}</div>
-    if(!rooms) return <div></div>
+    if(!rooms.length) return <div></div>
 
     return(    
       <div className="mt-3 rounded-lg bg-[#0B0F18]">
@@ -1330,7 +1331,7 @@ export default function EventDetailPage() {
           </div>
 
         </div>
-        <SessionCardSchedule session={session} selectedRoom={selectedRoom}/>
+        <SessionCardSchedule session={session} selectedRoom={selectedRoom} toggle={toggle} isFavorite={isFavorite}/>
       </div>
 
     )
