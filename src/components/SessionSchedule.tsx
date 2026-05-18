@@ -62,9 +62,9 @@ export default function SessionCardSchedule(
         <table>
           <thead >
             <tr >
-              <th className="text-grey-700 px-10 text-lg font-extralight">Heure</th>
+              <th className="text-white px-10 text-lg font-extralight">Heure</th>
               {filterRooms.map(room => (
-              <th className="bg-gray-200 px-10 py-3 text-lg w-300 font-extralight border-5 border-gray-100 mx-3 rounded-2xl " key={room}>
+              <th className=" px-10 py-3 text-lg w-300 font-extralight text-white mx-3 rounded-2xl " key={room}>
                 {room}</th>
           ))}
             </tr>
@@ -72,8 +72,8 @@ export default function SessionCardSchedule(
           <tbody className="h-120">
            {
             timeSlots.map(time => (
-              <tr key={time} className=" py-6">
-                <td className="font-medium h-30 text-center">{time}</td>
+              <tr key={time} className="py-6">
+                <td className="font-medium h-30 text-center text-white">{time}</td>
                 {filterRooms.map((roomName, i) => {
 
                   const sessionTime = getSessionAtTime(time, roomName)
@@ -81,10 +81,10 @@ export default function SessionCardSchedule(
                   return (
                     <td key={`${time}-${roomName}-${i}`}>{
                       sessionTime ? (
-                        <div className="bg-white border-1 border-gray-400 rounded-lg px-5 py-2">
+                        <div className="border-1 border-[#3A4A5A] text-white rounded-lg px-5 py-2">
                           <h1 className="font-bold">{sessionTime.title}</h1>
-                          <p className="text-sm ">{sessionTime.startTime.substring(11,16)}-{sessionTime.endTime.substring(11,16)}</p>
-                          <p className="text-[12px] font-bold text-blue-700">{sessionTime.speakers.map(s => s.fullName).join(", ")}</p>
+                          <p className="text-sm text-[#3A4A5A]">{sessionTime.startTime.substring(11,16)}-{sessionTime.endTime.substring(11,16)}</p>
+                          <p className="text-[12px] font-bold text-[#00EEFF]">{sessionTime.speakers.map(s => s.fullName).join(", ")}</p>
                         </div>
                       ):
                       (<div>
