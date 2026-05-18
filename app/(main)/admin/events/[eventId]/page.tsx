@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
+import { useFavorites } from "@/hooks/useFavorites";
 import ToggleSwitch from "@/components/ToggleSwitch";
 import Link from "next/link";
 import {
@@ -1311,14 +1312,14 @@ export default function EventDetailPage() {
     if(!rooms) return <div></div>
 
     return(    
-      <div className="mt-3 rounded-lg bg-gray-100">
+      <div className="mt-3 rounded-lg bg-[#0B0F18]">
         <div className="flex flex-row justify-between p-5">
           <div className="flex gap-3">
-            <button className="bg-blue-700 h-13 rounded-xl text-white font-bold w-35" onClick={() => setSelectedRoom(null)}>Toutes les salles</button>
+            <button className="bg-[#00EEFF] text-black h-13 rounded-xl font-bold w-35" onClick={() => setSelectedRoom(null)}>Toutes les salles</button>
             {
               rooms.map(r => (
                 <button 
-                className="w-35 rounded-xl border-gray-300 border-1 h-13 font-bold " 
+                className="w-35 rounded-xl border-[#2A3A4A] hover:text-[#00EEFF] hover:border-[#00EEFF] text-[#3A4A5A] border-1 h-13 font-bold " 
                 key={r}
                 onClick={() => setSelectedRoom(r)}
                 >
