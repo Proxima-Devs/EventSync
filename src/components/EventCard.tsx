@@ -1,4 +1,9 @@
+"use client";
+
+import { MapPin, Calendar } from "lucide-react";
 import Link from "next/link";
+import { motion } from "framer-motion";
+import Image from "next/image";
 
 type Event = {
   id: string;
@@ -8,6 +13,7 @@ type Event = {
   startDate: string;
   endDate: string;
   location?: string | null;
+  coverImage?: string | null;
 };
 
 function formatDate(d: string) {
@@ -18,40 +24,107 @@ function formatDate(d: string) {
   });
 }
 
-export default function EventCard({ event }: { event: Event }) {
+
+export default function EventCard({ event, index = 0 }: { event: Event; index?: number }) {
   const day = new Date(event.startDate).getDate();
   const month = new Date(event.startDate).toLocaleDateString("fr-FR", { month: "short" });
   const isMultiDay = event.startDate.slice(0, 10) !== event.endDate.slice(0, 10);
+  const isUpcoming = new Date(event.startDate) >= new Date();
 
   return (
-    <Link
-      href={`/events/${event.slug}`}
-      className="group rounded-2xl border border-[#1e2530] bg-[#0d1117] p-5 hover:border-[#00E5FF33] hover:bg-[#0f1520] transition-all duration-300 cursor-pointer hover:-translate-y-0.5 hover:shadow-xl hover:shadow-[#00E5FF08]"
+    <motion.div
+      initial={{ opacity: 0, y: 32 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
     >
-      <div className="flex gap-4">
-        <div className="shrink-0 w-14 h-14 rounded-xl bg-[#00E5FF15] border border-[#00E5FF33] flex flex-col items-center justify-center">
-          <span className="text-xl font-black text-[#00E5FF] leading-none">{day}</span>
-          <span className="text-[10px] text-[#4a5568] uppercase tracking-wider">{month}</span>
-        </div>
+      <Link href={`/events/${event.slug}`} className="group block">
+        <motion.div
+          className="relative rounded-2xl overflow-hidden border border-[#1e2530] bg-[#0b0f18] shadow-lg shadow-black/30 cursor-pointer"
+        >
+          {/* Cover Image */}
+          <motion.div
+            whileHover={{ scale: 1.04 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            className="relative h-44 w-full overflow-hidden bg-[#0d1117]"
+          >
+            {event.coverImage ? (
+              <Image
+                src={event.coverImage}
+                alt={event.title}
+                fill
+                loading="eager"
+                unoptimized
+                sizes="(max-width: 768px) 100vw, 33vw"
+                className="w-full h-full object-cover transition-transform duration-500"
+              />
+            ) : (
+              /* Placeholder pattern when no image */
+              <div className="w-full h-full flex items-center justify-center relative overflow-hidden">
+                <div className="absolute inset-0 bg-linear-to-br from-[#00E5FF08] via-[#0d1117] to-[#001a1e]" />
+                {/* Grid pattern */}
+                <svg className="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <pattern id={`grid-${event.id}`} width="32" height="32" patternUnits="userSpaceOnUse">
+                      <path d="M 32 0 L 0 0 0 32" fill="none" stroke="#00E5FF" strokeWidth="0.5" />
+                    </pattern>
+                  </defs>
+                  <rect width="100%" height="100%" fill={`url(#grid-${event.id})`} />
+                </svg>
+                <span className="relative text-[#00E5FF22] text-7xl font-black select-none tracking-tighter">
+                  {event.title.slice(0, 2).toUpperCase()}
+                </span>
+              </div>
+            )}
 
-        <div className="flex-1 min-w-0">
-          <h3 className="text-white font-bold text-base leading-tight truncate group-hover:text-[#00E5FF] transition-colors">
-            {event.title}
-          </h3>
-          <p className="text-[#4a5568] text-xs mt-1 line-clamp-2">
-            {event.description ?? "Aucune description."}
-          </p>
-        </div>
-      </div>
+            {/* Gradient overlay */}
+            <div className="absolute inset-0 bg-linear-to-t from-[#0b0f18] via-[#0b0f1840] to-transparent" />
 
-      <div className="mt-4 flex items-center justify-between text-xs text-[#3a4550] border-t border-[#1e2530] pt-3">
-        <span>📍 {event.location ?? "Lieu non précisé"}</span>
-        <span>
-          {isMultiDay
-            ? `${formatDate(event.startDate)} → ${formatDate(event.endDate)}`
-            : formatDate(event.startDate)}
-        </span>
-      </div>
-    </Link>
+            {/* Date badge */}
+            <div className="absolute top-3 left-3 flex flex-col items-center justify-center w-12 h-12 rounded-xl bg-[#0b0f18cc] border border-[#00E5FF33] backdrop-blur-sm">
+              <span className="text-lg font-black text-[#00E5FF] leading-none">{day}</span>
+              <span className="text-[9px] text-[#00E5FF88] uppercase tracking-widest">{month}</span>
+            </div>
+
+            {/* Status badge */}
+            {isUpcoming && (
+              <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-[#00E5FF15] border border-[#00E5FF44] backdrop-blur-sm">
+                <span className="text-[10px] font-bold text-[#00E5FF] tracking-widest uppercase">À venir</span>
+              </div>
+            )}
+          </motion.div>
+
+          {/* Content */}
+          <div className="p-4">
+            <h3 className="text-white font-bold text-2xl leading-snug line-clamp-1 group-hover:text-[#00E5FF] transition-colors duration-200">
+              {event.title}
+            </h3>
+            <p className="text-[#4a5568] text-lg h-15 mt-1.5 line-clamp-2 leading-relaxed">
+              {event.description ?? "Aucune description disponible."}
+            </p>
+
+            <div className="mt-4 pt-3 border-t border-[#1a2030] flex flex-col gap-2 text-lg text-[#3a4550]">
+              <span className="flex items-center gap-2">
+                <MapPin size={11} className="text-[#00E5FF66]" />
+                <span className="line-clamp-1">{event.location ?? "Lieu non précisé"}</span>
+              </span>
+              <span className="flex items-center gap-2 shrink-0">
+                <Calendar size={11} className="text-[#00E5FF66]" />
+                {isMultiDay
+                  ? `${formatDate(event.startDate)} → ${formatDate(event.endDate)}`
+                  : formatDate(event.startDate)}
+              </span>
+            </div>
+
+            <div className="mt-5 overflow-hidden">
+              <div className="rounded-full border border-[#00E5FF33] bg-[#0b0f18] px-4 py-2 text-sm font-semibold text-[#00E5FF] text-center opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+                Voir le programme
+              </div>
+            </div>
+          </div>
+
+          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-linear-to-r from-transparent via-[#00E5FF] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        </motion.div>
+      </Link>
+    </motion.div>
   );
 }

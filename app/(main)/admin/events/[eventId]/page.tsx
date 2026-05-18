@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
+import ToggleSwitch from "@/components/ToggleSwitch";
 import Link from "next/link";
 import {
   Calendar,
@@ -23,6 +24,7 @@ import {
   CheckSquare,
   Square,
 } from "lucide-react";
+import SessionCardSchedule from "@/components/SessionSchedule";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -185,25 +187,25 @@ function SessionModal({
   const [form, setForm] = useState<SessionFormData>(EMPTY_SESSION);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [prevOpen, setPrevOpen] = useState(open);
+  const [prevEditingSession, setPrevEditingSession] = useState(editingSession);
 
-  useEffect(() => {
+  if (open !== prevOpen || editingSession !== prevEditingSession) {
+    setPrevOpen(open);
+    setPrevEditingSession(editingSession);
     if (open) {
-      if (editingSession) {
-        setForm({
-          title: editingSession.title,
-          description: editingSession.description ?? "",
-          startTime: toDatetimeLocal(editingSession.startTime),
-          endTime: toDatetimeLocal(editingSession.endTime),
-          capacity: editingSession.capacity?.toString() ?? "",
-          roomId: editingSession.room?.id ?? "",
-          speakerIds: editingSession.speakers.map((s) => s.id),
-        });
-      } else {
-        setForm(EMPTY_SESSION);
-      }
+      setForm(editingSession ? {
+        title: editingSession.title,
+        description: editingSession.description ?? "",
+        startTime: toDatetimeLocal(editingSession.startTime),
+        endTime: toDatetimeLocal(editingSession.endTime),
+        capacity: editingSession.capacity?.toString() ?? "",
+        roomId: editingSession.room?.id ?? "",
+        speakerIds: editingSession.speakers.map((s) => s.id),
+      } : EMPTY_SESSION);
       setError("");
     }
-  }, [open, editingSession]);
+  }
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -418,11 +420,10 @@ function SessionModal({
                             key={sp.id}
                             type="button"
                             onClick={() => toggleSpeaker(sp.id)}
-                            className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-all duration-150 ${
-                              checked
-                                ? "bg-[#00E5FF08] hover:bg-[#00E5FF10]"
-                                : "hover:bg-[#ffffff04]"
-                            }`}
+                            className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-all duration-150 ${checked
+                              ? "bg-[#00E5FF08] hover:bg-[#00E5FF10]"
+                              : "hover:bg-[#ffffff04]"
+                              }`}
                           >
                             {/* Avatar */}
                             <div className="w-7 h-7 rounded-full bg-[#1e2530] border border-[#2a3a4a] flex items-center justify-center text-[10px] font-black text-[#3a4a5a] shrink-0 overflow-hidden">
@@ -434,9 +435,8 @@ function SessionModal({
                               )}
                             </div>
                             <span
-                              className={`flex-1 text-sm font-semibold transition-colors ${
-                                checked ? "text-white" : "text-[#4a5568]"
-                              }`}
+                              className={`flex-1 text-sm font-semibold transition-colors ${checked ? "text-white" : "text-[#4a5568]"
+                                }`}
                             >
                               {sp.fullName}
                             </span>
@@ -499,9 +499,7 @@ function SessionModal({
     </AnimatePresence>
   );
 }
-
 // ─── Delete Session Modal ─────────────────────────────────────────────────────
-
 function DeleteSessionModal({
   session,
   onClose,
@@ -626,7 +624,12 @@ function EditEventModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
+  const [prevOpen, setPrevOpen] = useState(open);
+  const [prevEvent, setPrevEvent] = useState(event);
+
+  if (open !== prevOpen || event !== prevEvent) {
+    setPrevOpen(open);
+    setPrevEvent(event);
     if (open) {
       setForm({
         title: event.title,
@@ -638,7 +641,7 @@ function EditEventModal({
       });
       setError("");
     }
-  }, [open, event]);
+  }
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -799,9 +802,9 @@ function SessionCard({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.97 }}
       transition={{ duration: 0.2 }}
-      className="group relative rounded-2xl border border-[#1e2530] bg-[#0d1117] p-5 hover:border-[#00E5FF22] transition-all duration-300 overflow-hidden"
+      className="group relative rounded-2xl border border-[#1e2530] bg-[#0d1117] p-5 hover:border-[#00E5FF22] transition-all duration-300 overflow-hidden mt-3"
     >
-      <div className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-[radial-gradient(ellipse_at_top_left,#00E5FF06_0%,transparent_60%)]" />
+      <div className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-[radial-gradient(ellipse_at_top_left,#00E5FF06_0%,transparent_60%)] m-5" />
 
       {/* Live badge */}
       {session.isLive && (
@@ -846,9 +849,9 @@ function SessionCard({
           </span>
         )}
 
-        {session._count.questions > 0 && (
+        {(session._count?.questions ?? 0) > 0 && (
           <span className="inline-flex items-center gap-1 text-[10px] px-2 py-1 rounded-full border border-[#00E5FF20] bg-[#00E5FF08] text-[#00E5FF] font-semibold">
-            💬 {session._count.questions} question{session._count.questions !== 1 ? "s" : ""}
+            💬 {session._count?.questions ?? 0} question{(session._count?.questions ?? 0) !== 1 ? "s" : ""}
           </span>
         )}
       </div>
@@ -880,7 +883,7 @@ function SessionCard({
       )}
 
       {/* Actions */}
-      <div className="flex gap-2 pt-3 border-t border-[#1e2530]">
+      <div className="flex gap-2 pt-3 border-t border-[#1e2530] mt66">
         <button
           onClick={() => onEdit(session)}
           className="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 rounded-xl border border-[#1e2530] text-xs text-[#3a4a5a] hover:text-white hover:border-[#2e3a4a] transition-all font-semibold"
@@ -901,8 +904,92 @@ function SessionCard({
 }
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
-
 export default function EventDetailPage() {
+  const { eventId } = useParams<{ eventId: string }>();
+
+  const [event, setEvent] = useState<Event | null>(null);
+  const [allSpeakers, setAllSpeakers] = useState<Speaker[]>([]);
+  const [allRooms, setAllRooms] = useState<Room[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [pageError, setPageError] = useState("");
+  const [ isOn, setIsOn ] = useState(false);
+
+
+  const load = useCallback(async () => {
+    try {
+      const [evtRes, spkRes, roomRes] = await Promise.all([
+        fetch(`/api/events/${eventId}`),
+        fetch("/api/speakers"),
+        fetch("/api/rooms"),
+      ]);
+      const [evtData, spkData, roomData] = await Promise.all([
+        evtRes.json(),
+        spkRes.json(),
+        roomRes.json(),
+      ]);
+      if (!evtRes.ok) throw new Error(evtData.error ?? "Erreur");
+      setEvent(evtData);
+      setAllSpeakers(Array.isArray(spkData) ? spkData : []);
+      setAllRooms(Array.isArray(roomData) ? roomData : []);
+    } catch {
+      setPageError("Impossible de charger l'événement.");
+    } finally {
+      setLoading(false);
+    }
+  }, [eventId]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  // ── Loading ──
+  if (loading) {
+    return (
+      <main className="flex-1 px-8 py-12 max-w-6xl mx-auto w-full">
+        <div className="h-4 w-32 bg-[#1e2530] rounded-lg animate-pulse mb-10" />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-1 h-64 bg-[#0d1117] rounded-2xl border border-[#1e2530] animate-pulse" />
+          <div className="lg:col-span-2 grid sm:grid-cols-2 gap-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <SessionCardSkeleton key={i} />
+            ))}
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  if (pageError || !event) {
+    return (
+      <main className="flex-1 px-8 py-12 max-w-6xl mx-auto w-full">
+        <div className="flex items-center gap-2 text-red-400 text-sm">
+          <AlertTriangle size={16} />
+          {pageError || "Événement introuvable."}
+        </div>
+      </main>
+    );
+  }
+
+  return (
+    
+    <>
+      <main className="flex-1 px-8 py-12 max-w-6xl mx-auto w-full">
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-2 text-sm text-[#4a5568] mb-8 flex-wrap">
+          <Link href="/admin" className="hover:text-[#00E5FF] transition-colors">Admin</Link>
+          <ChevronRight size={13} />
+          <Link href="/admin/events" className="hover:text-[#00E5FF] transition-colors">Événements</Link>
+          <ChevronRight size={13} />
+          <span className="text-white truncate max-w-50">{event.title}</span>
+        </div>
+        <ToggleSwitch isOn={isOn} setIsOn={setIsOn}/>
+        {isOn? <PlanningPage/> : <ListEventBySessionsPage/> }
+
+      </main>
+    </>
+  );
+
+  function ListEventBySessionsPage(){
   const { eventId } = useParams<{ eventId: string }>();
 
   const [event, setEvent] = useState<Event | null>(null);
@@ -941,7 +1028,9 @@ export default function EventDetailPage() {
   }, [eventId]);
 
   useEffect(() => {
-    load();
+    (async () => {
+      await load();
+    })();
   }, [load]);
 
   const openCreateSession = () => {
@@ -1005,9 +1094,9 @@ export default function EventDetailPage() {
     );
   }
 
-  return (
-    <>
-      <EditEventModal
+    return (
+      <div>      
+        <EditEventModal
         open={editEventOpen}
         onClose={() => setEditEventOpen(false)}
         event={event}
@@ -1028,24 +1117,14 @@ export default function EventDetailPage() {
         onDeleted={handleSessionDeleted}
       />
 
-      <main className="flex-1 px-8 py-12 max-w-6xl mx-auto w-full">
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-[#4a5568] mb-8 flex-wrap">
-          <Link href="/admin" className="hover:text-[#00E5FF] transition-colors">Admin</Link>
-          <ChevronRight size={13} />
-          <Link href="/admin/events" className="hover:text-[#00E5FF] transition-colors">Événements</Link>
-          <ChevronRight size={13} />
-          <span className="text-white truncate max-w-50">{event.title}</span>
-        </div>
-
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* ── Left: Event details ── */}
           <div className="lg:col-span-1 flex flex-col gap-4">
             {/* Event card */}
             <div
-              className="relative rounded-2xl border border-[#1e2530] bg-[#0d1117] overflow-hidden"
-              style={{ boxShadow: "0 0 0 1px #00E5FF0a, 0 0 30px #00E5FF08" }}
-            >
+              className="relative rounded-2xl border border-[#1e2530] bg-[#0d1117] mt-20 overflow-hidden"
+              style={{ boxShadow: "0 0 0 1px #00E5FF0a, 0 0 30px #07282c08" }}
+            > 
               {/* Cover image */}
               {event.coverImage ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -1068,7 +1147,6 @@ export default function EventDetailPage() {
                   {event.title}
                 </h1>
                 <p className="text-xs font-mono text-[#2a3a4a] mb-3">{event.slug}</p>
-
                 {event.description && (
                   <p className="text-sm text-[#4a5568] leading-relaxed mb-4">{event.description}</p>
                 )}
@@ -1112,49 +1190,48 @@ export default function EventDetailPage() {
                 </div>
               </div>
             </div>
-
-            {/* Stats mini cards */}
+            {/* grille contenant les listes des sessions */}
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-4 text-center">
                 <div className="text-2xl font-black text-[#00E5FF]">{event.sessions.length}</div>
                 <div className="text-[10px] text-[#3a4a5a] font-semibold uppercase tracking-widest mt-0.5">Sessions</div>
               </div>
-              <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-4 text-center">
-                <div className="text-2xl font-black text-white">
-                  {event.sessions.filter((s) => s.isLive).length}
-                </div>
-                <div className="text-[10px] text-[#3a4a5a] font-semibold uppercase tracking-widest mt-0.5 flex items-center justify-center gap-1">
-                  {event.sessions.some((s) => s.isLive) && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#00E5FF] animate-pulse" />
-                  )}
-                  Live
-                </div>
+            <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-4 text-center">
+              <div className="text-2xl font-black text-white">
+                {event.sessions.filter((s) => s.isLive).length}
               </div>
-              <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-4 text-center">
-                <div className="text-2xl font-black text-white">
-                  {[...new Set(event.sessions.flatMap((s) => s.speakers.map((sp) => sp.id)))].length}
-                </div>
-                <div className="text-[10px] text-[#3a4a5a] font-semibold uppercase tracking-widest mt-0.5">Speakers</div>
-              </div>
-              <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-4 text-center">
-                <div className="text-2xl font-black text-white">
-                  {event.sessions.reduce((sum, s) => sum + s._count.questions, 0)}
-                </div>
-                <div className="text-[10px] text-[#3a4a5a] font-semibold uppercase tracking-widest mt-0.5">Questions</div>
+              <div className="text-[10px] text-[#3a4a5a] font-semibold uppercase tracking-widest mt-0.5 flex items-center justify-center gap-1">
+                {event.sessions.some((s) => s.isLive) && (
+                <span className="w-1.5 h-1.5 rounded-full bg-[#00E5FF] animate-pulse" />
+              )}
+              Live
               </div>
             </div>
-          </div>
 
+            <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-4 text-center">
+              <div className="text-2xl font-black text-white">
+              {[...new Set(event.sessions.flatMap((s) => s.speakers.map((sp) => sp.id)))].length}
+              </div>
+              <div className="text-[10px] text-[#3a4a5a] font-semibold uppercase tracking-widest mt-0.5">Speakers</div>
+            </div>
+
+            <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-4 text-center">
+              <div className="text-2xl font-black text-white">
+                {event.sessions.reduce((sum, s) => sum + s._count.questions, 0)}
+              </div>
+              <div className="text-[10px] text-[#3a4a5a] font-semibold uppercase tracking-widest mt-0.5">Questions</div>
+            </div>
+          </div>
+              </div>          
           {/* ── Right: Sessions ── */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 mt-20">
             {/* Sessions header */}
             <div className="flex items-center justify-between mb-5">
-              <div className="flex items-center gap-2">
-                <Radio size={15} className="text-[#00E5FF]" />
-                <h2 className="text-lg font-black text-white tracking-tight">
+             <div className="flex items-center gap-2"> 
+                <Radio size={25} className="text-[#00E5FF]" />
+                <h2 className="text-3xl font-black tracking-tight">
                   Sessions
-                  <span className="ml-2 text-sm font-normal text-[#3a4a5a]">{event.sessions.length}</span>
-                </h2>
+               </h2>
               </div>
               <button
                 onClick={openCreateSession}
@@ -1182,9 +1259,6 @@ export default function EventDetailPage() {
                 </button>
               </div>
             )}
-
-            {/* Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <AnimatePresence initial={false}>
                 {sortedSessions.map((session) => (
                   <SessionCard
@@ -1195,10 +1269,69 @@ export default function EventDetailPage() {
                   />
                 ))}
               </AnimatePresence>
-            </div>
-          </div>
+          </div> 
         </div>
-      </main>
-    </>
-  );
+      </div>
+  )}
+
+  function PlanningPage(){
+    const { eventId } = useParams<{ eventId: string }>();
+    const [ session, setSession ] = useState<Session[] | []>([]);
+    const [ loading, setLoading ] = useState(true);
+    const [ error, setError ] = useState<string | null>(null);
+    const [ selectedRoom, setSelectedRoom ] = useState<string | null>(null)
+
+
+    useEffect(() => {
+      const fetchSession = async () => {
+        try{
+          const response = await fetch(`/api/events/${eventId}/sessions`);
+          if(!response.ok) throw new Error("Internal Servor Error");
+          const data = await response.json(); 
+          
+          setSession(data);
+          console.log(data);
+          
+
+        }catch(err){
+          setError("Session charge failed");
+
+        }finally{
+          setLoading(false);
+        }
+      }
+      fetchSession()
+
+    }, [eventId]);
+
+    const rooms = [...new Set(session.flatMap(s => s.room ? [s.room.name] : []))]
+
+    if(loading) return <div>Chargement de l'emploi du temps</div>
+    if(error) return <div>{error}</div>
+    if(!rooms) return <div></div>
+
+    return(    
+      <div className="mt-3 rounded-lg bg-gray-100">
+        <div className="flex flex-row justify-between p-5">
+          <div className="flex gap-3">
+            <button className="bg-blue-700 h-13 rounded-xl text-white font-bold w-35" onClick={() => setSelectedRoom(null)}>Toutes les salles</button>
+            {
+              rooms.map(r => (
+                <button 
+                className="w-35 rounded-xl border-gray-300 border-1 h-13 font-bold " 
+                key={r}
+                onClick={() => setSelectedRoom(r)}
+                >
+                  {r}
+                  </button>
+              ))
+            }
+          </div>
+
+        </div>
+        <SessionCardSchedule session={session} selectedRoom={selectedRoom}/>
+      </div>
+
+    )
+  }
 }

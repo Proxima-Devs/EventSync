@@ -13,17 +13,15 @@ export async function GET(request: NextRequest) {
     const perPage = parseInt(searchParams.get("perPage") ?? "20");
     const skip = (page - 1) * perPage;
 
-    const [events, total] = await prisma.$transaction([
-      prisma.event.findMany({
-        orderBy: { startDate: "desc" },
-        skip,
-        take: perPage,
-        include: {
-          _count: { select: { sessions: true } },
-        },
-      }),
-      prisma.event.count(),
-    ]);
+    const events = await prisma.event.findMany({
+      orderBy: { startDate: "desc" },
+      skip,
+      take: perPage,
+      include: {
+        _count: { select: { sessions: true } },
+      },
+    });
+    const total = await prisma.event.count();
 
     return NextResponse.json({
       data: events,

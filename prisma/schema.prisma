@@ -13,21 +13,22 @@ enum Role {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String   @id @default(cuid())
   name          String
-  email         String    @unique
-  emailVerified Boolean   @default(false)
+  email         String   @unique
+  emailVerified Boolean  @default(false)
   image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  role          Role    @default(USER)
-  banned        Boolean?  @default(false)
-  banReason     String?
-  banExpires    DateTime?
+  role       Role      @default(USER)
+  banned     Boolean?  @default(false)
+  banReason  String?
+  banExpires DateTime?
 
-  sessions      Session[]
-  accounts      Account[]
+  sessions Session[]
+  accounts Account[]
+  upvotes  QuestionUpvote[]
 
   @@map("user")
 }
@@ -66,12 +67,12 @@ model Account {
 }
 
 model Verification {
-  id         String    @id @default(cuid())
+  id         String   @id @default(cuid())
   identifier String
-  value      String    @db.Text
+  value      String   @db.Text
   expiresAt  DateTime
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@map("verification")
 }
@@ -108,7 +109,7 @@ model Speaker {
   fullName  String
   photo     String?
   bio       String?          @db.Text
-  links     Json?            // { twitter?, linkedin?, website?, github? }
+  links     Json? // { twitter?, linkedin?, website?, github? }
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
   sessions  SessionSpeaker[]
@@ -146,14 +147,39 @@ model SessionSpeaker {
 }
 
 model Question {
-  id         String       @id @default(cuid())
-  content    String       @db.Text
+  id         String           @id @default(cuid())
+  content    String           @db.Text
   authorName String?
-  upvotes    Int          @default(0)
-  isHidden   Boolean      @default(false)
+  upvotes    Int              @default(0)
+  isHidden   Boolean          @default(false)
   sessionId  String
-  session    EventSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  createdAt  DateTime     @default(now())
+  session    EventSession     @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  replies    QuestionReply[]
+  upvotesBy  QuestionUpvote[]
+  createdAt  DateTime         @default(now())
 
   @@map("question")
+}
+
+model QuestionReply {
+  id         String   @id @default(cuid())
+  content    String   @db.Text
+  authorName String?
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@map("question_reply")
+}
+
+model QuestionUpvote {
+  id         String   @id @default(cuid())
+  userId     String
+  questionId String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, questionId])
+  @@map("question_upvote")
 }

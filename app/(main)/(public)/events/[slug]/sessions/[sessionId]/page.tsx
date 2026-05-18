@@ -97,9 +97,8 @@ export default function SessionDetailPage() {
         <span>/</span>
         <span className="text-white truncate max-w-[180px]">{session.title}</span>
       </div>
-
-      {/* Header card */}
-      <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-8 mb-6">
+      <div className="border border-[#1e2530] bg-[#0d1117] w-210 rounded-2xl">
+        <div className="rounded-2xl  p-8 mb-6">
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-2 flex-wrap">
             {session.isLive && (
@@ -126,9 +125,9 @@ export default function SessionDetailPage() {
           </button>
         </div>
 
-        <h1 className="text-3xl font-black mb-4 leading-tight">{session.title}</h1>
+        <h1 className="text-3xl font-black mb-4 text-white leading-tight">{session.title}</h1>
 
-        <div className="flex flex-wrap gap-4 text-sm text-[#4a5568] mb-6">
+        <div className="flex flex-wrap gap-4 text-sm text-[#4a5568] p- mb-6">
           <span>
             🕐 {formatTime(session.startTime)} → {formatTime(session.endTime)}
           </span>
@@ -138,20 +137,20 @@ export default function SessionDetailPage() {
         </div>
 
         {session.description && (
-          <p className="text-[#6b7280] leading-relaxed">{session.description}</p>
+          <p className="text-[#6b7280] leading-relaxed ">{session.description}</p>
         )}
       </div>
 
       {/* Intervenants */}
       {session.speakers.length > 0 && (
         <div className="mb-6">
-          <h2 className="text-xl font-black mb-4">Intervenants</h2>
+          <h2 className="text-xl font-black mb-4 pl-7 text-white">Intervenants</h2>
           <div className="grid gap-3 md:grid-cols-2">
             {session.speakers.map((speaker) => (
               <Link
                 key={speaker.id}
                 href={`/speakers/${speaker.id}`}
-                className="flex items-center gap-4 rounded-2xl border border-[#1e2530] bg-[#0d1117] p-5 hover:border-[#00E5FF44] transition-all duration-200 group"
+                className="flex items-center gap-4 rounded-2xl px-4 py-3 mx-4 hover:border-[#00E5FF44] transition-all duration-200 group hover:border-1 "
               >
                 {speaker.photo ? (
                   <Image
@@ -168,7 +167,7 @@ export default function SessionDetailPage() {
                   </div>
                 )}
                 <div className="min-w-0">
-                  <p className="font-bold group-hover:text-[#00E5FF] transition-colors">
+                  <p className="font-bold group-hover:text-[#00E5FF] text-white transition-colors">
                     {speaker.fullName}
                   </p>
                   {speaker.bio && (
@@ -185,11 +184,11 @@ export default function SessionDetailPage() {
           </div>
         </div>
       )}
-
-      {/* Q&A */}
-      <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-6">
-        <QuestionSection sessionId={session.id} isLive={session.isLive} />
+        <div className="rounded-2xl  bg-[#0d1117] p-6">
+          <QuestionSection sessionId={session.id} isLive={session.isLive} />
+        </div>
       </div>
+
     </main>
   );
 }

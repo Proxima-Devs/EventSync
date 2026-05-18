@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth-utils";
 import type { SpeakerPayload } from "@/types";
+import { Prisma } from "@/generated/prisma/client";
 
 // ── GET /api/speakers 
 // Public — liste tous les intervenants
@@ -55,7 +56,7 @@ export async function POST(request: NextRequest) {
         fullName: fullName.trim(),
         photo: photo || null,
         bio: bio?.trim() || null,
-        links: links ?? null,
+        links: links as Prisma.InputJsonValue ?? null,
       },
     });
 

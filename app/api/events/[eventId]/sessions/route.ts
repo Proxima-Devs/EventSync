@@ -110,6 +110,7 @@ export async function POST(request: NextRequest, { params }: Params) {
       include: {
         room: true,
         speakers: { include: { speaker: true } },
+        _count: { select: { questions: true } },
       },
     });
 

@@ -1,0 +1,107 @@
+interface Speaker {
+  id: string;
+  fullName: string;
+  photo?: string | null;
+}
+
+interface Room {
+  id: string;
+  name: string;
+}
+
+interface Session {
+  id: string;
+  title: string;
+  description?: string | null;
+  startTime: string;
+  endTime: string;
+  capacity?: number | null;
+  isLive: boolean;
+  room?: Room | null;
+  speakers: Speaker[];
+  _count: { questions: number };
+}
+
+
+
+export default function SessionCardSchedule(
+  { session,
+    selectedRoom } : {
+    session: Session[],
+     selectedRoom: string | null
+}){
+
+  const timeSlots = [...new Set(
+  session.map(s => s.startTime.substring(11, 16))
+)].sort();
+
+  const getSessionAtTime = (time: string, roomName: string) => {
+  return session.find(session => {
+    let sessionStart = "";
+    if (session.startTime.includes('T')) {
+      sessionStart = session.startTime.substring(11, 16);
+    } else if (session.startTime.includes(' ')) {
+      sessionStart = session.startTime.split(' ')[1].substring(0, 5);
+    } else {
+      sessionStart = session.startTime.substring(0, 5);
+    }
+    
+    const match = sessionStart === time && session.room?.name === roomName;
+    
+    return match;
+  });
+};
+
+    const rooms = [...new Set(session.map(s => s.room?.name).filter(Boolean) as string[])];
+    const filterRooms = selectedRoom ? rooms.filter(r => r === selectedRoom) : rooms;
+
+    if (!session.length) return <div>Session not found</div>
+
+    return (
+  
+        <table>
+          <thead >
+            <tr >
+              <th className="text-grey-700 px-10 text-lg font-extralight">Heure</th>
+              {filterRooms.map(room => (
+              <th className="bg-gray-200 px-10 py-3 text-lg w-300 font-extralight border-5 border-gray-100 mx-3 rounded-2xl " key={room}>
+                {room}</th>
+          ))}
+            </tr>
+          </thead>
+          <tbody className="h-120">
+           {
+            timeSlots.map(time => (
+              <tr key={time} className=" py-6">
+                <td className="font-medium h-30 text-center">{time}</td>
+                {filterRooms.map((roomName, i) => {
+
+                  const sessionTime = getSessionAtTime(time, roomName)
+               
+                  return (
+                    <td key={`${time}-${roomName}-${i}`}>{
+                      sessionTime ? (
+                        <div className="bg-white border-1 border-gray-400 rounded-lg px-5 py-2">
+                          <h1 className="font-bold">{sessionTime.title}</h1>
+                          <p className="text-sm ">{sessionTime.startTime.substring(11,16)}-{sessionTime.endTime.substring(11,16)}</p>
+                          <p className="text-[12px] font-bold text-blue-700">{sessionTime.speakers.map(s => s.fullName).join(", ")}</p>
+                        </div>
+                      ):
+                      (<div>
+
+                      </div>
+                      )}</td>
+                  );
+                })
+                }
+              </tr>
+            ))
+           }
+          </tbody>
+
+        </table>
+    )
+}
+
+
+
