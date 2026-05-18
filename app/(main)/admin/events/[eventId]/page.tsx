@@ -1313,7 +1313,6 @@ export default function EventDetailPage() {
     return(    
       <div className="mt-3 rounded-lg bg-gray-100">
         <div className="flex flex-row justify-between p-5">
-          <div></div>
           <div className="flex gap-3">
             <button className="bg-blue-700 h-13 rounded-xl text-white font-bold w-35" onClick={() => setSelectedRoom(null)}>Toutes les salles</button>
             {
