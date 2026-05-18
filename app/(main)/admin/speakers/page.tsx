@@ -1,31 +1,18 @@
 "use client";
 
+import { Mic, Plus, X, Pencil, Trash2, Layers, AlertTriangle, ChevronRight, Search } from "lucide-react";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import ImageUpload from "@/components/ImageUpload";
-import {
-  Users,
-  Plus,
-  X,
-  Pencil,
-  Trash2,
-  Mic,
-  AlertTriangle,
-  ChevronRight,
-  Search,
-  Globe,
-  Ghost
-} from "lucide-react";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// ─── Types ───
 
 interface SpeakerLinks {
   twitter?: string;
   linkedin?: string;
-  github?: string;
   website?: string;
+  github?: string;
 }
 
 interface Speaker {
@@ -37,61 +24,22 @@ interface Speaker {
   _count: { sessions: number };
 }
 
-interface FormState {
+interface SpeakerFormData {
   fullName: string;
-  bio: string;
   photo: string;
+  bio: string;
   twitter: string;
   linkedin: string;
-  github: string;
   website: string;
+  github: string;
 }
 
-const EMPTY_FORM: FormState = {
-  fullName: "",
-  bio: "",
-  photo: "",
-  twitter: "",
-  linkedin: "",
-  github: "",
-  website: "",
-};
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// ─── Style ───
 
 const inputClass =
   "w-full px-4 py-2.5 rounded-xl bg-[#060a0f] border border-[#1e2530] text-sm text-[#ccc] placeholder-[#2a3a4a] focus:outline-none focus:border-[#00E5FF44] focus:ring-1 focus:ring-[#00E5FF22] transition-all duration-200";
 
-function Field({
-  label,
-  required,
-  children,
-}: {
-  label: string;
-  required?: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      <label className="text-xs font-semibold uppercase tracking-widest text-[#3a4a5a]">
-        {label}
-        {required && <span className="text-[#00E5FF] ml-1">*</span>}
-      </label>
-      {children}
-    </div>
-  );
-}
-
-function initials(name: string) {
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-}
-
-// ─── Skeleton ─────────────────────────────────────────────────────────────────
+// ─── Skeleton ───
 
 function SpeakerRowSkeleton() {
   return (
@@ -99,9 +47,8 @@ function SpeakerRowSkeleton() {
       <div className="w-10 h-10 rounded-full bg-[#1e2530] shrink-0" />
       <div className="flex-1 space-y-2">
         <div className="h-3.5 w-1/3 bg-[#1e2530] rounded-lg" />
-        <div className="h-2.5 w-2/3 bg-[#1e2530] rounded-lg" />
+        <div className="h-2.5 w-1/4 bg-[#1e2530] rounded-lg" />
       </div>
-      <div className="h-3 w-16 bg-[#1e2530] rounded-lg hidden sm:block" />
       <div className="flex gap-2 ml-auto">
         <div className="w-8 h-8 bg-[#1e2530] rounded-xl" />
         <div className="w-8 h-8 bg-[#1e2530] rounded-xl" />
@@ -110,35 +57,7 @@ function SpeakerRowSkeleton() {
   );
 }
 
-// ─── Social icon map ──────────────────────────────────────────────────────────
-
-const SOCIAL_META: Record<
-  string,
-  { label: string; placeholder: string; icon: React.ReactNode }
-> = {
-  twitter: {
-    label: "Twitter / X",
-    placeholder: "https://x.com/username",
-    icon: <span className="text-[11px] font-black">𝕏</span>,
-  },
-  linkedin: {
-    label: "LinkedIn",
-    placeholder: "https://linkedin.com/in/username",
-    icon: <span className="text-[11px] font-black">in</span>,
-  },
-  github: {
-    label: "GitHub",
-    placeholder: "https://github.com/username",
-    icon: <Ghost size={12} />,
-  },
-  website: {
-    label: "Site web",
-    placeholder: "https://monsite.com",
-    icon: <Globe size={12} />,
-  },
-};
-
-// ─── Speaker Modal (Create / Edit) ───────────────────────────────────────────
+// ─── Speaker Modal (Create / Edit) ───
 
 function SpeakerModal({
   open,
@@ -148,33 +67,50 @@ function SpeakerModal({
 }: {
   open: boolean;
   onClose: () => void;
-  onSaved: (sp: Speaker) => void;
+  onSaved: (speaker: Speaker) => void;
   editingSpeaker: Speaker | null;
 }) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const isEdit = !!editingSpeaker;
-  const [form, setForm] = useState<FormState>(EMPTY_FORM);
+  const [form, setForm] = useState<SpeakerFormData>({
+    fullName: "",
+    photo: "",
+    bio: "",
+    twitter: "",
+    linkedin: "",
+    website: "",
+    github: "",
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [prevOpen, setPrevOpen] = useState(open);
-  const [prevEditingSpeaker, setPrevEditingSpeaker] = useState(editingSpeaker);
 
-  if (open !== prevOpen || editingSpeaker !== prevEditingSpeaker) {
-    setPrevOpen(open);
-    setPrevEditingSpeaker(editingSpeaker);
+  useEffect(() => {
     if (open) {
-      setForm(editingSpeaker ? {
-        fullName: editingSpeaker.fullName,
-        bio: editingSpeaker.bio ?? "",
-        photo: editingSpeaker.photo ?? "",
-        twitter: editingSpeaker.links?.twitter ?? "",
-        linkedin: editingSpeaker.links?.linkedin ?? "",
-        github: editingSpeaker.links?.github ?? "",
-        website: editingSpeaker.links?.website ?? "",
-      } : EMPTY_FORM);
+      if (editingSpeaker) {
+        const links = editingSpeaker.links || {};
+        setForm({
+          fullName: editingSpeaker.fullName,
+          photo: editingSpeaker.photo ?? "",
+          bio: editingSpeaker.bio ?? "",
+          twitter: links.twitter ?? "",
+          linkedin: links.linkedin ?? "",
+          website: links.website ?? "",
+          github: links.github ?? "",
+        });
+      } else {
+        setForm({
+          fullName: "",
+          photo: "",
+          bio: "",
+          twitter: "",
+          linkedin: "",
+          website: "",
+          github: "",
+        });
+      }
       setError("");
     }
-  }
+  }, [open, editingSpeaker]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -184,41 +120,43 @@ function SpeakerModal({
     return () => document.removeEventListener("keydown", handler);
   }, [open, onClose]);
 
-  const set = (field: keyof FormState, value: string) =>
+  const set = (field: keyof SpeakerFormData, value: string) =>
     setForm((f) => ({ ...f, [field]: value }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
     if (!form.fullName.trim()) {
       setError("Le nom complet est obligatoire.");
       return;
     }
+
     setLoading(true);
     try {
-      const payload = {
-        fullName: form.fullName.trim(),
-        bio: form.bio.trim() || undefined,
-        photo: form.photo || undefined,
-        links: {
-          ...(form.twitter && { twitter: form.twitter }),
-          ...(form.linkedin && { linkedin: form.linkedin }),
-          ...(form.github && { github: form.github }),
-          ...(form.website && { website: form.website }),
-        },
-      };
+      const links: SpeakerLinks = {};
+      if (form.twitter) links.twitter = form.twitter;
+      if (form.linkedin) links.linkedin = form.linkedin;
+      if (form.website) links.website = form.website;
+      if (form.github) links.github = form.github;
+
       const url = isEdit ? `/api/speakers/${editingSpeaker!.id}` : "/api/speakers";
       const method = isEdit ? "PUT" : "POST";
 
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          fullName: form.fullName.trim(),
+          photo: form.photo || undefined,
+          bio: form.bio || undefined,
+          links: Object.keys(links).length > 0 ? links : undefined,
+        }),
       });
+
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Erreur serveur");
-
-      onSaved({ _count: { sessions: editingSpeaker?._count.sessions ?? 0 }, ...data });
+      onSaved({ _count: { sessions: 0 }, ...data });
       onClose();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Erreur inconnue");
@@ -237,25 +175,25 @@ function SpeakerModal({
           exit={{ opacity: 0 }}
           transition={{ duration: 0.18 }}
           onClick={(e) => e.target === overlayRef.current && onClose()}
-          className="fixed inset-0 z-50 flex items-center justify-center px-4 py-8 bg-black/75 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center px-4 py-8 bg-black/75 backdrop-blur-sm overflow-y-auto"
         >
           <motion.div
-            initial={{ opacity: 0, y: 24, scale: 0.96 }}
+            initial={{ opacity: 0, y: 20, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.97 }}
             transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-            className="relative w-full max-w-xl rounded-2xl border border-[#1e2530] bg-[#0a0e14] overflow-hidden max-h-[90vh] flex flex-col"
+            className="relative w-full max-w-md rounded-2xl border border-[#1e2530] bg-[#0a0e14] overflow-hidden my-auto"
             style={{
               boxShadow:
                 "0 0 0 1px #00E5FF18, 0 0 40px #00E5FF18, 0 0 80px #00E5FF08, 0 32px 64px rgba(0,0,0,0.6)",
             }}
           >
-            {/* Neon top line */}
+            {/* Top neon line */}
             <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-[#00E5FF60] to-transparent" />
             <div className="pointer-events-none absolute -top-20 -left-20 w-64 h-64 bg-[#00E5FF08] rounded-full blur-3xl" />
 
             {/* Header */}
-            <div className="relative flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#1e2530] shrink-0">
+            <div className="relative flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#1e2530]">
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 rounded-lg bg-[#00E5FF15] border border-[#00E5FF30] flex items-center justify-center">
                   {isEdit ? (
@@ -269,7 +207,7 @@ function SpeakerModal({
                     {isEdit ? "Modifier l'intervenant" : "Nouvel intervenant"}
                   </h2>
                   <p className="text-xs text-[#3a4a5a]">
-                    {isEdit ? editingSpeaker?.fullName : "Renseignez les informations"}
+                    {isEdit ? `ID : ${editingSpeaker?.id.slice(0, 8)}…` : "Ajoutez un conférencier"}
                   </p>
                 </div>
               </div>
@@ -281,113 +219,112 @@ function SpeakerModal({
               </button>
             </div>
 
-            {/* Scrollable body */}
-            <form onSubmit={handleSubmit} className="relative flex flex-col overflow-hidden flex-1">
-              <div className="overflow-y-auto flex-1 px-6 py-5 flex flex-col gap-5">
-
-                {/* Photo + Name side by side */}
-                <div className="flex gap-4 items-start">
-                  {/* Avatar preview */}
-                  <div className="shrink-0">
-                    <p className="text-xs font-semibold uppercase tracking-widest text-[#3a4a5a] mb-2">
-                      Photo
-                    </p>
-                    <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-[#1e2530] bg-[#060a0f] flex items-center justify-center">
-                      {form.photo ? (
-                        <img
-                          src={form.photo}
-                          alt="preview"
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <span className="text-lg font-black text-[#2a3a4a]">
-                          {form.fullName ? initials(form.fullName) : "?"}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Name + bio */}
-                  <div className="flex-1 flex flex-col gap-3">
-                    <Field label="Nom complet" required>
-                      <input
-                        className={inputClass}
-                        value={form.fullName}
-                        onChange={(e) => set("fullName", e.target.value)}
-                        placeholder="Ex : Marie Dupont"
-                        autoFocus
-                      />
-                    </Field>
-                  </div>
-                </div>
-
-                {/* Image upload */}
-                <Field label="Upload photo">
-                  <div className="rounded-xl border border-[#1e2530] bg-[#060a0f] p-3">
-                    <ImageUpload
-                      value={form.photo}
-                      onChange={(url) => set("photo", url)}
-                    />
-                  </div>
-                </Field>
-
-                {/* Bio */}
-                <Field label="Biographie">
-                  <textarea
-                    className={`${inputClass} resize-none`}
-                    rows={3}
-                    value={form.bio}
-                    onChange={(e) => set("bio", e.target.value)}
-                    placeholder="Quelques mots sur l'intervenant…"
-                  />
-                </Field>
-
-                {/* Social links */}
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-widest text-[#3a4a5a] mb-3">
-                    Liens sociaux
-                  </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {(["twitter", "linkedin", "github", "website"] as const).map((field) => {
-                      const meta = SOCIAL_META[field];
-                      return (
-                        <div key={field} className="flex flex-col gap-1.5">
-                          <label className="text-xs font-semibold text-[#2a3a4a] flex items-center gap-1.5">
-                            <span className="w-4 h-4 rounded-md bg-[#1e2530] flex items-center justify-center text-[#3a4a5a]">
-                              {meta.icon}
-                            </span>
-                            {meta.label}
-                          </label>
-                          <input
-                            className={inputClass}
-                            value={form[field]}
-                            onChange={(e) => set(field, e.target.value)}
-                            placeholder={meta.placeholder}
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Error */}
-                <AnimatePresence>
-                  {error && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="flex items-start gap-2.5 rounded-xl border border-red-900/60 bg-red-500/10 px-4 py-3 text-sm text-red-400"
-                    >
-                      <AlertTriangle size={14} className="shrink-0 mt-0.5" />
-                      {error}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="relative px-6 py-5 flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto">
+              {/* Full Name */}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold uppercase tracking-widest text-[#3a4a5a]">
+                  Nom complet <span className="text-[#00E5FF]">*</span>
+                </label>
+                <input
+                  className={inputClass}
+                  value={form.fullName}
+                  onChange={(e) => set("fullName", e.target.value)}
+                  placeholder="Ex : Jean Dupont"
+                  autoFocus
+                />
               </div>
 
-              {/* Sticky footer */}
-              <div className="px-6 pb-6 pt-4 border-t border-[#1e2530] bg-[#0a0e14] shrink-0 flex gap-3">
+              {/* Photo URL */}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold uppercase tracking-widest text-[#3a4a5a]">
+                  Photo (URL)
+                </label>
+                <input
+                  className={inputClass}
+                  type="url"
+                  value={form.photo}
+                  onChange={(e) => set("photo", e.target.value)}
+                  placeholder="https://…"
+                />
+              </div>
+
+              {/* Bio */}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold uppercase tracking-widest text-[#3a4a5a]">
+                  Biographie
+                </label>
+                <textarea
+                  className={`${inputClass} resize-none`}
+                  rows={3}
+                  value={form.bio}
+                  onChange={(e) => set("bio", e.target.value)}
+                  placeholder="Décrivez l'intervenant…"
+                />
+              </div>
+
+              {/* Social Links */}
+              <div className="border-t border-[#1e2530] pt-4 mt-2">
+                <p className="text-xs font-semibold uppercase tracking-widest text-[#3a4a5a] mb-3">
+                  Liens sociaux (optionnel)
+                </p>
+
+                <div className="space-y-3">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs text-[#2a3a4a]">Twitter</label>
+                    <input
+                      className={inputClass}
+                      value={form.twitter}
+                      onChange={(e) => set("twitter", e.target.value)}
+                      placeholder="https://twitter.com/…"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs text-[#2a3a4a]">LinkedIn</label>
+                    <input
+                      className={inputClass}
+                      value={form.linkedin}
+                      onChange={(e) => set("linkedin", e.target.value)}
+                      placeholder="https://linkedin.com/in/…"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs text-[#2a3a4a]">Website</label>
+                    <input
+                      className={inputClass}
+                      type="url"
+                      value={form.website}
+                      onChange={(e) => set("website", e.target.value)}
+                      placeholder="https://…"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs text-[#2a3a4a]">GitHub</label>
+                    <input
+                      className={inputClass}
+                      value={form.github}
+                      onChange={(e) => set("github", e.target.value)}
+                      placeholder="https://github.com/…"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <AnimatePresence>
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="flex items-start gap-2.5 rounded-xl border border-red-900/60 bg-red-500/10 px-4 py-3 text-sm text-red-400"
+                  >
+                    <AlertTriangle size={14} className="shrink-0 mt-0.5" />
+                    {error}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <div className="flex gap-3 pt-3 border-t border-[#1e2530] mt-4">
                 <button
                   type="button"
                   onClick={onClose}
@@ -414,7 +351,7 @@ function SpeakerModal({
   );
 }
 
-// ─── Delete Modal ─────────────────────────────────────────────────────────────
+// ─── Delete Modal ───
 
 function DeleteModal({
   speaker,
@@ -428,12 +365,6 @@ function DeleteModal({
   const overlayRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [prevSpeaker, setPrevSpeaker] = useState(speaker);
-
-  if (speaker !== prevSpeaker) {
-    setPrevSpeaker(speaker);
-    setError("");
-  }
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -486,46 +417,21 @@ function DeleteModal({
             <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-red-500/50 to-transparent" />
 
             <div className="px-6 pt-6 pb-5">
-              {/* Avatar */}
-              <div className="flex items-center gap-3 mb-5">
-                <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-900/40 flex items-center justify-center shrink-0">
-                  <Trash2 size={18} className="text-red-400" />
-                </div>
-                <div>
-                  <h2 className="text-base font-black text-white">Supprimer l'intervenant ?</h2>
-                  <p className="text-xs text-[#3a4a5a]">Cette action est irréversible</p>
-                </div>
+              <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-900/40 flex items-center justify-center mb-4">
+                <Trash2 size={18} className="text-red-400" />
               </div>
-
-              {/* Speaker preview */}
-              <div className="flex items-center gap-3 p-3 rounded-xl border border-[#1e2530] bg-[#060a0f] mb-4">
-                <div className="w-9 h-9 rounded-full overflow-hidden border border-[#1e2530] bg-[#1e2530] flex items-center justify-center text-xs font-black text-[#3a4a5a] shrink-0">
-                  {speaker.photo ? (
-                    <img src={speaker.photo} alt={speaker.fullName} className="w-full h-full object-cover" />
-                  ) : (
-                    initials(speaker.fullName)
-                  )}
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-[#ccc]">{speaker.fullName}</p>
-                  <p className="text-[11px] text-[#3a4a5a]">
-                    {speaker._count.sessions} session{speaker._count.sessions !== 1 ? "s" : ""}
-                  </p>
-                </div>
-              </div>
-
-              {speaker._count.sessions > 0 && (
-                <div className="flex items-start gap-2 p-3 rounded-xl border border-amber-900/40 bg-amber-500/10 text-amber-400 text-xs mb-3">
-                  <AlertTriangle size={13} className="shrink-0 mt-0.5" />
-                  <span>
-                    Cet intervenant est assigné à {speaker._count.sessions} session{speaker._count.sessions !== 1 ? "s" : ""}. Retirez-le d'abord des sessions pour pouvoir le supprimer.
+              <h2 className="text-base font-black text-white mb-1">Supprimer l'intervenant ?</h2>
+              <p className="text-sm text-[#4a5568] leading-relaxed">
+                <span className="text-[#ccc] font-semibold">{speaker.fullName}</span> sera supprimé(e).
+                {speaker._count.sessions > 0 && (
+                  <span className="text-amber-400 block mt-1.5">
+                    ⚠️ {speaker._count.sessions} session{speaker._count.sessions !== 1 ? "s" : ""} associée{speaker._count.sessions !== 1 ? "s" : ""} seront dissociées.
                   </span>
-                </div>
-              )}
-
+                )}
+              </p>
               {error && (
-                <div className="flex items-start gap-2 text-sm text-red-400 bg-red-500/10 border border-red-900/40 rounded-xl px-3 py-2">
-                  <AlertTriangle size={13} className="shrink-0 mt-0.5" />
+                <div className="mt-3 flex items-center gap-2 text-sm text-red-400 bg-red-500/10 border border-red-900/40 rounded-xl px-3 py-2">
+                  <AlertTriangle size={13} className="shrink-0" />
                   {error}
                 </div>
               )}
@@ -540,8 +446,8 @@ function DeleteModal({
               </button>
               <button
                 onClick={handleDelete}
-                disabled={loading || speaker._count.sessions > 0}
-                className="flex-1 py-2.5 rounded-xl bg-red-500/90 text-white text-sm font-black tracking-wide hover:bg-red-500 active:scale-95 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                disabled={loading}
+                className="flex-1 py-2.5 rounded-xl bg-red-500/90 text-white text-sm font-black tracking-wide hover:bg-red-500 active:scale-95 transition-all duration-200 disabled:opacity-50"
               >
                 {loading ? "Suppression…" : "Supprimer"}
               </button>
@@ -553,7 +459,7 @@ function DeleteModal({
   );
 }
 
-// ─── Speaker Row ──────────────────────────────────────────────────────────────
+// ─── Speaker Row ───
 
 function SpeakerRow({
   speaker,
@@ -561,12 +467,9 @@ function SpeakerRow({
   onDelete,
 }: {
   speaker: Speaker;
-  onEdit: (sp: Speaker) => void;
-  onDelete: (sp: Speaker) => void;
+  onEdit: (s: Speaker) => void;
+  onDelete: (s: Speaker) => void;
 }) {
-  const links = speaker.links ?? {};
-  const activeSocials = Object.entries(links).filter(([, v]) => !!v);
-
   return (
     <motion.div
       layout
@@ -577,67 +480,42 @@ function SpeakerRow({
       className="group flex items-center gap-4 px-6 py-4 border-b border-[#1e2530] hover:bg-[#ffffff03] transition-colors"
     >
       {/* Avatar */}
-      <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-[#1e2530] bg-[#ffffff06] flex items-center justify-center text-xs font-black text-[#3a4a5a] shrink-0 group-hover:border-[#00E5FF22] transition-colors">
+      <div className="w-10 h-10 rounded-full bg-[#ffffff06] border border-[#1e2530] flex items-center justify-center shrink-0 group-hover:border-[#00E5FF22] transition-colors overflow-hidden">
         {speaker.photo ? (
-          <Image
-            src={speaker.photo}
-            alt={speaker.fullName}
-            width={40}
-            height={40}
-            unoptimized
-            className="w-full h-full object-cover"
-          />
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={speaker.photo} alt={speaker.fullName} className="w-full h-full object-cover" />
         ) : (
-          <span className="group-hover:text-[#00E5FF] transition-colors">
-            {initials(speaker.fullName)}
+          <span className="text-[#3a4a5a] group-hover:text-[#00E5FF] text-sm font-black transition-colors">
+            {speaker.fullName
+              .split(" ")
+              .map((n) => n[0])
+              .join("")
+              .slice(0, 2)
+              .toUpperCase()}
           </span>
         )}
       </div>
 
       {/* Info */}
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-0.5">
-          <span className="font-bold text-[#eee] text-sm truncate">{speaker.fullName}</span>
-          {activeSocials.length > 0 && (
-            <div className="flex gap-1">
-              {activeSocials.slice(0, 3).map(([key]) => {
-                const meta = SOCIAL_META[key];
-                return (
-                  <span
-                    key={key}
-                    className="inline-flex items-center text-[9px] px-1.5 py-0.5 rounded-full border border-[#1e2530] text-[#2a3a4a] font-bold"
-                  >
-                    {meta?.icon}
-                  </span>
-                );
-              })}
-            </div>
-          )}
+        <span className="font-bold text-[#eee] text-sm truncate block">{speaker.fullName}</span>
+        <div className="flex items-center gap-1.5 mt-0.5">
+          <Layers size={10} className="text-[#3a4a5a]" />
+          <span className="text-[11px] text-[#3a4a5a]">
+            {speaker._count.sessions} session{speaker._count.sessions !== 1 ? "s" : ""}
+          </span>
         </div>
-        {speaker.bio && (
-          <p className="text-[11px] text-[#3a4a5a] truncate max-w-sm">
-            {speaker.bio}
-          </p>
-        )}
       </div>
 
       {/* Sessions badge */}
-      <div className="hidden sm:flex items-center gap-1.5 shrink-0">
-        <Mic size={11} className="text-[#3a4a5a]" />
-        <span className="text-xs text-[#3a4a5a] font-semibold">
-          {speaker._count.sessions} session{speaker._count.sessions !== 1 ? "s" : ""}
-        </span>
-      </div>
-
-      {/* Public profile link */}
-      <Link
-        href={`/speakers/${speaker.id}`}
-        target="_blank"
-        className="hidden md:flex w-8 h-8 rounded-xl border border-[#1e2530] items-center justify-center text-[#3a4a5a] hover:text-[#00E5FF] hover:border-[#00E5FF33] transition-all duration-200"
-        title="Voir le profil public"
-      >
-        <Globe size={13} />
-      </Link>
+      {speaker._count.sessions > 0 && (
+        <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#1e2530] bg-[#ffffff04]">
+          <Layers size={11} className="text-[#3a4a5a]" />
+          <span className="text-xs text-[#3a4a5a] font-semibold">
+            {speaker._count.sessions} session{speaker._count.sessions !== 1 ? "s" : ""}
+          </span>
+        </div>
+      )}
 
       {/* Actions */}
       <div className="flex items-center gap-2 shrink-0">
@@ -660,7 +538,7 @@ function SpeakerRow({
   );
 }
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
+// ─── Main Page ───
 
 export default function AdminSpeakersPage() {
   const [speakers, setSpeakers] = useState<Speaker[]>([]);
@@ -683,10 +561,9 @@ export default function AdminSpeakersPage() {
       setLoading(false);
     }
   }, []);
+
   useEffect(() => {
-    (async () => {
-      await load();
-    })();
+    load();
   }, [load]);
 
   const openCreate = () => {
@@ -694,8 +571,8 @@ export default function AdminSpeakersPage() {
     setModalOpen(true);
   };
 
-  const openEdit = (sp: Speaker) => {
-    setEditingSpeaker(sp);
+  const openEdit = (speaker: Speaker) => {
+    setEditingSpeaker(speaker);
     setModalOpen(true);
   };
 
@@ -703,7 +580,7 @@ export default function AdminSpeakersPage() {
     setSpeakers((prev) => {
       const exists = prev.find((s) => s.id === saved.id);
       if (exists) return prev.map((s) => (s.id === saved.id ? { ...s, ...saved } : s));
-      return [...prev, saved].sort((a, b) => a.fullName.localeCompare(b.fullName));
+      return [...prev, saved];
     });
   };
 
@@ -713,11 +590,10 @@ export default function AdminSpeakersPage() {
 
   const filtered = speakers.filter((s) => {
     const q = search.trim().toLowerCase();
-    return !q || s.fullName.toLowerCase().includes(q) || s.bio?.toLowerCase().includes(q);
+    return !q || s.fullName.toLowerCase().includes(q);
   });
 
   const totalSessions = speakers.reduce((sum, s) => sum + s._count.sessions, 0);
-  const withPhoto = speakers.filter((s) => s.photo).length;
 
   return (
     <>
@@ -733,7 +609,7 @@ export default function AdminSpeakersPage() {
         onDeleted={handleDeleted}
       />
 
-      <main className="flex-1 px-8 py-12 max-w-5xl mx-auto w-full">
+      <main className="flex-1 px-8 py-12 max-w-4xl mx-auto w-full">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-[#4a5568] mb-8">
           <Link href="/admin" className="hover:text-[#00E5FF] transition-colors">
@@ -748,7 +624,7 @@ export default function AdminSpeakersPage() {
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-1">
               <div className="w-8 h-8 rounded-xl bg-[#00E5FF15] border border-[#00E5FF30] flex items-center justify-center">
-                <Users size={16} className="text-[#00E5FF]" />
+                <Mic size={16} className="text-[#00E5FF]" />
               </div>
               <h1 className="text-3xl font-black text-white tracking-tight">
                 Intervenants
@@ -758,7 +634,7 @@ export default function AdminSpeakersPage() {
               </h1>
             </div>
             <p className="text-sm text-[#4a5568] ml-11">
-              Gérez les profils des experts et conférenciers.
+              Gérez les conférenciers et leurs profils publics.
             </p>
           </div>
 
@@ -774,27 +650,19 @@ export default function AdminSpeakersPage() {
 
         {/* Mini stats + search */}
         {!loading && speakers.length > 0 && (
-          <div className="flex items-center gap-3 mb-6 flex-wrap">
+          <div className="flex items-center gap-4 mb-6 flex-wrap">
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#1e2530] bg-[#0d1117]">
-              <Users size={11} className="text-[#3a4a5a]" />
+              <Mic size={11} className="text-[#3a4a5a]" />
               <span className="text-xs text-[#3a4a5a] font-semibold">
                 {speakers.length} intervenant{speakers.length !== 1 ? "s" : ""}
               </span>
             </div>
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#1e2530] bg-[#0d1117]">
-              <Mic size={11} className="text-[#3a4a5a]" />
+              <Layers size={11} className="text-[#3a4a5a]" />
               <span className="text-xs text-[#3a4a5a] font-semibold">
                 {totalSessions} session{totalSessions !== 1 ? "s" : ""} au total
               </span>
             </div>
-            {withPhoto > 0 && (
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#1e2530] bg-[#0d1117]">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                <span className="text-xs text-[#3a4a5a] font-semibold">
-                  {withPhoto} avec photo
-                </span>
-              </div>
-            )}
 
             <div className="relative ml-auto">
               <Search
@@ -806,7 +674,7 @@ export default function AdminSpeakersPage() {
                 placeholder="Rechercher…"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-52 pl-9 pr-4 py-2 rounded-xl bg-[#0d1117] border border-[#1e2530] text-sm text-[#ccc] placeholder-[#3a4a5a] focus:outline-none focus:border-[#00E5FF44] focus:ring-1 focus:ring-[#00E5FF22] transition-all"
+                className="w-48 pl-9 pr-4 py-2 rounded-xl bg-[#0d1117] border border-[#1e2530] text-sm text-[#ccc] placeholder-[#3a4a5a] focus:outline-none focus:border-[#00E5FF44] focus:ring-1 focus:ring-[#00E5FF22] transition-all"
               />
             </div>
           </div>
@@ -814,17 +682,21 @@ export default function AdminSpeakersPage() {
 
         {/* Table */}
         <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] overflow-hidden">
-          {/* Column headers */}
+          {/* Header */}
           <div className="flex items-center gap-4 px-6 py-3 border-b border-[#1e2530] bg-[#060a0f]">
             <div className="w-10 shrink-0" />
-            <span className="flex-1 text-[10px] font-bold uppercase tracking-widest text-[#2a3a4a]">Intervenant</span>
-            <span className="hidden sm:block text-[10px] font-bold uppercase tracking-widest text-[#2a3a4a]">Sessions</span>
-            <span className="w-30 shrink-0" />
+            <span className="flex-1 text-[10px] font-bold uppercase tracking-widest text-[#2a3a4a]">
+              Intervenant
+            </span>
+            <span className="hidden sm:block text-[10px] font-bold uppercase tracking-widest text-[#2a3a4a]">
+              Sessions
+            </span>
+            <span className="w-20 shrink-0" />
           </div>
 
           {/* Loading */}
           {loading &&
-            Array.from({ length: 5 }).map((_, i) => <SpeakerRowSkeleton key={i} />)}
+            Array.from({ length: 4 }).map((_, i) => <SpeakerRowSkeleton key={i} />)}
 
           {/* Error */}
           {error && (
@@ -834,7 +706,7 @@ export default function AdminSpeakersPage() {
             </div>
           )}
 
-          {/* Empty */}
+          {/* Empty state */}
           {!loading && !error && speakers.length === 0 && (
             <div className="py-20 text-center">
               <Mic size={28} className="mx-auto text-[#1e2530] mb-3" />
@@ -846,26 +718,26 @@ export default function AdminSpeakersPage() {
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#00E5FF15] border border-[#00E5FF30] text-[#00E5FF] text-sm font-bold hover:bg-[#00E5FF20] transition-all"
               >
                 <Plus size={13} />
-                Ajouter le premier
+                Créer le premier intervenant
               </button>
             </div>
           )}
 
-          {/* No results */}
+          {/* No search results */}
           {!loading && !error && speakers.length > 0 && filtered.length === 0 && (
             <div className="py-12 text-center">
               <p className="text-[#3a4a5a] italic text-sm">
-                Aucun résultat pour «&nbsp;{search}&nbsp;».
+                Aucun intervenant ne correspond à «&nbsp;{search}&nbsp;».
               </p>
             </div>
           )}
 
           {/* Rows */}
           <AnimatePresence initial={false}>
-            {filtered.map((sp) => (
+            {filtered.map((speaker) => (
               <SpeakerRow
-                key={sp.id}
-                speaker={sp}
+                key={speaker.id}
+                speaker={speaker}
                 onEdit={openEdit}
                 onDelete={(s) => setDeletingSpeaker(s)}
               />
