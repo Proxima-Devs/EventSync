@@ -1,6 +1,8 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
-import { strict } from "assert";
+import { useRouter } from "next/navigation";
+
+
 
 interface Speaker {
   id: string;
@@ -30,16 +32,19 @@ interface Session {
 
 export default function SessionCardSchedule(
   { session,
-    selectedRoom, toggle, isFavorite } : {
+    selectedRoom, toggle, isFavorite, eventId } : {
     session: Session[],
      selectedRoom: string | null, 
      toggle: (sessionId: string) => void, 
-     isFavorite: (sessionId: string) => boolean
+     isFavorite: (sessionId: string) => boolean,
+     eventId: string
 }){
 
   const timeSlots = [...new Set(
   session.map(s => s.startTime.substring(11, 16))
 )].sort();
+   
+   const router = useRouter();
 
   const getSessionAtTime = (time: string, roomName: string) => {
   return session.find(session => {
@@ -87,7 +92,7 @@ export default function SessionCardSchedule(
                   return (
                     <td key={`${time}-${roomName}-${i}`}>{
                       sessionTime ? (
-                        <div className="border-1 border-[#3A4A5A] text-white rounded-lg px-5 py-2 flex flex-row justify-between m-5">
+                        <div className="border-1 border-[#3A4A5A] text-white rounded-lg px-5 py-2 flex flex-row justify-between m-5 " onClick={() => router.push(`/sessions/${sessionTime.id}`)}>
                           <div>
                             <h1 className="font-bold">{sessionTime.title}</h1>
                             <p className="text-sm text-[#3A4A5A]">{sessionTime.startTime.substring(11,16)}-{sessionTime.endTime.substring(11,16)}</p>

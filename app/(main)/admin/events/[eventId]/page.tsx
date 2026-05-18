@@ -1331,7 +1331,7 @@ export default function EventDetailPage() {
           </div>
 
         </div>
-        <SessionCardSchedule session={session} selectedRoom={selectedRoom} toggle={toggle} isFavorite={isFavorite}/>
+        <SessionCardSchedule session={session} selectedRoom={selectedRoom} toggle={toggle} isFavorite={isFavorite} eventId={eventId}/>
       </div>
 
     )
