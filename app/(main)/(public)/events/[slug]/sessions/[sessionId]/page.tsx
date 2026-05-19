@@ -7,25 +7,7 @@ import Image from "next/image";
 import { apiFetch } from "@/lib/api";
 import { useFavorites } from "@/hooks/useFavorites";
 import QuestionSection from "@/components/QuestionSection";
-
-type Speaker = {
-  id: string;
-  slug: string;
-  fullName: string;
-  photo?: string | null;
-  bio?: string | null;
-};
-type Session = {
-  id: string;
-  title: string;
-  description?: string | null;
-  startTime: string;
-  endTime: string;
-  capacity?: number | null;
-  isLive: boolean;
-  room?: { id: string; name: string } | null;
-  speakers: Speaker[];
-};
+import { Session } from "@/types";
 
 function formatTime(iso: string) {
   return new Date(iso).toLocaleTimeString("fr-FR", {
@@ -98,7 +80,7 @@ export default function SessionDetailPage() {
           Sessions
         </Link>
         <span>/</span>
-        <span className="text-white truncate max-w-[180px]">{session.title}</span>
+        <span className="text-white truncate max-w-45">{session.title}</span>
       </div>
       <div className="border border-[#1e2530] bg-[#0d1117] w-210 rounded-2xl">
         <div className="rounded-2xl  p-8 mb-6">
@@ -153,7 +135,7 @@ export default function SessionDetailPage() {
               <Link
                 key={speaker.id}
                 href={`/speakers/${speaker.slug}`}
-                className="flex items-center gap-4 rounded-2xl px-4 py-3 mx-4 hover:border-[#00E5FF44] transition-all duration-200 group hover:border-1 "
+                className="flex items-center gap-4 rounded-2xl px-4 py-3 mx-4 hover:border-[#00E5FF44] transition-all duration-200 group hover:border "
               >
                 {speaker.photo ? (
                   <Image

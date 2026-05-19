@@ -4,9 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
-
-type Room = { id: string; slug: string; name: string };
-type EventMeta = { id: string; title: string; slug: string };
+import { Room, EventMeta} from "@/types";
 
 export default function RoomsPage() {
   const { slug } = useParams<{ slug: string }>();

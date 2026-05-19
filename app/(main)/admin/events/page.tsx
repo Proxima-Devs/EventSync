@@ -4,34 +4,8 @@ import { useEffect, useState, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import {
-  Calendar, MapPin, Layers, Pencil, Trash2, Plus, X,
-  ExternalLink, Search, AlertTriangle,
-  ChevronRight, Settings2,
-} from "lucide-react";
-
-// ─── Types ───
-
-interface Event {
-  id: string;
-  title: string;
-  slug: string;
-  description?: string | null;
-  startDate: string;
-  endDate: string;
-  location?: string | null;
-  coverImage?: string | null;
-  _count: { sessions: number };
-}
-
-interface EventFormData {
-  title: string;
-  description: string;
-  startDate: string;
-  endDate: string;
-  location: string;
-  coverImage: string;
-}
+import { Calendar, MapPin, Layers, Pencil, Trash2, Plus, X, ExternalLink, Search, AlertTriangle, ChevronRight, Settings2 } from "lucide-react";
+import { Event, EventFormData } from "@/types";
 
 const EMPTY_FORM: EventFormData = {
   title: "",

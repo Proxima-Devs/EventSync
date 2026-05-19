@@ -4,16 +4,9 @@ import { Mic, Plus, X, Pencil, Trash2, Layers, AlertTriangle, ChevronRight, Sear
 import { useEffect, useState, useRef, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
-import Image from "next/image";
+import { SpeakerLinks } from "@/types";
 
 // ─── Types ───
-
-interface SpeakerLinks {
-  twitter?: string;
-  linkedin?: string;
-  website?: string;
-  github?: string;
-}
 
 interface Speaker {
   id: string;
@@ -420,7 +413,7 @@ function DeleteModal({
               <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-900/40 flex items-center justify-center mb-4">
                 <Trash2 size={18} className="text-red-400" />
               </div>
-              <h2 className="text-base font-black text-white mb-1">Supprimer l'intervenant ?</h2>
+              <h2 className="text-base font-black text-white mb-1">Supprimer l&apos;intervenant ?</h2>
               <p className="text-sm text-[#4a5568] leading-relaxed">
                 <span className="text-[#ccc] font-semibold">{speaker.fullName}</span> sera supprimé(e).
                 {speaker._count.sessions > 0 && (
@@ -563,7 +556,9 @@ export default function AdminSpeakersPage() {
   }, []);
 
   useEffect(() => {
-    load();
+    (async () => {
+      await load();
+    })();
   }, [load]);
 
   const openCreate = () => {

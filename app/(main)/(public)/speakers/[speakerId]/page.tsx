@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 import Image from "next/image";
+import { SpeakerLinks } from "@/types";
 
 type Session = {
     id: string;
@@ -15,13 +16,6 @@ type Session = {
     isLive: boolean;
     room?: { id: string; name: string } | null;
     event: { id: string; title: string; slug: string };
-};
-
-type SpeakerLinks = {
-    twitter?: string;
-    linkedin?: string;
-    website?: string;
-    github?: string;
 };
 
 type Speaker = {

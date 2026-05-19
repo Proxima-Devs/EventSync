@@ -4,22 +4,11 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useFavorites } from "@/hooks/useFavorites";
 import { apiFetch } from "@/lib/api";
-
-type Session = {
-  id: string;
-  slug: string;
-  title: string;
-  startTime: string;
-  endTime: string;
-  isLive: boolean;
-  room?: { id: string; name: string } | null;
-  speakers: { id: string; fullName: string }[];
-  event: { slug: string; title: string };
-};
+import { SessionFavorite } from "@/types";
 
 export default function FavoritesPage() {
   const { favorites, toggle } = useFavorites();
-  const [sessions, setSessions] = useState<Session[]>([]);
+  const [sessions, setSessions] = useState<SessionFavorite[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -30,10 +19,10 @@ export default function FavoritesPage() {
     // On fetch tous les events pour retrouver les sessions favorites
     apiFetch<{ data: { slug: string; title: string; id: string }[] }>("/api/events")
       .then(async (res) => {
-        const all: Session[] = [];
+        const all: SessionFavorite[] = [];
         for (const event of res.data) {
           const detail = await apiFetch<{
-            sessions: Omit<Session, "event">[];
+            sessions: Omit<SessionFavorite, "event">[];
           }>(`/api/events/slug/${event.slug}`);
           for (const s of detail.sessions) {
             if (favorites.includes(s.id)) {

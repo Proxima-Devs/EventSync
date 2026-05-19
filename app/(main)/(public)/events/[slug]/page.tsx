@@ -5,37 +5,8 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faClock,
-  faArrowLeft,
-  faMapPin,
-  faCalendar,
-  faChevronRight,
-} from "@fortawesome/free-solid-svg-icons";
-
-type Speaker = { id: string; fullName: string; photo?: string | null };
-type Session = {
-  id: string;
-  slug: string;
-  title: string;
-  description?: string | null;
-  startTime: string;
-  endTime: string;
-  isLive: boolean;
-  room?: { id: string; name: string } | null;
-  speakers: Speaker[];
-};
-type EventDetail = {
-  id: string;
-  title: string;
-  description?: string | null;
-  slug: string;
-  startDate: string;
-  endDate: string;
-  location?: string | null;
-  coverImage?: string | null;
-  sessions: Session[];
-};
+import { faClock, faArrowLeft, faMapPin, faCalendar, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import { Event } from "@/types";
 
 const STYLES = `
   @keyframes fadeSlideUp {
@@ -291,14 +262,14 @@ function TimeProgress({ start, end }: { start: string; end: string }) {
 
 export default function EventDetailPage() {
   const { slug } = useParams<{ slug: string }>();
-  const [event, setEvent] = useState<EventDetail | null>(null);
+  const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useInjectStyles(STYLES);
 
   useEffect(() => {
-    apiFetch<EventDetail>(`/api/events/slug/${slug}`)
+    apiFetch<Event>(`/api/events/slug/${slug}`)
         .then(setEvent)
         .catch(() => setError("Événement introuvable"))
         .finally(() => setLoading(false));

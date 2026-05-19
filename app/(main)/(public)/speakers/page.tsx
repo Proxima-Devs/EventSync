@@ -5,13 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { apiFetch } from "@/lib/api";
 import { Search, Mic } from "lucide-react";
-
-type SpeakerLinks = {
-    twitter?: string;
-    linkedin?: string;
-    website?: string;
-    github?: string;
-};
+import { SpeakerLinks } from "@/types";
 
 type Speaker = {
     id: string;

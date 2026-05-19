@@ -6,74 +6,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useFavorites } from "@/hooks/useFavorites";
 import ToggleSwitch from "@/components/ToggleSwitch";
 import Link from "next/link";
-import {
-  Calendar,
-  MapPin,
-  Pencil,
-  Trash2,
-  Plus,
-  X,
-  AlertTriangle,
-  ChevronRight,
-  Clock,
-  Mic,
-  Building2,
-  Radio,
-  Users,
-  Save,
-  ExternalLink,
-  CheckSquare,
-  Square,
-} from "lucide-react";
+import { Calendar, MapPin, Pencil, Trash2, Plus, X, AlertTriangle, ChevronRight, Clock, Mic, Building2, Radio, Users, Save, ExternalLink, CheckSquare, Square } from "lucide-react";
 import SessionCardSchedule from "@/components/SessionSchedule";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface Speaker {
-  id: string;
-  fullName: string;
-  photo?: string | null;
-}
-
-interface Room {
-  id: string;
-  name: string;
-}
-
-interface Session {
-  id: string;
-  title: string;
-  description?: string | null;
-  startTime: string;
-  endTime: string;
-  capacity?: number | null;
-  isLive: boolean;
-  room?: Room | null;
-  speakers: Speaker[];
-  _count: { questions: number };
-}
-
-interface Event {
-  id: string;
-  title: string;
-  slug: string;
-  description?: string | null;
-  startDate: string;
-  endDate: string;
-  location?: string | null;
-  coverImage?: string | null;
-  sessions: Session[];
-}
-
-interface SessionFormData {
-  title: string;
-  description: string;
-  startTime: string;
-  endTime: string;
-  capacity: string;
-  roomId: string;
-  speakerIds: string[];
-}
+import { Room, Session, SessionFormData, Speaker, Event } from "@/types";
 
 const EMPTY_SESSION: SessionFormData = {
   title: "",
@@ -409,7 +344,7 @@ function SessionModal({
                         <Link href="/admin/speakers" className="underline hover:text-amber-300">
                           En créer un
                         </Link>{" "}
-                        d'abord.
+                        d&apos;abord.
                       </span>
                     </div>
                   ) : (
@@ -718,7 +653,7 @@ function EditEventModal({
                 <div className="w-6 h-6 rounded-lg bg-[#00E5FF15] border border-[#00E5FF30] flex items-center justify-center">
                   <Pencil size={12} className="text-[#00E5FF]" />
                 </div>
-                <h2 className="text-base font-black text-white">Modifier l'événement</h2>
+                <h2 className="text-base font-black text-white">Modifier l&apos;événement</h2>
               </div>
               <button
                 onClick={onClose}
@@ -1295,7 +1230,7 @@ export default function EventDetailPage() {
           console.log(data);
           
 
-        }catch(err){
+        }catch{
           setError("Session charge failed");
 
         }finally{
@@ -1308,7 +1243,7 @@ export default function EventDetailPage() {
 
     const rooms = [...new Set(session.flatMap(s => s.room ? [s.room.name] : []))]
 
-    if(loading) return <div>Chargement de l'emploi du temps</div>
+    if(loading) return <div>Chargement de l&apos;emploi du temps</div>
     if(error) return <div>{error}</div>
     if(!rooms.length) return <div></div>
 
@@ -1320,7 +1255,7 @@ export default function EventDetailPage() {
             {
               rooms.map(r => (
                 <button 
-                className="w-35 rounded-xl border-[#2A3A4A] hover:text-[#00EEFF] hover:border-[#00EEFF] text-[#3A4A5A] border-1 h-13 font-bold " 
+                className="w-35 rounded-xl border-[#2A3A4A] hover:text-[#00EEFF] hover:border-[#00EEFF] text-[#3A4A5A] border h-13 font-bold " 
                 key={r}
                 onClick={() => setSelectedRoom(r)}
                 >

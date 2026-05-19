@@ -5,19 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 import { useFavorites } from "@/hooks/useFavorites";
-
-type Session = {
-    id: string;
-    slug: string;
-    title: string;
-    description?: string | null;
-    startTime: string;
-    endTime: string;
-    isLive: boolean;
-    room?: { id: string; name: string } | null;
-    speakers: { id: string; fullName: string }[];
-};
-type EventMeta = { id: string; title: string; slug: string };
+import { Session, EventMeta } from "@/types";
 
 const STYLES = `
   @keyframes fadeSlideUp {
