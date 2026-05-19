@@ -10,6 +10,7 @@ import QuestionSection from "@/components/QuestionSection";
 
 type Speaker = {
   id: string;
+  slug: string;
   fullName: string;
   photo?: string | null;
   bio?: string | null;
@@ -41,15 +42,17 @@ export default function SessionDetailPage() {
   const { toggle, isFavorite } = useFavorites();
 
   useEffect(() => {
-    apiFetch<{ sessions: Session[] }>(`/api/events/slug/${slug}`)
+    apiFetch<Session>(`/api/sessions/${sessionId}`)
       .then((data) => {
-        const found = data.sessions.find((s) => s.id === sessionId);
-        if (!found) setError("Session introuvable");
-        else setSession(found);
+        if (!data) {
+          setError("Session introuvable");
+        } else {
+          setSession(data);
+        }
       })
-      .catch(() => setError("Erreur de chargement"))
+      .catch(() => setError("Session introuvable"))
       .finally(() => setLoading(false));
-  }, [slug, sessionId]);
+  }, [sessionId]);
 
   if (loading)
     return (
@@ -149,7 +152,7 @@ export default function SessionDetailPage() {
             {session.speakers.map((speaker) => (
               <Link
                 key={speaker.id}
-                href={`/speakers/${speaker.id}`}
+                href={`/speakers/${speaker.slug}`}
                 className="flex items-center gap-4 rounded-2xl px-4 py-3 mx-4 hover:border-[#00E5FF44] transition-all duration-200 group hover:border-1 "
               >
                 {speaker.photo ? (

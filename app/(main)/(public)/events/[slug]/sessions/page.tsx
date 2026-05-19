@@ -8,6 +8,7 @@ import { useFavorites } from "@/hooks/useFavorites";
 
 type Session = {
     id: string;
+    slug: string;
     title: string;
     description?: string | null;
     startTime: string;
@@ -339,7 +340,7 @@ export default function SessionsPage() {
                     {filtered.map((session, i) => (
                         <div key={session.id} style={{ position: "relative" }}>
                             <Link
-                                href={`/events/${slug}/sessions/${session.id}`}
+                                href={`/events/${slug}/sessions/${session.slug}`}
                                 className="session-card"
                                 style={{
                                     padding: "18px 56px 18px 20px",
