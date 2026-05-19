@@ -7,6 +7,7 @@ import { apiFetch } from "@/lib/api";
 
 type Session = {
   id: string;
+  slug: string;
   title: string;
   startTime: string;
   endTime: string;
@@ -66,7 +67,7 @@ export default function FavoritesPage() {
           {sessions.map((session) => (
             <div key={session.id} className="relative">
               <Link
-                href={`/events/${session.event.slug}/sessions/${session.id}`}
+                href={`/events/${session.event.slug}/sessions/${session.slug}`}
                 className="block rounded-2xl border border-[#1e2530] bg-[#0d1117] p-5 hover:border-[#00E5FF44] transition-colors pr-14"
               >
                 <p className="text-xs text-[#00E5FF] mb-1">{session.event.title}</p>

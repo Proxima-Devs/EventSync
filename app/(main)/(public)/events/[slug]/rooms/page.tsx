@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 
-type Room = { id: string; name: string };
+type Room = { id: string; slug: string; name: string };
 type EventMeta = { id: string; title: string; slug: string };
 
 export default function RoomsPage() {
@@ -42,7 +42,7 @@ export default function RoomsPage() {
           {rooms.map((room) => (
             <Link
               key={room.id}
-              href={`/events/${slug}/sessions?room=${room.id}`}
+              href={`/events/${slug}/sessions?room=${room.slug}`}
               className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-6 hover:border-[#00E5FF44] transition-colors"
             >
               <div className="text-2xl mb-2">🏛️</div>

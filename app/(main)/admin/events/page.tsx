@@ -659,7 +659,7 @@ export default function AdminEventsPage() {
                 { key: "upcoming", label: "À venir",   count: upcomingCount,   dot: "#34d399" },
                 { key: "past",     label: "Passés",    count: pastCount,       dot: "#2a3a4a" },
               ] as const
-            ).map(({ key, label, count, dot, pulse }) => {
+            ).map(({ key, label, count, dot, pulse }: { key: "all" | "live" | "upcoming" | "past"; label: string; count: number; dot: string; pulse?: boolean }) => {
               const active = filter === key;
               return (
                 <button

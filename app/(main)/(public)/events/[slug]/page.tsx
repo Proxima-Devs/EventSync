@@ -16,6 +16,7 @@ import {
 type Speaker = { id: string; fullName: string; photo?: string | null };
 type Session = {
   id: string;
+  slug: string;
   title: string;
   description?: string | null;
   startTime: string;
@@ -425,7 +426,7 @@ export default function EventDetailPage() {
             {event.sessions.map((session, i) => (
                 <Link
                     key={session.id}
-                    href={`/events/${slug}/sessions/${session.id}`}
+                    href={`/events/${slug}/sessions/${session.slug}`}
                     className="session-card"
                     style={{
                       display: "flex", flexDirection: "row",

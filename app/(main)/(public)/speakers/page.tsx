@@ -15,6 +15,7 @@ type SpeakerLinks = {
 
 type Speaker = {
     id: string;
+    slug: string;
     fullName: string;
     photo?: string | null;
     bio?: string | null;
@@ -60,7 +61,7 @@ function SpeakerCard({ speaker }: { speaker: Speaker }) {
 
     return (
         <Link
-            href={`/speakers/${speaker.id}`}
+            href={`/speakers/${speaker.slug}`}
             className="group relative flex flex-col rounded-2xl border border-[#1e2530] bg-[#0d1117] p-6 hover:border-[#00E5FF33] hover:bg-[#0d1117] transition-all duration-300"
         >
             <div className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-[radial-gradient(ellipse_at_top_left,#00E5FF08_0%,transparent_60%)]" />
