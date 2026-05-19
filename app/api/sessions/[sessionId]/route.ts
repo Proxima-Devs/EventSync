@@ -1,18 +1,36 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireAdmin, isSessionLive } from "@/lib/auth-utils";
+import { slugify } from "@/lib/slugify";
 import type { SessionPayload } from "@/types";
 
 type Params = { params: Promise<{ sessionId: string }> };
 
+// Fonction pour générer un slug unique
+async function generateUniqueEventSessionSlug(title: string, excludeId?: string): Promise<string> {
+  let slug = slugify(title);
+  let counter = 1;
+  
+  while (true) {
+    const existing = await prisma.eventSession.findUnique({ where: { slug } });
+    if (!existing || (excludeId && existing.id === excludeId)) break;
+    slug = `${slugify(title)}-${counter}`;
+    counter++;
+  }
+  
+  return slug;
+}
+
 // ── GET /api/sessions/[sessionId]
 // Public — détail d'une session avec speakers, salle, flag live
+// Accepte soit un ID soit un slug
 export async function GET(_req: NextRequest, { params }: Params) {
   try {
     const { sessionId } = await params;
 
-    const session = await prisma.eventSession.findUnique({
-      where: { id: sessionId },
+    // Essayer de trouver par slug d'abord, sinon par ID
+    let session = await prisma.eventSession.findUnique({
+      where: { slug: sessionId },
       include: {
         event: { select: { id: true, title: true, slug: true } },
         room: true,
@@ -20,6 +38,18 @@ export async function GET(_req: NextRequest, { params }: Params) {
         _count: { select: { questions: true } },
       },
     });
+
+    if (!session) {
+      session = await prisma.eventSession.findUnique({
+        where: { id: sessionId },
+        include: {
+          event: { select: { id: true, title: true, slug: true } },
+          room: true,
+          speakers: { include: { speaker: true } },
+          _count: { select: { questions: true } },
+        },
+      });
+    }
 
     if (!session) {
       return NextResponse.json({ error: "Session introuvable" }, { status: 404 });
@@ -60,6 +90,11 @@ export async function PUT(request: NextRequest, { params }: Params) {
       );
     }
 
+    // Générer un nouveau slug si le titre a changé
+    const slug = body.title && body.title !== existing.title 
+      ? await generateUniqueEventSessionSlug(body.title, sessionId) 
+      : existing.slug;
+
     // Transaction : mise à jour session + remplacement des speakers si fournis
     const updated = await prisma.$transaction(async (tx) => {
       // Remplacement des speakers si fournis
@@ -73,7 +108,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
       return tx.eventSession.update({
         where: { id: sessionId },
         data: {
-          ...(body.title && { title: body.title }),
+          ...(body.title && { title: body.title, slug }),
           ...(body.description !== undefined && { description: body.description }),
           ...(body.startTime && { startTime: new Date(body.startTime) }),
           ...(body.endTime && { endTime: new Date(body.endTime) }),

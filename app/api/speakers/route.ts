@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth-utils";
+import { slugify } from "@/lib/slugify";
 import type { SpeakerPayload } from "@/types";
 import { Prisma } from "@/generated/prisma/client";
 
@@ -34,6 +35,21 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// Fonction pour générer un slug unique
+async function generateUniqueSpeakerSlug(fullName: string): Promise<string> {
+  let slug = slugify(fullName);
+  let counter = 1;
+  
+  while (true) {
+    const existing = await prisma.speaker.findUnique({ where: { slug } });
+    if (!existing) break;
+    slug = `${slugify(fullName)}-${counter}`;
+    counter++;
+  }
+  
+  return slug;
+}
+
 // ── POST /api/speakers
 // Admin — crée un intervenant
 export async function POST(request: NextRequest) {
@@ -51,9 +67,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const slug = await generateUniqueSpeakerSlug(fullName);
+
     const speaker = await prisma.speaker.create({
       data: {
         fullName: fullName.trim(),
+        slug,
         photo: photo || null,
         bio: bio?.trim() || null,
         links: links as Prisma.InputJsonValue ?? null,

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth-utils";
+import { slugify } from "@/lib/slugify";
 import type { RoomPayload } from "@/types";
 
 // ── GET /api/rooms
@@ -18,6 +19,21 @@ export async function GET() {
     console.error("[GET /api/rooms]", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
+}
+
+// Fonction pour générer un slug unique
+async function generateUniqueRoomSlug(name: string): Promise<string> {
+  let slug = slugify(name);
+  let counter = 1;
+  
+  while (true) {
+    const existing = await prisma.room.findUnique({ where: { slug } });
+    if (!existing) break;
+    slug = `${slugify(name)}-${counter}`;
+    counter++;
+  }
+  
+  return slug;
 }
 
 // ── POST /api/rooms
@@ -39,8 +55,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Une salle avec ce nom existe déjà" }, { status: 409 });
     }
 
+    const slug = await generateUniqueRoomSlug(name);
+
     const room = await prisma.room.create({
-      data: { name: name.trim() },
+      data: { name: name.trim(), slug },
     });
 
     return NextResponse.json(room, { status: 201 });
