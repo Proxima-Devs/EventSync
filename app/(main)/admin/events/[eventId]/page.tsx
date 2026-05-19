@@ -904,91 +904,6 @@ function SessionCard({
   );
 }
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
-export default function EventDetailPage() {
-  const { eventId } = useParams<{ eventId: string }>();
-
-  const [event, setEvent] = useState<Event | null>(null);
-  const [allSpeakers, setAllSpeakers] = useState<Speaker[]>([]);
-  const [allRooms, setAllRooms] = useState<Room[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [pageError, setPageError] = useState("");
-  const [ isOn, setIsOn ] = useState(false);
-
-
-  const load = useCallback(async () => {
-    try {
-      const [evtRes, spkRes, roomRes] = await Promise.all([
-        fetch(`/api/events/${eventId}`),
-        fetch("/api/speakers"),
-        fetch("/api/rooms"),
-      ]);
-      const [evtData, spkData, roomData] = await Promise.all([
-        evtRes.json(),
-        spkRes.json(),
-        roomRes.json(),
-      ]);
-      if (!evtRes.ok) throw new Error(evtData.error ?? "Erreur");
-      setEvent(evtData);
-      setAllSpeakers(Array.isArray(spkData) ? spkData : []);
-      setAllRooms(Array.isArray(roomData) ? roomData : []);
-    } catch {
-      setPageError("Impossible de charger l'événement.");
-    } finally {
-      setLoading(false);
-    }
-  }, [eventId]);
-
-  useEffect(() => {
-    load();
-  }, [load]);
-
-  // ── Loading ──
-  if (loading) {
-    return (
-      <main className="flex-1 px-8 py-12 max-w-6xl mx-auto w-full">
-        <div className="h-4 w-32 bg-[#1e2530] rounded-lg animate-pulse mb-10" />
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-1 h-64 bg-[#0d1117] rounded-2xl border border-[#1e2530] animate-pulse" />
-          <div className="lg:col-span-2 grid sm:grid-cols-2 gap-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <SessionCardSkeleton key={i} />
-            ))}
-          </div>
-        </div>
-      </main>
-    );
-  }
-
-  if (pageError || !event) {
-    return (
-      <main className="flex-1 px-8 py-12 max-w-6xl mx-auto w-full">
-        <div className="flex items-center gap-2 text-red-400 text-sm">
-          <AlertTriangle size={16} />
-          {pageError || "Événement introuvable."}
-        </div>
-      </main>
-    );
-  }
-
-  return (
-    
-    <>
-      <main className="flex-1 px-8 py-12 max-w-6xl mx-auto w-full">
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-[#4a5568] mb-8 flex-wrap">
-          <Link href="/admin" className="hover:text-[#00E5FF] transition-colors">Admin</Link>
-          <ChevronRight size={13} />
-          <Link href="/admin/events" className="hover:text-[#00E5FF] transition-colors">Événements</Link>
-          <ChevronRight size={13} />
-          <span className="text-white truncate max-w-50">{event.title}</span>
-        </div>
-        <ToggleSwitch isOn={isOn} setIsOn={setIsOn}/>
-        {isOn? <PlanningPage/> : <ListEventBySessionsPage/> }
-
-      </main>
-    </>
-  );
 
   function ListEventBySessionsPage(){
   const { eventId } = useParams<{ eventId: string }>();
@@ -1275,8 +1190,8 @@ export default function EventDetailPage() {
       </div>
   )}
 
-  function PlanningPage(){
-    const { eventId } = useParams<{ eventId: string }>();
+  function PlanningPage({slug}: {slug: string}){
+    const { eventId} = useParams<{ eventId: string}>();
     const [ session, setSession ] = useState<Session[]>([]);
     const [ loading, setLoading ] = useState(true);
     const [ error, setError ] = useState<string | null>(null);
@@ -1331,9 +1246,95 @@ export default function EventDetailPage() {
           </div>
 
         </div>
-        <SessionCardSchedule session={session} selectedRoom={selectedRoom} toggle={toggle} isFavorite={isFavorite} eventId={eventId}/>
+        <SessionCardSchedule session={session} selectedRoom={selectedRoom} toggle={toggle} isFavorite={isFavorite} slug={slug}/>
       </div>
 
     )
   }
+
+// ─── Main Page ────────────────────────────────────────────────────────────────
+export default function EventDetailPage() {
+  const { eventId } = useParams<{ eventId: string }>();
+
+  const [event, setEvent] = useState<Event | null>(null);
+  const [allSpeakers, setAllSpeakers] = useState<Speaker[]>([]);
+  const [allRooms, setAllRooms] = useState<Room[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [pageError, setPageError] = useState("");
+  const [ isOn, setIsOn ] = useState(false);
+
+
+  const load = useCallback(async () => {
+    try {
+      const [evtRes, spkRes, roomRes] = await Promise.all([
+        fetch(`/api/events/${eventId}`),
+        fetch("/api/speakers"),
+        fetch("/api/rooms"),
+      ]);
+      const [evtData, spkData, roomData] = await Promise.all([
+        evtRes.json(),
+        spkRes.json(),
+        roomRes.json(),
+      ]);
+      if (!evtRes.ok) throw new Error(evtData.error ?? "Erreur");
+      setEvent(evtData);
+      setAllSpeakers(Array.isArray(spkData) ? spkData : []);
+      setAllRooms(Array.isArray(roomData) ? roomData : []);
+    } catch {
+      setPageError("Impossible de charger l'événement.");
+    } finally {
+      setLoading(false);
+    }
+  }, [eventId]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  // ── Loading ──
+  if (loading) {
+    return (
+      <main className="flex-1 px-8 py-12 max-w-6xl mx-auto w-full">
+        <div className="h-4 w-32 bg-[#1e2530] rounded-lg animate-pulse mb-10" />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-1 h-64 bg-[#0d1117] rounded-2xl border border-[#1e2530] animate-pulse" />
+          <div className="lg:col-span-2 grid sm:grid-cols-2 gap-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <SessionCardSkeleton key={i} />
+            ))}
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  if (pageError || !event) {
+    return (
+      <main className="flex-1 px-8 py-12 max-w-6xl mx-auto w-full">
+        <div className="flex items-center gap-2 text-red-400 text-sm">
+          <AlertTriangle size={16} />
+          {pageError || "Événement introuvable."}
+        </div>
+      </main>
+    );
+  }
+
+  return (
+    
+    <>
+      <main className="flex-1 px-8 py-12 max-w-6xl mx-auto w-full">
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-2 text-sm text-[#4a5568] mb-8 flex-wrap">
+          <Link href="/admin" className="hover:text-[#00E5FF] transition-colors">Admin</Link>
+          <ChevronRight size={13} />
+          <Link href="/admin/events" className="hover:text-[#00E5FF] transition-colors">Événements</Link>
+          <ChevronRight size={13} />
+          <span className="text-white truncate max-w-50">{event.title}</span>
+        </div>
+        <ToggleSwitch isOn={isOn} setIsOn={setIsOn}/>
+        {isOn? <PlanningPage slug={event.slug}/> : <ListEventBySessionsPage/> }
+
+      </main>
+    </>
+  );
 }
