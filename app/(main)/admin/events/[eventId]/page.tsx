@@ -1224,7 +1224,7 @@ function SessionCard({
     const rooms = [...new Set(session.flatMap(s => s.room ? [s.room.name] : []))]
 
     if(loading) return <div className=" h-80 items-center justify-center flex">
-      <div className="w-12 h-12 border-8 border-cyan-300 rounded-full border-t-transparent animate-spin"></div>
+      <div className="w-12 h-12 border-5 border-cyan-300 rounded-full border-t-transparent animate-spin"></div>
     </div>
     if(error) return <div>{error}</div>
     if(!rooms.length) return <div></div>
