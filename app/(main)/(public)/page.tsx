@@ -6,16 +6,7 @@ import EventSkeleton from "@/components/EventSkeleton";
 import EventCard from "@/components/EventCard";
 import { motion } from "framer-motion";
 import { Search } from "lucide-react";
-
-type Event = {
-  id: string;
-  title: string;
-  description?: string | null;
-  slug: string;
-  startDate: string;
-  endDate: string;
-  location?: string | null;
-};
+import { Event } from "@/types";
 
 type ApiResponse = {
   data: Event[];

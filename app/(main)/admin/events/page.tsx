@@ -4,34 +4,8 @@ import { useEffect, useState, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import {
-  Calendar, MapPin, Layers, Pencil, Trash2, Plus, X,
-  ExternalLink, Search, AlertTriangle,
-  ChevronRight, Settings2,
-} from "lucide-react";
-
-// ─── Types ───
-
-interface Event {
-  id: string;
-  title: string;
-  slug: string;
-  description?: string | null;
-  startDate: string;
-  endDate: string;
-  location?: string | null;
-  coverImage?: string | null;
-  _count: { sessions: number };
-}
-
-interface EventFormData {
-  title: string;
-  description: string;
-  startDate: string;
-  endDate: string;
-  location: string;
-  coverImage: string;
-}
+import { Calendar, MapPin, Layers, Pencil, Trash2, Plus, X, ExternalLink, Search, AlertTriangle, ChevronRight, Settings2 } from "lucide-react";
+import { Event, EventFormData } from "@/types";
 
 const EMPTY_FORM: EventFormData = {
   title: "",
@@ -659,7 +633,7 @@ export default function AdminEventsPage() {
                 { key: "upcoming", label: "À venir",   count: upcomingCount,   dot: "#34d399" },
                 { key: "past",     label: "Passés",    count: pastCount,       dot: "#2a3a4a" },
               ] as const
-            ).map(({ key, label, count, dot, pulse }) => {
+            ).map(({ key, label, count, dot, pulse }: { key: "all" | "live" | "upcoming" | "past"; label: string; count: number; dot: string; pulse?: boolean }) => {
               const active = filter === key;
               return (
                 <button

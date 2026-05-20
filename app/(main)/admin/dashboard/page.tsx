@@ -309,16 +309,24 @@ export default function DashboardPage() {
       const res = await fetch("/api/admin/stats");
       if (!res.ok) throw new Error();
       const data = await res.json();
-      setStats(data);
+      return data;
     } catch {
       // silent
-    } finally {
-      setLoading(false);
+      return null;
     }
   }, []);
 
   useEffect(() => {
-    fetchStats();
+    let isMounted = true;
+    fetchStats().then((data) => {
+      if (isMounted) {
+        setStats(data);
+        setLoading(false);
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
   }, [fetchStats]);
 
   const statCards = stats

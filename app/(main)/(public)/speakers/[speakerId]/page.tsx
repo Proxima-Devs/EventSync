@@ -5,22 +5,17 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 import Image from "next/image";
+import { SpeakerLinks } from "@/types";
 
 type Session = {
     id: string;
+    slug: string;
     title: string;
     startTime: string;
     endTime: string;
     isLive: boolean;
     room?: { id: string; name: string } | null;
     event: { id: string; title: string; slug: string };
-};
-
-type SpeakerLinks = {
-    twitter?: string;
-    linkedin?: string;
-    website?: string;
-    github?: string;
 };
 
 type Speaker = {
@@ -164,7 +159,7 @@ export default function SpeakerPage() {
                     {sessions.map((session) => (
                         <Link
                             key={session.id}
-                            href={`/events/${session.event.slug}/sessions/${session.id}`}
+                            href={`/events/${session.event.slug}/sessions/${session.slug}`}
                             className="block rounded-2xl border border-[#1e2530] bg-[#0d1117] p-5 hover:border-[#00E5FF44] transition-all duration-200"
                         >
                             <p className="text-xs text-[#00E5FF] mb-2 font-semibold">

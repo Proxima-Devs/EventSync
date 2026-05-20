@@ -5,18 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 import { useFavorites } from "@/hooks/useFavorites";
-
-type Session = {
-    id: string;
-    title: string;
-    description?: string | null;
-    startTime: string;
-    endTime: string;
-    isLive: boolean;
-    room?: { id: string; name: string } | null;
-    speakers: { id: string; fullName: string }[];
-};
-type EventMeta = { id: string; title: string; slug: string };
+import { Session, EventMeta } from "@/types";
 
 const STYLES = `
   @keyframes fadeSlideUp {
@@ -339,7 +328,7 @@ export default function SessionsPage() {
                     {filtered.map((session, i) => (
                         <div key={session.id} style={{ position: "relative" }}>
                             <Link
-                                href={`/events/${slug}/sessions/${session.id}`}
+                                href={`/events/${slug}/sessions/${session.slug}`}
                                 className="session-card"
                                 style={{
                                     padding: "18px 56px 18px 20px",

@@ -60,7 +60,7 @@ export default function EventCard({ event, index = 0 }: { event: Event; index?: 
             ) : (
               /* Placeholder pattern when no image */
               <div className="w-full h-full flex items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-linear-to-br from-[rgb(0,229,255,0.03)] via-[#0d1117] to-[#001a1e]" />
+                <div className="absolute inset-0 bg-linear-to-br from-[#00e5ff08] via-[#0d1117] to-[#001a1e]" />
                 {/* Grid pattern */}
                 <svg className="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
                   <defs>
@@ -116,7 +116,7 @@ export default function EventCard({ event, index = 0 }: { event: Event; index?: 
             </div>
 
             <div className="mt-5 overflow-hidden">
-              <div className="rounded-full border border-[var(--color-primary)] opacity-30 bg-[#0b0f18] px-4 py-2 text-sm font-semibold text-[var(--color-primary)] text-center opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+              <div className="rounded-full border border-[var(--color-primary)] bg-[#0b0f18] px-4 py-2 text-sm font-semibold text-[var(--color-primary)] text-center opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
                 Voir le programme
               </div>
             </div>
