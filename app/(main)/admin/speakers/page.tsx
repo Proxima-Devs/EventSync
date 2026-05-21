@@ -5,11 +5,14 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { SpeakerLinks } from "@/types";
+import FileUpload from "@/components/FileUpload";
+import { SpeakerCard } from "@/components/SpeakerCard";
 
 // ─── Types ───
 
 interface Speaker {
   id: string;
+  slug?: string;
   fullName: string;
   photo?: string | null;
   bio?: string | null;
@@ -34,17 +37,22 @@ const inputClass =
 
 // ─── Skeleton ───
 
-function SpeakerRowSkeleton() {
+function SpeakerCardSkeleton() {
   return (
-    <div className="animate-pulse flex items-center gap-4 px-6 py-5 border-b border-[#1e2530]">
-      <div className="w-10 h-10 rounded-full bg-[#1e2530] shrink-0" />
-      <div className="flex-1 space-y-2">
-        <div className="h-3.5 w-1/3 bg-[#1e2530] rounded-lg" />
-        <div className="h-2.5 w-1/4 bg-[#1e2530] rounded-lg" />
+    <div className="animate-pulse flex flex-col rounded-2xl border border-[#1e2530] bg-[#0d1117] overflow-hidden">
+      <div className="flex flex-col items-center pt-7 pb-5 px-5 flex-1">
+        <div className="w-20 h-20 rounded-full bg-[#1e2530] mb-4" />
+        <div className="h-3.5 w-2/3 bg-[#1e2530] rounded-lg mb-2" />
+        <div className="h-2.5 w-1/3 bg-[#1e2530] rounded-lg mb-4" />
+        <div className="space-y-1.5 w-full">
+          <div className="h-2 bg-[#1e2530] rounded-lg w-full" />
+          <div className="h-2 bg-[#1e2530] rounded-lg w-4/5 mx-auto" />
+          <div className="h-2 bg-[#1e2530] rounded-lg w-3/5 mx-auto" />
+        </div>
       </div>
-      <div className="flex gap-2 ml-auto">
-        <div className="w-8 h-8 bg-[#1e2530] rounded-xl" />
-        <div className="w-8 h-8 bg-[#1e2530] rounded-xl" />
+      <div className="flex gap-2 px-4 py-3 border-t border-[#1e2530] bg-[#060a0f]">
+        <div className="flex-1 h-8 bg-[#1e2530] rounded-xl" />
+        <div className="flex-1 h-8 bg-[#1e2530] rounded-xl" />
       </div>
     </div>
   );
@@ -214,6 +222,18 @@ function SpeakerModal({
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="relative px-6 py-5 flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto">
+
+              {/* Photo upload — avatar centré en haut */}
+              <div className="flex flex-col items-center pt-1 pb-2 border-b border-[#1e2530]">
+                <label className="text-xs font-semibold uppercase tracking-widest text-[#3a4a5a] mb-3">
+                  Photo de profil
+                </label>
+                <FileUpload
+                  value={form.photo}
+                  onChange={(url) => set("photo", url)}
+                />
+              </div>
+
               {/* Full Name */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-semibold uppercase tracking-widest text-[#3a4a5a]">
@@ -225,20 +245,6 @@ function SpeakerModal({
                   onChange={(e) => set("fullName", e.target.value)}
                   placeholder="Ex : Jean Dupont"
                   autoFocus
-                />
-              </div>
-
-              {/* Photo URL */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold uppercase tracking-widest text-[#3a4a5a]">
-                  Photo (URL)
-                </label>
-                <input
-                  className={inputClass}
-                  type="url"
-                  value={form.photo}
-                  onChange={(e) => set("photo", e.target.value)}
-                  placeholder="https://…"
                 />
               </div>
 
@@ -452,85 +458,6 @@ function DeleteModal({
   );
 }
 
-// ─── Speaker Row ───
-
-function SpeakerRow({
-  speaker,
-  onEdit,
-  onDelete,
-}: {
-  speaker: Speaker;
-  onEdit: (s: Speaker) => void;
-  onDelete: (s: Speaker) => void;
-}) {
-  return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, x: -16 }}
-      transition={{ duration: 0.2 }}
-      className="group flex items-center gap-4 px-6 py-4 border-b border-[#1e2530] hover:bg-[#ffffff03] transition-colors"
-    >
-      {/* Avatar */}
-      <div className="w-10 h-10 rounded-full bg-[#ffffff06] border border-[#1e2530] flex items-center justify-center shrink-0 group-hover:border-[#00E5FF22] transition-colors overflow-hidden">
-        {speaker.photo ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={speaker.photo} alt={speaker.fullName} className="w-full h-full object-cover" />
-        ) : (
-          <span className="text-[#3a4a5a] group-hover:text-[#00E5FF] text-sm font-black transition-colors">
-            {speaker.fullName
-              .split(" ")
-              .map((n) => n[0])
-              .join("")
-              .slice(0, 2)
-              .toUpperCase()}
-          </span>
-        )}
-      </div>
-
-      {/* Info */}
-      <div className="flex-1 min-w-0">
-        <span className="font-bold text-[#eee] text-sm truncate block">{speaker.fullName}</span>
-        <div className="flex items-center gap-1.5 mt-0.5">
-          <Layers size={10} className="text-[#3a4a5a]" />
-          <span className="text-[11px] text-[#3a4a5a]">
-            {speaker._count.sessions} session{speaker._count.sessions !== 1 ? "s" : ""}
-          </span>
-        </div>
-      </div>
-
-      {/* Sessions badge */}
-      {speaker._count.sessions > 0 && (
-        <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#1e2530] bg-[#ffffff04]">
-          <Layers size={11} className="text-[#3a4a5a]" />
-          <span className="text-xs text-[#3a4a5a] font-semibold">
-            {speaker._count.sessions} session{speaker._count.sessions !== 1 ? "s" : ""}
-          </span>
-        </div>
-      )}
-
-      {/* Actions */}
-      <div className="flex items-center gap-2 shrink-0">
-        <button
-          onClick={() => onEdit(speaker)}
-          className="w-8 h-8 rounded-xl border border-[#1e2530] flex items-center justify-center text-[#3a4a5a] hover:text-white hover:border-[#2e3a4a] transition-all duration-200"
-          title="Modifier"
-        >
-          <Pencil size={13} />
-        </button>
-        <button
-          onClick={() => onDelete(speaker)}
-          className="w-8 h-8 rounded-xl border border-[#1e2530] flex items-center justify-center text-[#3a4a5a] hover:text-red-400 hover:border-red-900/50 transition-all duration-200"
-          title="Supprimer"
-        >
-          <Trash2 size={13} />
-        </button>
-      </div>
-    </motion.div>
-  );
-}
-
 // ─── Main Page ───
 
 export default function AdminSpeakersPage() {
@@ -604,7 +531,7 @@ export default function AdminSpeakersPage() {
         onDeleted={handleDeleted}
       />
 
-      <main className="flex-1 px-8 py-12 max-w-4xl mx-auto w-full">
+      <main className="flex-1 px-8 py-12 max-w-7xl mx-auto w-full">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-[#4a5568] mb-8">
           <Link href="/admin" className="hover:text-[#00E5FF] transition-colors">
@@ -645,7 +572,7 @@ export default function AdminSpeakersPage() {
 
         {/* Mini stats + search */}
         {!loading && speakers.length > 0 && (
-          <div className="flex items-center gap-4 mb-6 flex-wrap">
+          <div className="flex items-center gap-4 mb-8 flex-wrap">
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#1e2530] bg-[#0d1117]">
               <Mic size={11} className="text-[#3a4a5a]" />
               <span className="text-xs text-[#3a4a5a] font-semibold">
@@ -675,70 +602,64 @@ export default function AdminSpeakersPage() {
           </div>
         )}
 
-        {/* Table */}
-        <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] overflow-hidden">
-          {/* Header */}
-          <div className="flex items-center gap-4 px-6 py-3 border-b border-[#1e2530] bg-[#060a0f]">
-            <div className="w-10 shrink-0" />
-            <span className="flex-1 text-[10px] font-bold uppercase tracking-widest text-[#2a3a4a]">
-              Intervenant
-            </span>
-            <span className="hidden sm:block text-[10px] font-bold uppercase tracking-widest text-[#2a3a4a]">
-              Sessions
-            </span>
-            <span className="w-20 shrink-0" />
-          </div>
-
-          {/* Loading */}
-          {loading &&
-            Array.from({ length: 4 }).map((_, i) => <SpeakerRowSkeleton key={i} />)}
-
-          {/* Error */}
-          {error && (
-            <div className="px-6 py-10 flex items-center justify-center gap-2 text-red-400 text-sm">
-              <AlertTriangle size={16} />
-              {error}
-            </div>
-          )}
-
-          {/* Empty state */}
-          {!loading && !error && speakers.length === 0 && (
-            <div className="py-20 text-center">
-              <Mic size={28} className="mx-auto text-[#1e2530] mb-3" />
-              <p className="text-[#3a4a5a] italic text-sm mb-4">
-                Aucun intervenant pour le moment.
-              </p>
-              <button
-                onClick={openCreate}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#00E5FF15] border border-[#00E5FF30] text-[#00E5FF] text-sm font-bold hover:bg-[#00E5FF20] transition-all"
-              >
-                <Plus size={13} />
-                Créer le premier intervenant
-              </button>
-            </div>
-          )}
-
-          {/* No search results */}
-          {!loading && !error && speakers.length > 0 && filtered.length === 0 && (
-            <div className="py-12 text-center">
-              <p className="text-[#3a4a5a] italic text-sm">
-                Aucun intervenant ne correspond à «&nbsp;{search}&nbsp;».
-              </p>
-            </div>
-          )}
-
-          {/* Rows */}
-          <AnimatePresence initial={false}>
-            {filtered.map((speaker) => (
-              <SpeakerRow
-                key={speaker.id}
-                speaker={speaker}
-                onEdit={openEdit}
-                onDelete={(s) => setDeletingSpeaker(s)}
-              />
+        {/* Loading skeletons */}
+        {loading && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <SpeakerCardSkeleton key={i} />
             ))}
-          </AnimatePresence>
-        </div>
+          </div>
+        )}
+
+        {/* Error */}
+        {error && (
+          <div className="flex items-center justify-center gap-2 py-20 text-red-400 text-sm">
+            <AlertTriangle size={16} />
+            {error}
+          </div>
+        )}
+
+        {/* Empty state */}
+        {!loading && !error && speakers.length === 0 && (
+          <div className="py-20 text-center">
+            <Mic size={28} className="mx-auto text-[#1e2530] mb-3" />
+            <p className="text-[#3a4a5a] italic text-sm mb-4">
+              Aucun intervenant pour le moment.
+            </p>
+            <button
+              onClick={openCreate}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#00E5FF15] border border-[#00E5FF30] text-[#00E5FF] text-sm font-bold hover:bg-[#00E5FF20] transition-all"
+            >
+              <Plus size={13} />
+              Créer le premier intervenant
+            </button>
+          </div>
+        )}
+
+        {/* No search results */}
+        {!loading && !error && speakers.length > 0 && filtered.length === 0 && (
+          <div className="py-12 text-center">
+            <p className="text-[#3a4a5a] italic text-sm">
+              Aucun intervenant ne correspond à «&nbsp;{search}&nbsp;».
+            </p>
+          </div>
+        )}
+
+        {/* Cards grid — 4 columns */}
+        {!loading && !error && filtered.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <AnimatePresence initial={false}>
+              {filtered.map((speaker) => (
+                <SpeakerCard
+                  key={speaker.id}
+                  speaker={speaker}
+                  onEdit={openEdit}
+                  onDelete={(s) => setDeletingSpeaker(s)}
+                />
+              ))}
+            </AnimatePresence>
+          </div>
+        )}
       </main>
     </>
   );
