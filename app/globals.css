@@ -4,6 +4,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --background-dark: #0a0a0a;
   --color-primary: #00E5FF;
   --color-secondary: #7b61ff;
   --color-tertiary: #00ffc8;
@@ -18,7 +19,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: var(--background-dark);
     --foreground: #ededed;
   }
 }

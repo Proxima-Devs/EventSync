@@ -26,7 +26,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         if (
           isValidHex(parsed.primary) &&
           isValidHex(parsed.secondary) &&
-          isValidHex(parsed.tertiary)
+          isValidHex(parsed.tertiary) &&
+          isValidHex(parsed.background) &&
+          isValidHex(parsed.backgroundDark)
         ) {
           setThemeState(parsed);
         }
@@ -42,6 +44,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     root.style.setProperty('--color-primary', newTheme.primary);
     root.style.setProperty('--color-secondary', newTheme.secondary);
     root.style.setProperty('--color-tertiary', newTheme.tertiary);
+    root.style.setProperty('--background', newTheme.background);
+    root.style.setProperty('--background-dark', newTheme.backgroundDark);
   }, []);
 
   useEffect(() => {
