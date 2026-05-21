@@ -147,7 +147,7 @@ function SettingsModal({
                                 onClick={() => setTab(t)}
                                 className={`cursor-pointer w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors duration-150
                                     ${tab === t
-                                        ? "bg-[#00E5FF14] text-[#00E5FF]"
+                                        ? "bg-primary-light text-primary"
                                         : "text-[#666] hover:text-[#aaa] hover:bg-white/4"
                                     }`}
                             >
@@ -231,7 +231,7 @@ function SettingsModal({
                                                 onClick={() => setTheme(opt.value)}
                                                 className={`cursor-pointer py-2.5 rounded-xl border text-xs font-bold transition-all
                                                     ${theme === opt.value
-                                                        ? "border-[#00E5FF44] bg-[#00E5FF12] text-[#00E5FF]"
+                                                        ? "border-primary-light bg-primary-light text-primary"
                                                         : "border-[#1e2226] bg-[#111316] text-[#666] hover:text-[#aaa] hover:border-[#333]"
                                                     }`}
                                             >
@@ -258,7 +258,7 @@ function SettingsModal({
                                                 onClick={() => setLang(opt.value)}
                                                 className={`cursor-pointer py-2.5 rounded-xl border text-sm font-bold transition-all
                                                     ${lang === opt.value
-                                                        ? "border-[#00E5FF44] bg-[#00E5FF12] text-[#00E5FF]"
+                                                        ? "border-primary-light bg-primary-light text-primary"
                                                         : "border-[#1e2226] bg-[#111316] text-[#666] hover:text-[#aaa] hover:border-[#333]"
                                                     }`}
                                             >
@@ -387,7 +387,7 @@ export default function Sidebar() {
                 <div className="flex items-center h-16 pl-4 pr-3 shrink-0">
                     <span
                         className={`
-                            font-[Lavishly_Yours] text-3xl text-[#00E5FF] whitespace-nowrap
+                            font-[Lavishly_Yours] text-3xl text-primary whitespace-nowrap
                             select-none
                             transition-all duration-300 ease-in-out
                             ${expanded ? "max-w-40 opacity-100 mr-auto" : "max-w-0 opacity-0 mr-0"}
@@ -397,7 +397,7 @@ export default function Sidebar() {
                     </span>
                     <button
                         onClick={() => setExpanded(!expanded)}
-                        className="w-8 h-8 flex items-center justify-center rounded-lg shrink-0 text-[#444] hover:text-[#00E5FF] hover:bg-[#00E5FF11] transition-colors duration-200 cursor-pointer ml-auto"
+                        className="w-8 h-8 flex items-center justify-center rounded-lg shrink-0 text-[#444] hover:text-primary hover:bg-primary-light transition-colors duration-200 cursor-pointer ml-auto"
                     >
                         <PanelLeft size={18} className={`transition-transform duration-300 ${expanded ? "" : "rotate-180"}`} />
                     </button>
@@ -413,14 +413,17 @@ export default function Sidebar() {
                                 href={item.href}
                                 className={`
                                     group relative flex items-center rounded-xl px-2.5 py-2.5 transition-colors duration-200
-                                    ${active ? "bg-[#00E5FF18] text-[#00E5FF]" : "text-[#505050] hover:text-[#00E5FF] hover:bg-[#00E5FF0d]"}
+                                    ${active ? "bg-primary-lighter text-primary" : "text-[#505050] hover:text-primary hover:bg-primary-light"}
                                 `}
                             >
                                 <Icon size={19} className="shrink-0" />
                                 <span className={`text-sm font-semibold whitespace-nowrap overflow-hidden transition-all duration-300 ease-in-out ${expanded ? "max-w-40 opacity-100 pl-3" : "max-w-0 opacity-0 pl-0"}`}>
                                     {item.label}
                                 </span>
-                                <span className={`absolute left-full ml-3 px-2.5 py-1 rounded-md z-50 bg-[#00E5FF] text-black text-xs font-bold whitespace-nowrap pointer-events-none shadow-lg shadow-[#00E5FF22] transition-all duration-200 ${expanded ? "opacity-0 translate-x-0 invisible" : "opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0"}`}>
+                                <span
+                                  className={`absolute left-full ml-3 px-2.5 py-1 rounded-md z-50 text-black text-xs font-bold whitespace-nowrap pointer-events-none transition-all duration-200 ${expanded ? "opacity-0 translate-x-0 invisible" : "opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0"}`}
+                                  style={{ backgroundColor: 'var(--color-primary)', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.6), 0 0 20px color-mix(in srgb, var(--color-primary) 13%)' }}
+                                >
                                     {item.label}
                                 </span>
                             </Link>
@@ -446,21 +449,27 @@ export default function Sidebar() {
                             {user.image ? (
                                 <Image src={user.image} alt={user.name} width={32} height={32} className="rounded-full object-cover shrink-0 ring-1 ring-white/10" />
                             ) : (
-                                <div className="w-8 h-8 rounded-full shrink-0 flex items-center justify-center bg-linear-to-br from-[#00E5FF] to-[#0066ff] text-black text-xs font-bold ring-1 ring-white/10">
+                                <div
+                                  className="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-black text-xs font-bold ring-1 ring-white/10"
+                                  style={{ backgroundImage: 'linear-gradient(to bottom right, var(--color-primary), #0066ff)' }}
+                                >
                                     {initials}
                                 </div>
                             )}
                             <span className={`text-sm font-semibold whitespace-nowrap overflow-hidden text-ellipsis transition-all duration-300 ease-in-out ${expanded ? "max-w-32 opacity-100" : "max-w-0 opacity-0"}`}>
                                 {user.name ?? user.email}
                             </span>
-                            <span className={`absolute left-full ml-3 px-2.5 py-1 rounded-md z-50 bg-[#00E5FF] text-black text-xs font-bold whitespace-nowrap pointer-events-none shadow-lg shadow-[#00E5FF22] transition-all duration-200 ${expanded ? "opacity-0 invisible" : "opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0"}`}>
+                            <span
+                              className={`absolute left-full ml-3 px-2.5 py-1 rounded-md z-50 text-black text-xs font-bold whitespace-nowrap pointer-events-none transition-all duration-200 ${expanded ? "opacity-0 invisible" : "opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0"}`}
+                              style={{ backgroundColor: 'var(--color-primary)', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.6), 0 0 20px color-mix(in srgb, var(--color-primary) 13%)' }}
+                            >
                                 {user.name ?? "Profil"}
                             </span>
                         </button>
                     ) : (
                         <Link
                             href="/auth/login"
-                            className="group relative flex items-center rounded-xl px-2.5 py-2.5 w-full text-[#505050] hover:text-[#00E5FF] hover:bg-[#00E5FF0d] transition-colors duration-200"
+                            className="group relative flex items-center rounded-xl px-2.5 py-2.5 w-full text-[#505050] hover:text-primary hover:bg-primary-light transition-colors duration-200"
                         >
                             <LogIn size={19} className="shrink-0" />
                             <span className={`text-sm font-semibold whitespace-nowrap overflow-hidden transition-all duration-300 ease-in-out ${expanded ? "max-w-40 opacity-100 pl-3" : "max-w-0 opacity-0 pl-0"}`}>

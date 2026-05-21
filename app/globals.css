@@ -111,3 +111,13 @@ body {
  
 .animate-fade-up  { animation: fade-up  0.15s ease forwards; }
 .animate-scale-in { animation: scale-in 0.18s ease forwards; }
+
+/* Primary color utility classes with CSS variables */
+.text-primary { color: var(--color-primary); }
+.bg-primary-light { background-color: color-mix(in srgb, var(--color-primary) 5%); }
+.bg-primary-lighter { background-color: color-mix(in srgb, var(--color-primary) 8%); }
+.bg-primary-lightest { background-color: color-mix(in srgb, var(--color-primary) 12%); }
+.border-primary-light { border-color: color-mix(in srgb, var(--color-primary) 27%); }
+.border-primary-lighter { border-color: color-mix(in srgb, var(--color-primary) 17%); }
+.hover\:text-primary:hover { color: var(--color-primary); }
+.hover\:bg-primary-light:hover { background-color: color-mix(in srgb, var(--color-primary) 7%); }

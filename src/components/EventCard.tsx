@@ -60,7 +60,10 @@ export default function EventCard({ event, index = 0 }: { event: Event; index?: 
             ) : (
               /* Placeholder pattern when no image */
               <div className="w-full h-full flex items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-linear-to-br from-[#00e5ff08] via-[#0d1117] to-[#001a1e]" />
+                <div
+                  className="absolute inset-0"
+                  style={{ backgroundImage: 'linear-gradient(to bottom right, color-mix(in srgb, var(--color-primary) 5%), #0d1117, #001a1e)' }}
+                />
                 {/* Grid pattern */}
                 <svg className="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
                   <defs>
