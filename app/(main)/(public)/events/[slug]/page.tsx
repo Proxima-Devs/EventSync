@@ -275,6 +275,12 @@ export default function EventDetailPage() {
         .finally(() => setLoading(false));
   }, [slug]);
 
+  useEffect(() => {
+  if (event?.title) {
+    document.title = event.title;
+  }
+}, [event]);
+
   if (loading)
     return (
         <div style={{ minHeight: "100vh", background: "#0a0e17", display: "flex", alignItems: "center", justifyContent: "center" }}>

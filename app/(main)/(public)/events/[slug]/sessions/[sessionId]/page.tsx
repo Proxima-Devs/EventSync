@@ -36,6 +36,12 @@ export default function SessionDetailPage() {
       .finally(() => setLoading(false));
   }, [sessionId]);
 
+  useEffect(() => {
+  if (session?.title) {
+    document.title = session.title;
+  }
+}, [session]);
+
   if (loading)
     return (
       <main className="flex-1 px-8 py-12 max-w-3xl mx-auto w-full">

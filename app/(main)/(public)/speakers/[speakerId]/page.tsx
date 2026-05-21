@@ -54,6 +54,12 @@ export default function SpeakerPage() {
             .finally(() => setLoading(false));
     }, [speakerId]);
 
+    useEffect(() => {
+        if (speaker?.fullName) {
+            document.title = speaker?.fullName;
+        }
+    }, [speaker]);
+
     if (loading)
         return (
             <main className="flex-1 px-8 py-12 max-w-3xl mx-auto w-full">
