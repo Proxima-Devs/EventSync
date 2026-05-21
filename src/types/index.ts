@@ -161,3 +161,26 @@ export type SessionFavorite = {
   event: { slug: string; title: string };
 };
 
+export interface EventSession extends Session {
+  eventId: string;
+  event: { id: string; title: string; slug: string };
+}
+
+export interface Question {
+  id: string;
+  content: string;
+  authorName?: string | null;
+  upvotes: number;
+  isHidden: boolean;
+  sessionId: string;
+  createdAt: string;
+  replies?: QuestionReply[];
+}
+
+export interface QuestionReply {
+  id: string;
+  content: string;
+  authorName?: string | null;
+  createdAt: string;
+}
+
