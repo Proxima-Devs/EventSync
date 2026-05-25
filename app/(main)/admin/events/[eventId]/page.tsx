@@ -160,7 +160,7 @@ function SessionModal({ open, onClose, onSaved, editingSession, allSpeakers, all
                 <div className="grid grid-cols-2 gap-3">
                   <Field label="Salle">
                     <select className={inputCls} value={form.roomId} onChange={(e) => set("roomId", e.target.value)}>
-                      <option value="">— Sans salle —</option>
+                      <option value="" disabled>Choisir une salle</option>
                       {allRooms.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
                     </select>
                   </Field>
@@ -219,6 +219,8 @@ function SessionModal({ open, onClose, onSaved, editingSession, allSpeakers, all
 
 // ─── Delete Modal ─────────────────────────────────────────────────────────────
 
+// ─── Delete Modal ─────────────────────────────────────────────────────────────
+
 function DeleteSessionModal({ session, onClose, onDeleted }: {
   session: Session | null; onClose: () => void; onDeleted: (id: string) => void;
 }) {
@@ -237,8 +239,12 @@ function DeleteSessionModal({ session, onClose, onDeleted }: {
     setLoading(true);
     try {
       const res = await fetch(`/api/sessions/${session.id}`, { method: "DELETE" });
-      if (!res.ok) { const d = await res.json(); throw new Error(d.error ?? "Erreur"); }
-      onDeleted(session.id); onClose();
+      if (!res.ok) {
+        const d = await res.json();
+        throw new Error(d.error ?? "Erreur lors de la suppression");
+      }
+      onDeleted(session.id);
+      onClose();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Erreur inconnue");
       setLoading(false);
@@ -248,23 +254,51 @@ function DeleteSessionModal({ session, onClose, onDeleted }: {
   return (
     <AnimatePresence>
       {session && (
-        <motion.div ref={overlayRef} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        <motion.div
+          ref={overlayRef}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}
           onClick={(e) => e.target === overlayRef.current && onClose()}
-          className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/60 backdrop-blur-sm">
-          <motion.div initial={{ opacity: 0, scale: 0.96, y: 8 }} animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.97, y: 4 }} transition={{ duration: 0.18 }}
-            className="w-full max-w-sm rounded-3xl border border-slate-700 bg-slate-900 shadow-2xl shadow-black/40 overflow-hidden">
-            <div className="px-6 pt-6 pb-4">
-              <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mb-4">
-                <Trash2 size={18} className="text-rose-400" />
+          className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/80 backdrop-blur-sm"
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.94, y: 12 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.96, y: 8 }}
+            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="relative w-full max-w-sm rounded-2xl border border-red-900/40 bg-[#0a0e14] overflow-hidden"
+            style={{ boxShadow: "0 0 0 1px #ff444418, 0 0 40px #ff444412, 0 32px 64px rgba(0,0,0,0.6)" }}
+          >
+            <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-red-500/50 to-transparent" />
+            <div className="px-6 pt-6 pb-5">
+              <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-900/40 flex items-center justify-center mb-4">
+                <Trash2 size={18} className="text-red-400" />
               </div>
-              <h2 className="text-sm font-bold text-white mb-1">Supprimer la session ?</h2>
-              <p className="text-sm text-slate-400">«&nbsp;<span className="font-semibold text-slate-200">{session.title}</span>&nbsp;» sera définitivement supprimée.</p>
-              {error && <div className="mt-3 flex items-center gap-2 text-sm text-rose-300 bg-rose-500/10 border border-rose-500/20 rounded-lg px-3 py-2"><AlertTriangle size={13} />{error}</div>}
+              <h2 className="text-base font-black text-white mb-1">Supprimer la session ?</h2>
+              <p className="text-sm text-[#4a5568] leading-relaxed">
+                <span className="text-[#ccc] font-semibold">{session.title}</span> sera définitivement supprimée.
+              </p>
+              {error && (
+                <div className="mt-3 flex items-center gap-2 text-sm text-red-400 bg-red-500/10 border border-red-900/40 rounded-xl px-3 py-2">
+                  <AlertTriangle size={13} className="shrink-0" />
+                  {error}
+                </div>
+              )}
             </div>
             <div className="flex gap-3 px-6 pb-6">
-              <button onClick={onClose} className="flex-1 py-2.5 rounded-2xl border border-slate-700 text-sm text-slate-400 hover:text-white font-semibold transition-colors">Annuler</button>
-              <button onClick={handleDelete} disabled={loading} className="flex-1 py-2.5 rounded-2xl bg-rose-500 text-white text-sm font-bold hover:bg-rose-400 active:scale-[0.98] transition-all disabled:opacity-50">
+              <button
+                onClick={onClose}
+                className="flex-1 py-2.5 rounded-xl border border-[#1e2530] text-sm text-[#4a5568] hover:text-white hover:border-[#2e3a4a] transition-all duration-200 font-semibold"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={loading}
+                className="flex-1 py-2.5 rounded-xl bg-red-500/90 text-white text-sm font-black tracking-wide hover:bg-red-500 active:scale-95 transition-all duration-200 disabled:opacity-50"
+              >
                 {loading ? "Suppression…" : "Supprimer"}
               </button>
             </div>
@@ -718,9 +752,10 @@ export default function EventDetailPage() {
                           </button>
                           <button
                             onClick={() => setDeletingSession(s)}
-                            className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-600 hover:text-rose-400 hover:bg-rose-500/10 transition-all"
-                            aria-label="Supprimer">
-                            <Trash2 size={14} />
+                            className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg border border-[#1e2530] text-[#3a4a5a] text-[11px] font-semibold hover:text-red-400 hover:border-red-900/50 hover:bg-red-500/05 transition-all duration-200"
+                          >
+                            <Trash2 size={11} />
+                            Supprimer
                           </button>
                         </div>
                       </motion.div>

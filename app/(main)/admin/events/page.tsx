@@ -628,10 +628,10 @@ export default function AdminEventsPage() {
             {/* Filter tabs */}
             {(
               [
-                { key: "all",      label: "Tous",      count: events.length,   dot: "#3a4a5a" },
-                { key: "live",     label: "Live",      count: liveCount,       dot: "#00E5FF", pulse: true },
-                { key: "upcoming", label: "À venir",   count: upcomingCount,   dot: "#34d399" },
-                { key: "past",     label: "Passés",    count: pastCount,       dot: "#2a3a4a" },
+                { key: "all", label: "Tous", count: events.length, dot: "#3a4a5a" },
+                { key: "live", label: "Live", count: liveCount, dot: "#00E5FF", pulse: true },
+                { key: "upcoming", label: "À venir", count: upcomingCount, dot: "#34d399" },
+                { key: "past", label: "Passés", count: pastCount, dot: "#2a3a4a" },
               ] as const
             ).map(({ key, label, count, dot, pulse }: { key: "all" | "live" | "upcoming" | "past"; label: string; count: number; dot: string; pulse?: boolean }) => {
               const active = filter === key;
