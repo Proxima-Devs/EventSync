@@ -101,21 +101,14 @@ export default function SpeakerPage() {
 
             <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-8 mb-6">
                 <div className="flex items-start gap-6">
-                    {speaker.photo ? (
-                        <Image
-                            src={speaker.photo}
-                            alt={speaker.fullName}
-                            width={96}
-                            height={96}
-                            unoptimized
-                            className="w-24 h-24 rounded-full object-cover shrink-0 ring-2 ring-[#00E5FF33]"
-                        />
-                    ) : (
-                        <div className="w-24 h-24 rounded-full bg-[#1e2530] flex items-center justify-center text-[#00E5FF] font-black text-4xl shrink-0">
-                            {speaker.fullName[0]}
-                        </div>
-                    )}
-
+                    <Image
+                        src={speaker.photo ?? `https://api.dicebear.com/7.x/adventurer/svg?seed=${speaker.fullName}&flip=true&radius=50`}
+                        alt={speaker.fullName}
+                        width={96}
+                        height={96}
+                        unoptimized
+                        className="w-24 h-24 rounded-full object-cover shrink-0 ring-2 ring-[#00E5FF33]"
+                    />
                     <div className="flex-1 min-w-0">
                         <h1 className="text-3xl font-black mb-1">{speaker.fullName}</h1>
 

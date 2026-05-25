@@ -143,20 +143,14 @@ export default function SessionDetailPage() {
                 href={`/speakers/${speaker.slug}`}
                 className="flex items-center gap-4 rounded-2xl px-4 py-3 mx-4 hover:border-[#00E5FF44] transition-all duration-200 group hover:border "
               >
-                {speaker.photo ? (
-                  <Image
-                    src={speaker.photo}
-                    alt={speaker.fullName}
-                    width={56}
-                    height={56}
-                    unoptimized
-                    className="rounded-full object-cover shrink-0 ring-2 ring-[#1e2530] group-hover:ring-[#00E5FF33] transition-all"
-                  />
-                ) : (
-                  <div className="w-14 h-14 rounded-full bg-[#1e2530] flex items-center justify-center text-[#00E5FF] font-black text-xl shrink-0 group-hover:bg-[#00E5FF15] transition-colors">
-                    {speaker.fullName[0]}
-                  </div>
-                )}
+                <Image
+                  src={speaker.photo ?? `https://api.dicebear.com/7.x/adventurer/svg?seed=${speaker.fullName}&flip=true&radius=50`}
+                  alt={speaker.fullName}
+                  width={56}
+                  height={56}
+                  unoptimized
+                  className="rounded-full object-cover shrink-0 ring-2 ring-[#1e2530] group-hover:ring-[#00E5FF33] transition-all"
+                />
                 <div className="min-w-0">
                   <p className="font-bold group-hover:text-[#00E5FF] text-white transition-colors">
                     {speaker.fullName}
