@@ -4,20 +4,18 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { useFavorites } from "@/hooks/useFavorites";
-import ToggleSwitch from "@/components/ToggleSwitch";
 import Link from "next/link";
-import { Calendar, MapPin, Pencil, Trash2, Plus, X, AlertTriangle, ChevronRight, Clock, Mic, Building2, Radio, Users, Save, ExternalLink, CheckSquare, Square } from "lucide-react";
-import SessionCardSchedule from "@/components/SessionSchedule";
+import Image from "next/image";
+import {
+  ArrowLeft, Eye, Pencil, Trash2, Plus, X, AlertTriangle,
+  Clock, Building2, Users, CheckSquare, Square,
+  List, LayoutGrid, Heart, Calendar, MapPin,
+} from "lucide-react";
 import { Room, Session, SessionFormData, Speaker, Event } from "@/types";
 
 const EMPTY_SESSION: SessionFormData = {
-  title: "",
-  description: "",
-  startTime: "",
-  endTime: "",
-  capacity: "",
-  roomId: "",
-  speakerIds: [],
+  title: "", description: "", startTime: "", endTime: "",
+  capacity: "", roomId: "", speakerIds: [],
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -28,17 +26,12 @@ function toDatetimeLocal(iso: string) {
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("fr-FR", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
+    day: "numeric", month: "long", year: "numeric",
   });
 }
 
 function formatTime(iso: string) {
-  return new Date(iso).toLocaleTimeString("fr-FR", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  return new Date(iso).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
 }
 
 function duration(start: string, end: string) {
@@ -49,74 +42,32 @@ function duration(start: string, end: string) {
   return m ? `${h}h${m.toString().padStart(2, "0")}` : `${h}h`;
 }
 
-// ─── Style helpers ────────────────────────────────────────────────────────────
+// ─── Shared input style ───────────────────────────────────────────────────────
 
-const inputClass =
-  "w-full px-4 py-2.5 rounded-xl bg-[#060a0f] border border-[#1e2530] text-sm text-[#ccc] placeholder-[#2a3a4a] focus:outline-none focus:border-[#00E5FF44] focus:ring-1 focus:ring-[#00E5FF22] transition-all duration-200";
+const inputCls =
+  "w-full px-3 py-2 rounded-lg border border-slate-700 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all bg-slate-900";
 
-function Field({
-  label,
-  required,
-  hint,
-  children,
-}: {
-  label: string;
-  required?: boolean;
-  hint?: string;
-  children: React.ReactNode;
+function Field({ label, required, hint, children }: {
+  label: string; required?: boolean; hint?: string; children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-1.5">
-      <div className="flex items-center gap-1.5">
-        <label className="text-xs font-semibold uppercase tracking-widest text-[#3a4a5a]">
-          {label}
-          {required && <span className="text-[#00E5FF] ml-1">*</span>}
+    <div className="flex flex-col gap-1">
+      <div className="flex items-center gap-1">
+        <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
+          {label}{required && <span className="text-cyan-400 ml-0.5">*</span>}
         </label>
-        {hint && <span className="text-[10px] text-[#2a3a4a]">{hint}</span>}
+        {hint && <span className="text-[10px] text-slate-500">{hint}</span>}
       </div>
       {children}
     </div>
   );
 }
 
-// ─── Skeleton ─────────────────────────────────────────────────────────────────
-
-function SessionCardSkeleton() {
-  return (
-    <div className="animate-pulse rounded-2xl border border-[#1e2530] bg-[#0d1117] p-5">
-      <div className="flex items-start gap-3 mb-4">
-        <div className="w-8 h-8 rounded-xl bg-[#1e2530] shrink-0" />
-        <div className="flex-1 space-y-2 pt-0.5">
-          <div className="h-3.5 w-1/2 bg-[#1e2530] rounded-lg" />
-          <div className="h-2.5 w-1/3 bg-[#1e2530] rounded-lg" />
-        </div>
-      </div>
-      <div className="flex gap-2">
-        <div className="h-6 w-20 bg-[#1e2530] rounded-lg" />
-        <div className="h-6 w-24 bg-[#1e2530] rounded-lg" />
-      </div>
-    </div>
-  );
-}
-
 // ─── Session Modal ────────────────────────────────────────────────────────────
 
-function SessionModal({
-  open,
-  onClose,
-  onSaved,
-  editingSession,
-  allSpeakers,
-  allRooms,
-  eventId,
-}: {
-  open: boolean;
-  onClose: () => void;
-  onSaved: (s: Session) => void;
-  editingSession: Session | null;
-  allSpeakers: Speaker[];
-  allRooms: Room[];
-  eventId: string;
+function SessionModal({ open, onClose, onSaved, editingSession, allSpeakers, allRooms, eventId }: {
+  open: boolean; onClose: () => void; onSaved: (s: Session) => void;
+  editingSession: Session | null; allSpeakers: Speaker[]; allRooms: Room[]; eventId: string;
 }) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const isEdit = !!editingSession;
@@ -124,19 +75,15 @@ function SessionModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [prevOpen, setPrevOpen] = useState(open);
-  const [prevEditingSession, setPrevEditingSession] = useState(editingSession);
+  const [prevEditing, setPrevEditing] = useState(editingSession);
 
-  if (open !== prevOpen || editingSession !== prevEditingSession) {
-    setPrevOpen(open);
-    setPrevEditingSession(editingSession);
+  if (open !== prevOpen || editingSession !== prevEditing) {
+    setPrevOpen(open); setPrevEditing(editingSession);
     if (open) {
       setForm(editingSession ? {
-        title: editingSession.title,
-        description: editingSession.description ?? "",
-        startTime: toDatetimeLocal(editingSession.startTime),
-        endTime: toDatetimeLocal(editingSession.endTime),
-        capacity: editingSession.capacity?.toString() ?? "",
-        roomId: editingSession.room?.id ?? "",
+        title: editingSession.title, description: editingSession.description ?? "",
+        startTime: toDatetimeLocal(editingSession.startTime), endTime: toDatetimeLocal(editingSession.endTime),
+        capacity: editingSession.capacity?.toString() ?? "", roomId: editingSession.room?.id ?? "",
         speakerIds: editingSession.speakers.map((s) => s.id),
       } : EMPTY_SESSION);
       setError("");
@@ -144,288 +91,122 @@ function SessionModal({
   }
 
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    if (open) document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
+    const h = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    if (open) document.addEventListener("keydown", h);
+    return () => document.removeEventListener("keydown", h);
   }, [open, onClose]);
 
-  const set = (field: keyof SessionFormData, value: string) =>
-    setForm((f) => ({ ...f, [field]: value }));
+  const set = (f: keyof SessionFormData, v: string) => setForm((p) => ({ ...p, [f]: v }));
 
-  const toggleSpeaker = (id: string) => {
-    setForm((f) => ({
-      ...f,
-      speakerIds: f.speakerIds.includes(id)
-        ? f.speakerIds.filter((s) => s !== id)
-        : [...f.speakerIds, id],
+  const toggleSpeaker = (id: string) =>
+    setForm((p) => ({
+      ...p,
+      speakerIds: p.speakerIds.includes(id) ? p.speakerIds.filter((s) => s !== id) : [...p.speakerIds, id],
     }));
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-
-    if (!form.title || !form.startTime || !form.endTime) {
-      setError("Titre, heure de début et heure de fin sont obligatoires.");
-      return;
-    }
-    if (new Date(form.startTime) >= new Date(form.endTime)) {
-      setError("L'heure de début doit être antérieure à l'heure de fin.");
-      return;
-    }
-    if (form.speakerIds.length === 0) {
-      setError("Sélectionnez au moins un intervenant.");
-      return;
-    }
-
+    e.preventDefault(); setError("");
+    if (!form.title || !form.startTime || !form.endTime) { setError("Titre, début et fin sont obligatoires."); return; }
+    if (new Date(form.startTime) >= new Date(form.endTime)) { setError("Le début doit être avant la fin."); return; }
+    if (form.speakerIds.length === 0) { setError("Sélectionnez au moins un intervenant."); return; }
     setLoading(true);
     try {
-      const url = isEdit
-        ? `/api/sessions/${editingSession!.id}`
-        : `/api/events/${eventId}/sessions`;
-      const method = isEdit ? "PUT" : "POST";
-
+      const url = isEdit ? `/api/sessions/${editingSession!.id}` : `/api/events/${eventId}/sessions`;
       const res = await fetch(url, {
-        method,
+        method: isEdit ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          title: form.title,
-          description: form.description || undefined,
-          startTime: form.startTime,
-          endTime: form.endTime,
+          title: form.title, description: form.description || undefined,
+          startTime: form.startTime, endTime: form.endTime,
           capacity: form.capacity ? Number(form.capacity) : undefined,
-          roomId: form.roomId || undefined,
-          speakerIds: form.speakerIds,
+          roomId: form.roomId || undefined, speakerIds: form.speakerIds,
         }),
       });
-
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Erreur serveur");
-      onSaved(data);
-      onClose();
+      onSaved(data); onClose();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Erreur inconnue");
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
   return (
     <AnimatePresence>
       {open && (
-        <motion.div
-          ref={overlayRef}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.18 }}
+        <motion.div ref={overlayRef} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           onClick={(e) => e.target === overlayRef.current && onClose()}
-          className="fixed inset-0 z-50 flex items-center justify-center px-4 py-8 bg-black/75 backdrop-blur-sm"
-        >
-          <motion.div
-            initial={{ opacity: 0, y: 24, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 16, scale: 0.97 }}
-            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-            className="relative w-full max-w-xl rounded-2xl border border-[#1e2530] bg-[#0a0e14] overflow-hidden max-h-[90vh] flex flex-col"
-            style={{
-              boxShadow:
-                "0 0 0 1px #00E5FF18, 0 0 40px #00E5FF18, 0 0 80px #00E5FF08, 0 32px 64px rgba(0,0,0,0.6)",
-            }}
-          >
-            {/* Neon top line */}
-            <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-[#00E5FF60] to-transparent" />
-            <div className="pointer-events-none absolute -top-20 -left-20 w-64 h-64 bg-[#00E5FF08] rounded-full blur-3xl" />
-
-            {/* Header */}
-            <div className="relative flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#1e2530] shrink-0">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-lg bg-[#00E5FF15] border border-[#00E5FF30] flex items-center justify-center">
-                  {isEdit ? (
-                    <Pencil size={12} className="text-[#00E5FF]" />
-                  ) : (
-                    <Plus size={12} className="text-[#00E5FF]" strokeWidth={3} />
-                  )}
-                </div>
-                <div>
-                  <h2 className="text-base font-black text-white tracking-tight">
-                    {isEdit ? "Modifier la session" : "Nouvelle session"}
-                  </h2>
-                  <p className="text-xs text-[#3a4a5a]">
-                    {isEdit ? editingSession?.title : "Ajoutez une session à cet événement"}
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={onClose}
-                className="w-8 h-8 rounded-xl border border-[#1e2530] flex items-center justify-center text-[#3a4a5a] hover:text-white hover:border-[#2e3a4a] transition-all duration-200"
-              >
+          className="fixed inset-0 z-50 flex items-center justify-center px-4 py-8 bg-black/60 backdrop-blur-sm">
+          <motion.div initial={{ opacity: 0, y: 16, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.98 }} transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="relative w-full max-w-lg rounded-3xl border border-slate-700 bg-slate-900 shadow-2xl shadow-black/40 overflow-hidden max-h-[90vh] flex flex-col">
+            <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-slate-800">
+              <h2 className="text-base font-bold text-white">{isEdit ? "Modifier la session" : "Nouvelle session"}</h2>
+              <button onClick={onClose} className="w-8 h-8 rounded-lg border border-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition-colors">
                 <X size={14} />
               </button>
             </div>
-
-            {/* Scrollable form body */}
-            <form onSubmit={handleSubmit} className="relative flex flex-col overflow-hidden flex-1">
+            <form onSubmit={handleSubmit} className="flex flex-col overflow-hidden flex-1">
               <div className="overflow-y-auto flex-1 px-6 py-5 flex flex-col gap-4">
                 <Field label="Titre" required>
-                  <input
-                    className={inputClass}
-                    value={form.title}
-                    onChange={(e) => set("title", e.target.value)}
-                    placeholder="Ex : Keynote d'ouverture"
-                  />
+                  <input className={inputCls} value={form.title} onChange={(e) => set("title", e.target.value)} placeholder="Ex : Keynote d'ouverture" />
                 </Field>
-
                 <Field label="Description">
-                  <textarea
-                    className={`${inputClass} resize-none`}
-                    rows={2}
-                    value={form.description}
-                    onChange={(e) => set("description", e.target.value)}
-                    placeholder="Résumé de la session…"
-                  />
+                  <textarea className={`${inputCls} resize-none`} rows={2} value={form.description} onChange={(e) => set("description", e.target.value)} placeholder="Résumé…" />
                 </Field>
-
                 <div className="grid grid-cols-2 gap-3">
-                  <Field label="Début" required>
-                    <input
-                      className={inputClass}
-                      type="datetime-local"
-                      value={form.startTime}
-                      onChange={(e) => set("startTime", e.target.value)}
-                    />
-                  </Field>
-                  <Field label="Fin" required>
-                    <input
-                      className={inputClass}
-                      type="datetime-local"
-                      value={form.endTime}
-                      onChange={(e) => set("endTime", e.target.value)}
-                    />
-                  </Field>
+                  <Field label="Début" required><input className={inputCls} type="datetime-local" value={form.startTime} onChange={(e) => set("startTime", e.target.value)} /></Field>
+                  <Field label="Fin" required><input className={inputCls} type="datetime-local" value={form.endTime} onChange={(e) => set("endTime", e.target.value)} /></Field>
                 </div>
-
                 <div className="grid grid-cols-2 gap-3">
                   <Field label="Salle">
-                    <select
-                      className={inputClass}
-                      value={form.roomId}
-                      onChange={(e) => set("roomId", e.target.value)}
-                    >
+                    <select className={inputCls} value={form.roomId} onChange={(e) => set("roomId", e.target.value)}>
                       <option value="">— Sans salle —</option>
-                      {allRooms.map((r) => (
-                        <option key={r.id} value={r.id}>
-                          {r.name}
-                        </option>
-                      ))}
+                      {allRooms.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
                     </select>
                   </Field>
                   <Field label="Capacité" hint="(optionnel)">
-                    <input
-                      className={inputClass}
-                      type="number"
-                      min="1"
-                      value={form.capacity}
-                      onChange={(e) => set("capacity", e.target.value)}
-                      placeholder="Ex : 150"
-                    />
+                    <input className={inputCls} type="number" min="1" value={form.capacity} onChange={(e) => set("capacity", e.target.value)} placeholder="Ex : 150" />
                   </Field>
                 </div>
-
-                {/* Speaker picker */}
                 <Field label="Intervenants" required>
                   {allSpeakers.length === 0 ? (
-                    <div className="flex items-center gap-2 px-4 py-3 rounded-xl border border-amber-900/40 bg-amber-500/10 text-amber-400 text-sm">
-                      <AlertTriangle size={14} className="shrink-0" />
-                      <span>
-                        Aucun intervenant.{" "}
-                        <Link href="/admin/speakers" className="underline hover:text-amber-300">
-                          En créer un
-                        </Link>{" "}
-                        d&apos;abord.
-                      </span>
+                    <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-300 text-sm">
+                      <AlertTriangle size={14} /><span>Aucun intervenant. <Link href="/admin/speakers" className="underline">En créer un</Link> d&apos;abord.</span>
                     </div>
                   ) : (
-                    <div className="rounded-xl border border-[#1e2530] bg-[#060a0f] divide-y divide-[#1e2530] overflow-hidden">
+                    <div className="rounded-xl border border-slate-700 divide-y divide-slate-800 overflow-hidden">
                       {allSpeakers.map((sp) => {
                         const checked = form.speakerIds.includes(sp.id);
                         return (
-                          <button
-                            key={sp.id}
-                            type="button"
-                            onClick={() => toggleSpeaker(sp.id)}
-                            className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-all duration-150 ${checked
-                              ? "bg-[#00E5FF08] hover:bg-[#00E5FF10]"
-                              : "hover:bg-[#ffffff04]"
-                              }`}
-                          >
-                            {/* Avatar */}
-                            <div className="w-7 h-7 rounded-full bg-[#1e2530] border border-[#2a3a4a] flex items-center justify-center text-[10px] font-black text-[#3a4a5a] shrink-0 overflow-hidden">
-                              {sp.photo ? (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img src={sp.photo} alt={sp.fullName} className="w-full h-full object-cover" />
-                              ) : (
-                                sp.fullName.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()
-                              )}
+                          <button key={sp.id} type="button" onClick={() => toggleSpeaker(sp.id)}
+                            className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${checked ? "bg-cyan-500/10" : "hover:bg-slate-800"}`}>
+                            <div className="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center text-[10px] font-bold text-slate-300 shrink-0 overflow-hidden">
+                              {sp.photo ? <img src={sp.photo} alt={sp.fullName} className="w-full h-full object-cover" /> : sp.fullName.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()}
                             </div>
-                            <span
-                              className={`flex-1 text-sm font-semibold transition-colors ${checked ? "text-white" : "text-[#4a5568]"
-                                }`}
-                            >
-                              {sp.fullName}
-                            </span>
-                            {checked ? (
-                              <CheckSquare size={15} className="text-[#00E5FF] shrink-0" />
-                            ) : (
-                              <Square size={15} className="text-[#2a3a4a] shrink-0" />
-                            )}
+                            <span className={`flex-1 text-sm font-medium ${checked ? "text-cyan-300" : "text-slate-300"}`}>{sp.fullName}</span>
+                            {checked ? <CheckSquare size={15} className="text-cyan-400" /> : <Square size={15} className="text-slate-600" />}
                           </button>
                         );
                       })}
                     </div>
                   )}
                   {form.speakerIds.length > 0 && (
-                    <p className="text-[11px] text-[#00E5FF] mt-1">
-                      {form.speakerIds.length} intervenant{form.speakerIds.length !== 1 ? "s" : ""} sélectionné{form.speakerIds.length !== 1 ? "s" : ""}
-                    </p>
+                    <p className="text-[11px] text-cyan-400 mt-1">{form.speakerIds.length} intervenant{form.speakerIds.length !== 1 ? "s" : ""} sélectionné{form.speakerIds.length !== 1 ? "s" : ""}</p>
                   )}
                 </Field>
-
                 <AnimatePresence>
                   {error && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="flex items-start gap-2.5 rounded-xl border border-red-900/60 bg-red-500/10 px-4 py-3 text-sm text-red-400"
-                    >
-                      <AlertTriangle size={14} className="shrink-0 mt-0.5" />
-                      {error}
+                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
+                      className="flex items-start gap-2 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2.5 text-sm text-rose-300">
+                      <AlertTriangle size={14} className="shrink-0 mt-0.5" />{error}
                     </motion.div>
                   )}
                 </AnimatePresence>
               </div>
-
-              {/* Sticky footer */}
-              <div className="px-6 pb-6 pt-4 border-t border-[#1e2530] bg-[#0a0e14] shrink-0 flex gap-3">
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="flex-1 py-2.5 rounded-xl border border-[#1e2530] text-sm text-[#4a5568] hover:text-white hover:border-[#2e3a4a] transition-all duration-200 font-semibold"
-                >
-                  Annuler
-                </button>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="flex-1 py-2.5 rounded-xl bg-[#00E5FF] text-black text-sm font-black tracking-wide hover:bg-[#00cfea] active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{ boxShadow: "0 0 20px #00E5FF30" }}
-                >
-                  {loading
-                    ? isEdit ? "Sauvegarde…" : "Création…"
-                    : isEdit ? "Sauvegarder" : "Ajouter la session"}
+              <div className="px-6 pb-6 pt-4 border-t border-slate-800 flex gap-3">
+                <button type="button" onClick={onClose} className="flex-1 py-2.5 rounded-2xl border border-slate-700 text-sm text-slate-400 hover:text-white transition-colors font-semibold">Annuler</button>
+                <button type="submit" disabled={loading} className="flex-1 py-2.5 rounded-2xl bg-cyan-500 text-slate-950 text-sm font-bold hover:bg-cyan-400 active:scale-[0.98] transition-all disabled:opacity-50">
+                  {loading ? (isEdit ? "Sauvegarde…" : "Création…") : (isEdit ? "Sauvegarder" : "Ajouter")}
                 </button>
               </div>
             </form>
@@ -435,26 +216,20 @@ function SessionModal({
     </AnimatePresence>
   );
 }
-// ─── Delete Session Modal ─────────────────────────────────────────────────────
-function DeleteSessionModal({
-  session,
-  onClose,
-  onDeleted,
-}: {
-  session: Session | null;
-  onClose: () => void;
-  onDeleted: (id: string) => void;
+
+// ─── Delete Modal ─────────────────────────────────────────────────────────────
+
+function DeleteSessionModal({ session, onClose, onDeleted }: {
+  session: Session | null; onClose: () => void; onDeleted: (id: string) => void;
 }) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    if (session) document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
+    const h = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    if (session) document.addEventListener("keydown", h);
+    return () => document.removeEventListener("keydown", h);
   }, [session, onClose]);
 
   const handleDelete = async () => {
@@ -462,12 +237,8 @@ function DeleteSessionModal({
     setLoading(true);
     try {
       const res = await fetch(`/api/sessions/${session.id}`, { method: "DELETE" });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error ?? "Erreur lors de la suppression");
-      }
-      onDeleted(session.id);
-      onClose();
+      if (!res.ok) { const d = await res.json(); throw new Error(d.error ?? "Erreur"); }
+      onDeleted(session.id); onClose();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Erreur inconnue");
       setLoading(false);
@@ -477,54 +248,23 @@ function DeleteSessionModal({
   return (
     <AnimatePresence>
       {session && (
-        <motion.div
-          ref={overlayRef}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.15 }}
+        <motion.div ref={overlayRef} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           onClick={(e) => e.target === overlayRef.current && onClose()}
-          className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/80 backdrop-blur-sm"
-        >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.94, y: 12 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: 8 }}
-            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="relative w-full max-w-sm rounded-2xl border border-red-900/40 bg-[#0a0e14] overflow-hidden"
-            style={{
-              boxShadow:
-                "0 0 0 1px #ff444418, 0 0 40px #ff444412, 0 32px 64px rgba(0,0,0,0.6)",
-            }}
-          >
-            <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-red-500/50 to-transparent" />
-            <div className="px-6 pt-6 pb-5">
-              <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-900/40 flex items-center justify-center mb-4">
-                <Trash2 size={18} className="text-red-400" />
+          className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/60 backdrop-blur-sm">
+          <motion.div initial={{ opacity: 0, scale: 0.96, y: 8 }} animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.97, y: 4 }} transition={{ duration: 0.18 }}
+            className="w-full max-w-sm rounded-3xl border border-slate-700 bg-slate-900 shadow-2xl shadow-black/40 overflow-hidden">
+            <div className="px-6 pt-6 pb-4">
+              <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mb-4">
+                <Trash2 size={18} className="text-rose-400" />
               </div>
-              <h2 className="text-base font-black text-white mb-1">Supprimer la session ?</h2>
-              <p className="text-sm text-[#4a5568] leading-relaxed">
-                <span className="text-[#ccc] font-semibold">{session.title}</span> et toutes ses questions seront définitivement supprimées.
-              </p>
-              {error && (
-                <div className="mt-3 flex items-center gap-2 text-sm text-red-400 bg-red-500/10 border border-red-900/40 rounded-xl px-3 py-2">
-                  <AlertTriangle size={13} className="shrink-0" />
-                  {error}
-                </div>
-              )}
+              <h2 className="text-sm font-bold text-white mb-1">Supprimer la session ?</h2>
+              <p className="text-sm text-slate-400">«&nbsp;<span className="font-semibold text-slate-200">{session.title}</span>&nbsp;» sera définitivement supprimée.</p>
+              {error && <div className="mt-3 flex items-center gap-2 text-sm text-rose-300 bg-rose-500/10 border border-rose-500/20 rounded-lg px-3 py-2"><AlertTriangle size={13} />{error}</div>}
             </div>
             <div className="flex gap-3 px-6 pb-6">
-              <button
-                onClick={onClose}
-                className="flex-1 py-2.5 rounded-xl border border-[#1e2530] text-sm text-[#4a5568] hover:text-white transition-all font-semibold"
-              >
-                Annuler
-              </button>
-              <button
-                onClick={handleDelete}
-                disabled={loading}
-                className="flex-1 py-2.5 rounded-xl bg-red-500/90 text-white text-sm font-black hover:bg-red-500 active:scale-95 transition-all disabled:opacity-50"
-              >
+              <button onClick={onClose} className="flex-1 py-2.5 rounded-2xl border border-slate-700 text-sm text-slate-400 hover:text-white font-semibold transition-colors">Annuler</button>
+              <button onClick={handleDelete} disabled={loading} className="flex-1 py-2.5 rounded-2xl bg-rose-500 text-white text-sm font-bold hover:bg-rose-400 active:scale-[0.98] transition-all disabled:opacity-50">
                 {loading ? "Suppression…" : "Supprimer"}
               </button>
             </div>
@@ -537,178 +277,77 @@ function DeleteSessionModal({
 
 // ─── Edit Event Modal ─────────────────────────────────────────────────────────
 
-function EditEventModal({
-  open,
-  onClose,
-  event,
-  onSaved,
-}: {
-  open: boolean;
-  onClose: () => void;
-  event: Event;
-  onSaved: (e: Event) => void;
+function EditEventModal({ open, onClose, event, onSaved }: {
+  open: boolean; onClose: () => void; event: Event; onSaved: (e: Event) => void;
 }) {
   const overlayRef = useRef<HTMLDivElement>(null);
-  const [form, setForm] = useState({
-    title: "",
-    description: "",
-    startDate: "",
-    endDate: "",
-    location: "",
-    coverImage: "",
-  });
+  const [form, setForm] = useState({ title: "", description: "", startDate: "", endDate: "", location: "", coverImage: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
   const [prevOpen, setPrevOpen] = useState(open);
   const [prevEvent, setPrevEvent] = useState(event);
 
   if (open !== prevOpen || event !== prevEvent) {
-    setPrevOpen(open);
-    setPrevEvent(event);
+    setPrevOpen(open); setPrevEvent(event);
     if (open) {
-      setForm({
-        title: event.title,
-        description: event.description ?? "",
-        startDate: toDatetimeLocal(event.startDate),
-        endDate: toDatetimeLocal(event.endDate),
-        location: event.location ?? "",
-        coverImage: event.coverImage ?? "",
-      });
+      setForm({ title: event.title, description: event.description ?? "", startDate: toDatetimeLocal(event.startDate), endDate: toDatetimeLocal(event.endDate), location: event.location ?? "", coverImage: event.coverImage ?? "" });
       setError("");
     }
   }
 
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    if (open) document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
+    const h = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    if (open) document.addEventListener("keydown", h);
+    return () => document.removeEventListener("keydown", h);
   }, [open, onClose]);
 
-  const set = (field: string, value: string) =>
-    setForm((f) => ({ ...f, [field]: value }));
+  const set = (f: string, v: string) => setForm((p) => ({ ...p, [f]: v }));
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    if (!form.title || !form.startDate || !form.endDate) {
-      setError("Titre, date de début et date de fin sont obligatoires.");
-      return;
-    }
+    e.preventDefault(); setError("");
+    if (!form.title || !form.startDate || !form.endDate) { setError("Titre, début et fin sont obligatoires."); return; }
     setLoading(true);
     try {
-      const res = await fetch(`/api/events/${event.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: form.title,
-          description: form.description || undefined,
-          startDate: form.startDate,
-          endDate: form.endDate,
-          location: form.location || undefined,
-          coverImage: form.coverImage || undefined,
-        }),
-      });
+      const res = await fetch(`/api/events/${event.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title: form.title, description: form.description || undefined, startDate: form.startDate, endDate: form.endDate, location: form.location || undefined, coverImage: form.coverImage || undefined }) });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Erreur serveur");
-      onSaved({ ...event, ...data });
-      onClose();
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
-    } finally {
-      setLoading(false);
-    }
+      onSaved({ ...event, ...data }); onClose();
+    } catch (err: unknown) { setError(err instanceof Error ? err.message : "Erreur inconnue"); } finally { setLoading(false); }
   };
 
   return (
     <AnimatePresence>
       {open && (
-        <motion.div
-          ref={overlayRef}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.18 }}
+        <motion.div ref={overlayRef} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           onClick={(e) => e.target === overlayRef.current && onClose()}
-          className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/75 backdrop-blur-sm"
-        >
-          <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 16, scale: 0.97 }}
-            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-            className="relative w-full max-w-lg rounded-2xl border border-[#1e2530] bg-[#0a0e14] overflow-hidden"
-            style={{
-              boxShadow:
-                "0 0 0 1px #00E5FF18, 0 0 40px #00E5FF18, 0 0 80px #00E5FF08, 0 32px 64px rgba(0,0,0,0.6)",
-            }}
-          >
-            <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-[#00E5FF60] to-transparent" />
-            <div className="pointer-events-none absolute -top-20 -left-20 w-64 h-64 bg-[#00E5FF08] rounded-full blur-3xl" />
-
-            <div className="relative flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#1e2530]">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-lg bg-[#00E5FF15] border border-[#00E5FF30] flex items-center justify-center">
-                  <Pencil size={12} className="text-[#00E5FF]" />
-                </div>
-                <h2 className="text-base font-black text-white">Modifier l&apos;événement</h2>
-              </div>
-              <button
-                onClick={onClose}
-                className="w-8 h-8 rounded-xl border border-[#1e2530] flex items-center justify-center text-[#3a4a5a] hover:text-white hover:border-[#2e3a4a] transition-all duration-200"
-              >
-                <X size={14} />
-              </button>
+          className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/60 backdrop-blur-sm">
+          <motion.div initial={{ opacity: 0, y: 16, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.98 }} transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="w-full max-w-lg rounded-3xl border border-slate-700 bg-slate-900 shadow-2xl shadow-black/40 overflow-hidden">
+            <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-slate-800">
+              <h2 className="text-base font-bold text-white">Modifier l&apos;événement</h2>
+              <button onClick={onClose} className="w-8 h-8 rounded-lg border border-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition-colors"><X size={14} /></button>
             </div>
-
-            <form onSubmit={handleSubmit} className="relative px-6 py-5 flex flex-col gap-4">
-              <Field label="Titre" required>
-                <input className={inputClass} value={form.title} onChange={(e) => set("title", e.target.value)} placeholder="Titre de l'événement" />
-              </Field>
-              <Field label="Description">
-                <textarea className={`${inputClass} resize-none`} rows={3} value={form.description} onChange={(e) => set("description", e.target.value)} placeholder="Description…" />
-              </Field>
+            <form onSubmit={handleSubmit} className="px-6 py-5 flex flex-col gap-4">
+              <Field label="Titre" required><input className={inputCls} value={form.title} onChange={(e) => set("title", e.target.value)} placeholder="Titre de l'événement" /></Field>
+              <Field label="Description"><textarea className={`${inputCls} resize-none`} rows={3} value={form.description} onChange={(e) => set("description", e.target.value)} placeholder="Description…" /></Field>
               <div className="grid grid-cols-2 gap-3">
-                <Field label="Début" required>
-                  <input className={inputClass} type="datetime-local" value={form.startDate} onChange={(e) => set("startDate", e.target.value)} />
-                </Field>
-                <Field label="Fin" required>
-                  <input className={inputClass} type="datetime-local" value={form.endDate} onChange={(e) => set("endDate", e.target.value)} />
-                </Field>
+                <Field label="Début" required><input className={inputCls} type="datetime-local" value={form.startDate} onChange={(e) => set("startDate", e.target.value)} /></Field>
+                <Field label="Fin" required><input className={inputCls} type="datetime-local" value={form.endDate} onChange={(e) => set("endDate", e.target.value)} /></Field>
               </div>
-              <Field label="Lieu">
-                <input className={inputClass} value={form.location} onChange={(e) => set("location", e.target.value)} placeholder="Ex : Paris, France" />
-              </Field>
-              <Field label="Image de couverture (URL)">
-                <input className={inputClass} type="url" value={form.coverImage} onChange={(e) => set("coverImage", e.target.value)} placeholder="https://…" />
-              </Field>
-
+              <Field label="Lieu"><input className={inputCls} value={form.location} onChange={(e) => set("location", e.target.value)} placeholder="Ex : Paris, France" /></Field>
+              <Field label="Image de couverture (URL)"><input className={inputCls} type="url" value={form.coverImage} onChange={(e) => set("coverImage", e.target.value)} placeholder="https://…" /></Field>
               <AnimatePresence>
                 {error && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="flex items-start gap-2.5 rounded-xl border border-red-900/60 bg-red-500/10 px-4 py-3 text-sm text-red-400"
-                  >
-                    <AlertTriangle size={14} className="shrink-0 mt-0.5" />
-                    {error}
+                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
+                    className="flex items-start gap-2 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2.5 text-sm text-rose-300">
+                    <AlertTriangle size={14} className="shrink-0 mt-0.5" />{error}
                   </motion.div>
                 )}
               </AnimatePresence>
-
               <div className="flex gap-3 pt-1">
-                <button type="button" onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-[#1e2530] text-sm text-[#4a5568] hover:text-white transition-all font-semibold">
-                  Annuler
-                </button>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="flex-1 py-2.5 rounded-xl bg-[#00E5FF] text-black text-sm font-black hover:bg-[#00cfea] active:scale-95 transition-all disabled:opacity-50"
-                  style={{ boxShadow: "0 0 20px #00E5FF30" }}
-                >
+                <button type="button" onClick={onClose} className="flex-1 py-2.5 rounded-2xl border border-slate-700 text-sm text-slate-400 hover:text-white font-semibold transition-colors">Annuler</button>
+                <button type="submit" disabled={loading} className="flex-1 py-2.5 rounded-2xl bg-cyan-500 text-slate-950 text-sm font-bold hover:bg-cyan-400 active:scale-[0.98] transition-all disabled:opacity-50">
                   {loading ? "Sauvegarde…" : "Sauvegarder"}
                 </button>
               </div>
@@ -720,478 +359,101 @@ function EditEventModal({
   );
 }
 
-// ─── Session Card ─────────────────────────────────────────────────────────────
+// ─── Planning Grid ────────────────────────────────────────────────────────────
 
-function SessionCard({
-  session,
-  onEdit,
-  onDelete,
-}: {
-  session: Session;
-  onEdit: (s: Session) => void;
-  onDelete: (s: Session) => void;
+function PlanningGrid({ sessions, selectedRoom, toggle, isFavorite, slug }: {
+  sessions: Session[]; selectedRoom: string | null;
+  toggle: (id: string) => void; isFavorite: (id: string) => boolean; slug: string;
 }) {
+  const allRooms = [...new Set(sessions.flatMap((s) => s.room ? [s.room.name] : []))];
+  const visibleRooms = selectedRoom ? [selectedRoom] : allRooms;
+
+  const timeSlots = [...new Set(
+    sessions
+      .filter((s) => !selectedRoom || s.room?.name === selectedRoom)
+      .map((s) => formatTime(s.startTime))
+  )].sort();
+
+  const sessionsByTimeAndRoom: Record<string, Record<string, Session[]>> = {};
+  sessions.forEach((s) => {
+    if (selectedRoom && s.room?.name !== selectedRoom) return;
+    const time = formatTime(s.startTime);
+    const room = s.room?.name ?? "__no_room__";
+    if (!sessionsByTimeAndRoom[time]) sessionsByTimeAndRoom[time] = {};
+    if (!sessionsByTimeAndRoom[time][room]) sessionsByTimeAndRoom[time][room] = [];
+    sessionsByTimeAndRoom[time][room].push(s);
+  });
+
+  if (timeSlots.length === 0) {
+    return (
+      <div className="text-center py-20 text-slate-500 text-sm">
+        Aucune session pour cette salle.
+      </div>
+    );
+  }
+
   return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.97 }}
-      transition={{ duration: 0.2 }}
-      className="group relative rounded-2xl border border-[#1e2530] bg-[#0d1117] p-5 hover:border-[#00E5FF22] transition-all duration-300 overflow-hidden mt-3"
-    >
-      <div className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-[radial-gradient(ellipse_at_top_left,#00E5FF06_0%,transparent_60%)] m-5" />
-
-      {/* Live badge */}
-      {session.isLive && (
-        <div className="absolute top-4 right-4 flex items-center gap-1.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#00E5FF] animate-pulse" />
-          <span className="text-[10px] text-[#00E5FF] font-bold uppercase tracking-widest">Live</span>
-        </div>
-      )}
-
-      {/* Header */}
-      <div className="flex items-start gap-3 mb-3 pr-16">
-        <div className="w-8 h-8 rounded-xl bg-[#ffffff06] border border-[#1e2530] flex items-center justify-center shrink-0 group-hover:border-[#00E5FF22] transition-colors">
-          <Mic size={14} className="text-[#3a4a5a] group-hover:text-[#00E5FF] transition-colors" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <h3 className="font-bold text-[#eee] text-sm leading-tight truncate">{session.title}</h3>
-          {session.description && (
-            <p className="text-xs text-[#3a4a5a] mt-0.5 line-clamp-1">{session.description}</p>
-          )}
-        </div>
-      </div>
-
-      {/* Meta chips */}
-      <div className="flex flex-wrap gap-1.5 mb-4">
-        <span className="inline-flex items-center gap-1 text-[10px] px-2 py-1 rounded-full border border-[#1e2530] text-[#3a4a5a] font-semibold">
-          <Clock size={9} />
-          {formatTime(session.startTime)} — {formatTime(session.endTime)}
-          <span className="text-[#2a3a4a] ml-0.5">· {duration(session.startTime, session.endTime)}</span>
-        </span>
-
-        {session.room && (
-          <span className="inline-flex items-center gap-1 text-[10px] px-2 py-1 rounded-full border border-[#1e2530] text-[#3a4a5a] font-semibold">
-            <Building2 size={9} />
-            {session.room.name}
-          </span>
-        )}
-
-        {session.capacity && (
-          <span className="inline-flex items-center gap-1 text-[10px] px-2 py-1 rounded-full border border-[#1e2530] text-[#3a4a5a] font-semibold">
-            <Users size={9} />
-            {session.capacity} places
-          </span>
-        )}
-
-        {(session._count?.questions ?? 0) > 0 && (
-          <span className="inline-flex items-center gap-1 text-[10px] px-2 py-1 rounded-full border border-[#00E5FF20] bg-[#00E5FF08] text-[#00E5FF] font-semibold">
-            💬 {session._count?.questions ?? 0} question{(session._count?.questions ?? 0) !== 1 ? "s" : ""}
-          </span>
-        )}
-      </div>
-
-      {/* Speakers */}
-      {session.speakers.length > 0 && (
-        <div className="flex items-center gap-2 mb-4">
-          <div className="flex -space-x-2">
-            {session.speakers.slice(0, 4).map((sp) => (
-              <div
-                key={sp.id}
-                className="w-6 h-6 rounded-full bg-[#1e2530] border-2 border-[#0d1117] flex items-center justify-center text-[8px] font-black text-[#3a4a5a] overflow-hidden"
-                title={sp.fullName}
-              >
-                {sp.photo ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={sp.photo} alt={sp.fullName} className="w-full h-full object-cover" />
-                ) : (
-                  sp.fullName.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()
-                )}
-              </div>
+    <div className="overflow-x-auto">
+      <table className="w-full border-collapse">
+        <thead>
+          <tr>
+            <th className="w-20 py-3 px-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-800">
+              Heure
+            </th>
+            {visibleRooms.map((room) => (
+              <th key={room} className="py-3 px-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-800 bg-slate-900/50 border-l border-slate-800">
+                {room}
+              </th>
             ))}
-          </div>
-          <span className="text-[11px] text-[#3a4a5a]">
-            {session.speakers.map((s) => s.fullName).join(", ")}
-            {session.speakers.length > 4 && ` +${session.speakers.length - 4}`}
-          </span>
-        </div>
-      )}
-
-      {/* Actions */}
-      <div className="flex gap-2 pt-3 border-t border-[#1e2530] mt66">
-        <button
-          onClick={() => onEdit(session)}
-          className="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 rounded-xl border border-[#1e2530] text-xs text-[#3a4a5a] hover:text-white hover:border-[#2e3a4a] transition-all font-semibold"
-        >
-          <Pencil size={11} />
-          Modifier
-        </button>
-        <button
-          onClick={() => onDelete(session)}
-          className="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 rounded-xl border border-[#1e2530] text-xs text-[#3a4a5a] hover:text-red-400 hover:border-red-900/50 transition-all font-semibold"
-        >
-          <Trash2 size={11} />
-          Supprimer
-        </button>
-      </div>
-    </motion.div>
+          </tr>
+        </thead>
+        <tbody>
+          {timeSlots.map((time) => (
+            <tr key={time} className="border-b border-slate-800/60 align-top">
+              <td className="py-4 px-4 text-sm font-semibold text-slate-400 whitespace-nowrap w-20">
+                {time}
+              </td>
+              {visibleRooms.map((room) => {
+                const roomSessions = sessionsByTimeAndRoom[time]?.[room] ?? [];
+                return (
+                  <td key={room} className="py-3 px-3 border-l border-slate-800 min-w-[200px]">
+                    {roomSessions.map((s) => (
+                      <Link key={s.id} href={`/events/${slug}/sessions/${s.id}`}
+                        className="block rounded-2xl border border-slate-700 bg-slate-900/80 p-3 mb-2 hover:border-cyan-500/40 hover:bg-slate-800/80 transition-all group">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-slate-200 leading-snug group-hover:text-cyan-300 transition-colors">{s.title}</p>
+                            <p className="text-xs text-slate-500 mt-0.5">
+                              {formatTime(s.startTime)}–{formatTime(s.endTime)}
+                            </p>
+                            {s.speakers.length > 0 && (
+                              <p className="text-xs text-cyan-400 mt-1">
+                                {s.speakers.map((sp) => sp.fullName).join(", ")}
+                              </p>
+                            )}
+                          </div>
+                          <button
+                            onClick={(e) => { e.preventDefault(); toggle(s.id); }}
+                            className="shrink-0 mt-0.5 text-slate-600 hover:text-rose-400 transition-colors"
+                            aria-label="Favori">
+                            <Heart size={15} className={isFavorite(s.id) ? "fill-rose-400 text-rose-400" : ""} />
+                          </button>
+                        </div>
+                      </Link>
+                    ))}
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 
-
-  function ListEventBySessionsPage(){
-  const { eventId } = useParams<{ eventId: string }>();
-
-  const [event, setEvent] = useState<Event | null>(null);
-  const [allSpeakers, setAllSpeakers] = useState<Speaker[]>([]);
-  const [allRooms, setAllRooms] = useState<Room[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [pageError, setPageError] = useState("");
-
-  // Modals
-  const [editEventOpen, setEditEventOpen] = useState(false);
-  const [sessionModalOpen, setSessionModalOpen] = useState(false);
-  const [editingSession, setEditingSession] = useState<Session | null>(null);
-  const [deletingSession, setDeletingSession] = useState<Session | null>(null);
-
-  const load = useCallback(async () => {
-    try {
-      const [evtRes, spkRes, roomRes] = await Promise.all([
-        fetch(`/api/events/${eventId}`),
-        fetch("/api/speakers"),
-        fetch("/api/rooms"),
-      ]);
-      const [evtData, spkData, roomData] = await Promise.all([
-        evtRes.json(),
-        spkRes.json(),
-        roomRes.json(),
-      ]);
-      if (!evtRes.ok) throw new Error(evtData.error ?? "Erreur");
-      setEvent(evtData);
-      setAllSpeakers(Array.isArray(spkData) ? spkData : []);
-      setAllRooms(Array.isArray(roomData) ? roomData : []);
-    } catch {
-      setPageError("Impossible de charger l'événement.");
-    } finally {
-      setLoading(false);
-    }
-  }, [eventId]);
-
-  useEffect(() => {
-    (async () => {
-      await load();
-    })();
-  }, [load]);
-
-  const openCreateSession = () => {
-    setEditingSession(null);
-    setSessionModalOpen(true);
-  };
-
-  const openEditSession = (s: Session) => {
-    setEditingSession(s);
-    setSessionModalOpen(true);
-  };
-
-  const handleSessionSaved = (saved: Session) => {
-    setEvent((prev) => {
-      if (!prev) return prev;
-      const exists = prev.sessions.find((s) => s.id === saved.id);
-      return {
-        ...prev,
-        sessions: exists
-          ? prev.sessions.map((s) => (s.id === saved.id ? saved : s))
-          : [...prev.sessions, saved],
-      };
-    });
-  };
-
-  const handleSessionDeleted = (id: string) => {
-    setEvent((prev) =>
-      prev ? { ...prev, sessions: prev.sessions.filter((s) => s.id !== id) } : prev
-    );
-  };
-
-  const sortedSessions = event?.sessions.slice().sort(
-    (a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
-  ) ?? [];
-
-  // ── Loading ──
-  if (loading) {
-    return (
-      <main className="flex-1 px-8 py-12 max-w-6xl mx-auto w-full">
-        <div className="h-4 w-32 bg-[#1e2530] rounded-lg animate-pulse mb-10" />
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-1 h-64 bg-[#0d1117] rounded-2xl border border-[#1e2530] animate-pulse" />
-          <div className="lg:col-span-2 grid sm:grid-cols-2 gap-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <SessionCardSkeleton key={i} />
-            ))}
-          </div>
-        </div>
-      </main>
-    );
-  }
-
-  if (pageError || !event) {
-    return (
-      <main className="flex-1 px-8 py-12 max-w-6xl mx-auto w-full">
-        <div className="flex items-center gap-2 text-red-400 text-sm">
-          <AlertTriangle size={16} />
-          {pageError || "Événement introuvable."}
-        </div>
-      </main>
-    );
-  }
-
-    return (
-      <div>      
-        <EditEventModal
-        open={editEventOpen}
-        onClose={() => setEditEventOpen(false)}
-        event={event}
-        onSaved={setEvent}
-      />
-      <SessionModal
-        open={sessionModalOpen}
-        onClose={() => setSessionModalOpen(false)}
-        onSaved={handleSessionSaved}
-        editingSession={editingSession}
-        allSpeakers={allSpeakers}
-        allRooms={allRooms}
-        eventId={eventId}
-      />
-      <DeleteSessionModal
-        session={deletingSession}
-        onClose={() => setDeletingSession(null)}
-        onDeleted={handleSessionDeleted}
-      />
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* ── Left: Event details ── */}
-          <div className="lg:col-span-1 flex flex-col gap-4">
-            {/* Event card */}
-            <div
-              className="relative rounded-2xl border border-[#1e2530] bg-[#0d1117] mt-20 overflow-hidden"
-              style={{ boxShadow: "0 0 0 1px #00E5FF0a, 0 0 30px #07282c08" }}
-            > 
-              {/* Cover image */}
-              {event.coverImage ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={event.coverImage}
-                  alt={event.title}
-                  className="w-full h-32 object-cover"
-                />
-              ) : (
-                <div className="w-full h-32 bg-linear-to-br from-[#00E5FF08] to-[#0066ff08] border-b border-[#1e2530] flex items-center justify-center">
-                  <Calendar size={28} className="text-[#1e2530]" />
-                </div>
-              )}
-
-              {/* Top neon line */}
-              <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-[#00E5FF40] to-transparent" />
-
-              <div className="p-5">
-                <h1 className="text-lg font-black text-white tracking-tight leading-tight mb-1">
-                  {event.title}
-                </h1>
-                <p className="text-xs font-mono text-[#2a3a4a] mb-3">{event.slug}</p>
-                {event.description && (
-                  <p className="text-sm text-[#4a5568] leading-relaxed mb-4">{event.description}</p>
-                )}
-
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center gap-2 text-xs text-[#3a4a5a]">
-                    <Calendar size={12} className="text-[#00E5FF] shrink-0" />
-                    <span>{formatDate(event.startDate)}</span>
-                    <span className="text-[#2a3a4a]">→</span>
-                    <span>{formatDate(event.endDate)}</span>
-                  </div>
-                  {event.location && (
-                    <div className="flex items-center gap-2 text-xs text-[#3a4a5a]">
-                      <MapPin size={12} className="text-[#00E5FF] shrink-0" />
-                      <span>{event.location}</span>
-                    </div>
-                  )}
-                  <div className="flex items-center gap-2 text-xs text-[#3a4a5a]">
-                    <Mic size={12} className="text-[#00E5FF] shrink-0" />
-                    <span>{event.sessions.length} session{event.sessions.length !== 1 ? "s" : ""}</span>
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex gap-2 mt-5 pt-4 border-t border-[#1e2530]">
-                  <button
-                    onClick={() => setEditEventOpen(true)}
-                    className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 rounded-xl border border-[#1e2530] text-xs text-[#3a4a5a] hover:text-white hover:border-[#2e3a4a] transition-all font-semibold"
-                  >
-                    <Save size={11} />
-                    Modifier
-                  </button>
-                  <Link
-                    href={`/events/${event.slug}`}
-                    target="_blank"
-                    className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 rounded-xl border border-[#1e2530] text-xs text-[#3a4a5a] hover:text-[#00E5FF] hover:border-[#00E5FF33] transition-all font-semibold"
-                  >
-                    <ExternalLink size={11} />
-                    Voir
-                  </Link>
-                </div>
-              </div>
-            </div>
-            {/* grille contenant les listes des sessions */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-4 text-center">
-                <div className="text-2xl font-black text-[#00E5FF]">{event.sessions.length}</div>
-                <div className="text-[10px] text-[#3a4a5a] font-semibold uppercase tracking-widest mt-0.5">Sessions</div>
-              </div>
-            <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-4 text-center">
-              <div className="text-2xl font-black text-white">
-                {event.sessions.filter((s) => s.isLive).length}
-              </div>
-              <div className="text-[10px] text-[#3a4a5a] font-semibold uppercase tracking-widest mt-0.5 flex items-center justify-center gap-1">
-                {event.sessions.some((s) => s.isLive) && (
-                <span className="w-1.5 h-1.5 rounded-full bg-[#00E5FF] animate-pulse" />
-              )}
-              Live
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-4 text-center">
-              <div className="text-2xl font-black text-white">
-              {[...new Set(event.sessions.flatMap((s) => s.speakers.map((sp) => sp.id)))].length}
-              </div>
-              <div className="text-[10px] text-[#3a4a5a] font-semibold uppercase tracking-widest mt-0.5">Speakers</div>
-            </div>
-
-            <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-4 text-center">
-              <div className="text-2xl font-black text-white">
-                {event.sessions.reduce((sum, s) => sum + s._count.questions, 0)}
-              </div>
-              <div className="text-[10px] text-[#3a4a5a] font-semibold uppercase tracking-widest mt-0.5">Questions</div>
-            </div>
-          </div>
-              </div>          
-          {/* ── Right: Sessions ── */}
-          <div className="lg:col-span-2 mt-20">
-            {/* Sessions header */}
-            <div className="flex items-center justify-between mb-5">
-             <div className="flex items-center gap-2"> 
-                <Radio size={25} className="text-[#00E5FF]" />
-                <h2 className="text-3xl font-black tracking-tight">
-                  Sessions
-               </h2>
-              </div>
-              <button
-                onClick={openCreateSession}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#00E5FF] text-black text-xs font-black tracking-wide hover:bg-[#00cfea] active:scale-95 transition-all duration-200"
-                style={{ boxShadow: "0 0 20px #00E5FF25" }}
-              >
-                <Plus size={13} strokeWidth={3} />
-                Ajouter une session
-              </button>
-            </div>
-
-            {/* Empty */}
-            {sortedSessions.length === 0 && (
-              <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] py-20 text-center">
-                <Mic size={28} className="mx-auto text-[#1e2530] mb-3" />
-                <p className="text-[#3a4a5a] italic text-sm mb-4">
-                  Aucune session pour le moment.
-                </p>
-                <button
-                  onClick={openCreateSession}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#00E5FF15] border border-[#00E5FF30] text-[#00E5FF] text-sm font-bold hover:bg-[#00E5FF20] transition-all"
-                >
-                  <Plus size={13} />
-                  Créer la première session
-                </button>
-              </div>
-            )}
-              <AnimatePresence initial={false}>
-                {sortedSessions.map((session) => (
-                  <SessionCard
-                    key={session.id}
-                    session={session}
-                    onEdit={openEditSession}
-                    onDelete={(s) => setDeletingSession(s)}
-                  />
-                ))}
-              </AnimatePresence>
-          </div> 
-        </div>
-      </div>
-  )}
-
-  function PlanningPage({slug}: {slug: string}){
-    const { eventId} = useParams<{ eventId: string}>();
-    const [ session, setSession ] = useState<Session[]>([]);
-    const [ loading, setLoading ] = useState(true);
-    const [ error, setError ] = useState<string | null>(null);
-    const [ selectedRoom, setSelectedRoom ] = useState<string | null>(null);
-    const { toggle, isFavorite } = useFavorites();
-
-
-    useEffect(() => {
-      const fetchSession = async () => {
-        try{
-          const response = await fetch(`/api/events/${eventId}/sessions`);
-          if(!response.ok) throw new Error("Internal Servor Error");
-          const data = await response.json(); 
-          
-          setSession(data);
-          console.log(data);
-          
-
-        }catch{
-          setError("Session charge failed");
-
-        }finally{
-          setLoading(false);
-        }
-      }
-      fetchSession()
-
-    }, [eventId]);
-
-    const rooms = [...new Set(session.flatMap(s => s.room ? [s.room.name] : []))]
-
-    if(loading) return <div className=" h-80 items-center justify-center flex">
-      <div className="w-12 h-12 border-5 border-cyan-300 rounded-full border-t-transparent animate-spin"></div>
-    </div>
-    if(error) return <div>{error}</div>
-    if(!rooms.length) return <div></div>
-
-    return(    
-      <div className="mt-3 rounded-lg bg-[#0B0F18]">
-        <div className="flex flex-row justify-between p-5">
-          <div className="flex gap-3">
-            <button className="bg-[#00EEFF] text-black h-13 rounded-xl font-bold w-35" onClick={() => setSelectedRoom(null)}>Toutes les salles</button>
-            {
-              rooms.map(r => (
-                <button 
-                className="w-35 rounded-xl border-[#2A3A4A] hover:text-[#00EEFF] hover:border-[#00EEFF] text-[#3A4A5A] border h-13 font-bold " 
-                key={r}
-                onClick={() => setSelectedRoom(r)}
-                >
-                  {r}
-                  </button>
-              ))
-            }
-          </div>
-
-        </div>
-
-        
-        <SessionCardSchedule session={session} selectedRoom={selectedRoom} toggle={toggle} isFavorite={isFavorite} slug={slug}/>
-      </div>
-
-    )
-  }
-
 // ─── Main Page ────────────────────────────────────────────────────────────────
+
 export default function EventDetailPage() {
   const { eventId } = useParams<{ eventId: string }>();
 
@@ -1200,46 +462,74 @@ export default function EventDetailPage() {
   const [allRooms, setAllRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
   const [pageError, setPageError] = useState("");
-  const [ isOn, setIsOn ] = useState(false);
 
+  const [view, setView] = useState<"liste" | "planning">("liste");
+
+  const [editEventOpen, setEditEventOpen] = useState(false);
+  const [sessionModalOpen, setSessionModalOpen] = useState(false);
+  const [editingSession, setEditingSession] = useState<Session | null>(null);
+  const [deletingSession, setDeletingSession] = useState<Session | null>(null);
+
+  const [planSessions, setPlanSessions] = useState<Session[]>([]);
+  const [planLoading, setPlanLoading] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState<string | null>(null);
+  const { toggle, isFavorite } = useFavorites();
 
   const load = useCallback(async () => {
     try {
       const [evtRes, spkRes, roomRes] = await Promise.all([
-        fetch(`/api/events/${eventId}`),
-        fetch("/api/speakers"),
-        fetch("/api/rooms"),
+        fetch(`/api/events/${eventId}`), fetch("/api/speakers"), fetch("/api/rooms"),
       ]);
-      const [evtData, spkData, roomData] = await Promise.all([
-        evtRes.json(),
-        spkRes.json(),
-        roomRes.json(),
-      ]);
+      const [evtData, spkData, roomData] = await Promise.all([evtRes.json(), spkRes.json(), roomRes.json()]);
       if (!evtRes.ok) throw new Error(evtData.error ?? "Erreur");
       setEvent(evtData);
       setAllSpeakers(Array.isArray(spkData) ? spkData : []);
       setAllRooms(Array.isArray(roomData) ? roomData : []);
-    } catch {
-      setPageError("Impossible de charger l'événement.");
-    } finally {
-      setLoading(false);
-    }
+    } catch { setPageError("Impossible de charger l'événement."); } finally { setLoading(false); }
   }, [eventId]);
 
-  useEffect(() => {
-    load();
-  }, [load]);
+  useEffect(() => { load(); }, [load]);
 
-  // ── Loading ──
+  useEffect(() => {
+    if (view !== "planning" || !eventId) return;
+    setPlanLoading(true);
+    fetch(`/api/events/${eventId}/sessions`)
+      .then((r) => r.json())
+      .then((d) => { if (Array.isArray(d)) setPlanSessions(d); })
+      .catch(() => {})
+      .finally(() => setPlanLoading(false));
+  }, [view, eventId]);
+
+  const handleSessionSaved = (saved: Session) => {
+    setEvent((prev) => {
+      if (!prev) return prev;
+      const exists = prev.sessions.find((s) => s.id === saved.id);
+      return { ...prev, sessions: exists ? prev.sessions.map((s) => s.id === saved.id ? saved : s) : [...prev.sessions, saved] };
+    });
+  };
+
+  const handleSessionDeleted = (id: string) => {
+    setEvent((prev) => prev ? { ...prev, sessions: prev.sessions.filter((s) => s.id !== id) } : prev);
+  };
+
+  const sortedSessions = event?.sessions.slice().sort(
+    (a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+  ) ?? [];
+
+  const planRooms = [...new Set(planSessions.flatMap((s) => s.room ? [s.room.name] : []))];
+
+  // ── Loading ──────────────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <main className="flex-1 px-8 py-12 max-w-6xl mx-auto w-full">
-        <div className="h-4 w-32 bg-[#1e2530] rounded-lg animate-pulse mb-10" />
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-1 h-64 bg-[#0d1117] rounded-2xl border border-[#1e2530] animate-pulse" />
-          <div className="lg:col-span-2 grid sm:grid-cols-2 gap-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <SessionCardSkeleton key={i} />
+      <main className="flex-1 min-h-screen bg-slate-950">
+        <div className="h-72 w-full bg-slate-800 animate-pulse" />
+        <div className="px-6 py-8 max-w-5xl mx-auto w-full">
+          <div className="h-4 w-24 bg-slate-800 rounded animate-pulse mb-8" />
+          <div className="h-8 w-64 bg-slate-800 rounded animate-pulse mb-3" />
+          <div className="h-4 w-48 bg-slate-800 rounded animate-pulse mb-8" />
+          <div className="flex gap-4 mt-8">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="h-28 flex-1 bg-slate-800/50 rounded-2xl border border-slate-800 animate-pulse" />
             ))}
           </div>
         </div>
@@ -1249,31 +539,235 @@ export default function EventDetailPage() {
 
   if (pageError || !event) {
     return (
-      <main className="flex-1 px-8 py-12 max-w-6xl mx-auto w-full">
-        <div className="flex items-center gap-2 text-red-400 text-sm">
-          <AlertTriangle size={16} />
-          {pageError || "Événement introuvable."}
+      <main className="flex-1 min-h-screen bg-slate-950 px-6 py-8 max-w-5xl mx-auto w-full">
+        <div className="flex items-center gap-2 text-rose-300 text-sm bg-rose-500/10 border border-rose-500/20 rounded-2xl px-4 py-3">
+          <AlertTriangle size={15} />{pageError || "Événement introuvable."}
         </div>
       </main>
     );
   }
 
   return (
-    
-    <>
-      <main className="flex-1 px-8 py-12 max-w-6xl mx-auto w-full">
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-[#4a5568] mb-8 flex-wrap">
-          <Link href="/admin" className="hover:text-[#00E5FF] transition-colors">Admin</Link>
-          <ChevronRight size={13} />
-          <Link href="/admin/events" className="hover:text-[#00E5FF] transition-colors">Événements</Link>
-          <ChevronRight size={13} />
-          <span className="text-white truncate max-w-50">{event.title}</span>
-        </div>
-        <ToggleSwitch isOn={isOn} setIsOn={setIsOn}/>
-        {isOn? <PlanningPage slug={event.slug}/> : <ListEventBySessionsPage/> }
+    <div className="min-h-screen bg-slate-950 text-white">
+      {/* Modals */}
+      <EditEventModal open={editEventOpen} onClose={() => setEditEventOpen(false)} event={event} onSaved={setEvent} />
+      <SessionModal open={sessionModalOpen} onClose={() => setSessionModalOpen(false)} onSaved={handleSessionSaved}
+        editingSession={editingSession} allSpeakers={allSpeakers} allRooms={allRooms} eventId={eventId} />
+      <DeleteSessionModal session={deletingSession} onClose={() => setDeletingSession(null)} onDeleted={handleSessionDeleted} />
 
+      {/* ── Cover Image ─────────────────────────────────────────────────────── */}
+      <div className="relative">
+        <div className="h-72 w-full overflow-hidden bg-slate-900">
+          <Image
+            src={event.coverImage ?? "/background.png"}
+            alt={event.title}
+            fill
+            className="w-full h-full object-cover opacity-70"
+          />
+        </div>
+        {/* gradient overlay bottom */}
+        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-slate-950 via-slate-950/70 to-transparent" />
+        {/* gradient overlay top (for back link readability) */}
+        <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-slate-950/60 to-transparent" />
+
+        {/* Back link floating on image */}
+        <div className="absolute top-5 left-0 right-0 px-6 max-w-5xl mx-auto">
+          <Link href="/admin/events"
+            className="inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.3em] text-slate-300 hover:text-cyan-300 transition-colors">
+            <ArrowLeft size={12} /> Événements
+          </Link>
+        </div>
+      </div>
+
+      <main className="px-6 pb-12 max-w-5xl mx-auto w-full -mt-6">
+
+        {/* ── Event header card ──────────────────────────────────────────────── */}
+        <div className="rounded-3xl border border-slate-800 bg-slate-900/95 p-8 shadow-2xl shadow-black/30 backdrop-blur-xl mb-8">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              {/* accent bar */}
+              <div className="h-2 w-16 rounded-full bg-cyan-400/30 mb-5" />
+              <h1 className="text-3xl font-black text-white tracking-tight">{event.title}</h1>
+              <div className="flex items-center gap-4 mt-3 flex-wrap">
+                <span className="flex items-center gap-1.5 text-sm text-slate-400">
+                  <Calendar size={13} className="text-cyan-400" />
+                  {formatDate(event.startDate)}
+                </span>
+                {event.location && (
+                  <span className="flex items-center gap-1.5 text-sm text-slate-400">
+                    <MapPin size={13} className="text-cyan-400" />
+                    {event.location}
+                  </span>
+                )}
+              </div>
+              {event.description && (
+                <p className="mt-4 text-slate-400 leading-7 text-sm max-w-2xl">{event.description}</p>
+              )}
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex items-center gap-2 shrink-0">
+              <Link href={`/events/${event.slug}`} target="_blank"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl border border-slate-700 text-sm text-slate-300 hover:text-white hover:border-slate-500 transition-all font-medium">
+                <Eye size={14} /> Voir
+              </Link>
+              <button onClick={() => setEditEventOpen(true)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-slate-800 border border-slate-700 text-sm text-slate-300 hover:text-white hover:border-slate-500 transition-all font-medium">
+                <Pencil size={14} /> Modifier
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Tabs: Liste | Planning ─────────────────────────────────────────── */}
+        <div className="flex items-center justify-between mb-6 border-b border-slate-800 pb-0">
+          <div className="flex gap-1">
+            <button
+              onClick={() => setView("liste")}
+              className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-t-lg border-b-2 transition-all -mb-px ${
+                view === "liste"
+                  ? "border-cyan-400 text-cyan-300"
+                  : "border-transparent text-slate-500 hover:text-slate-300"
+              }`}>
+              <List size={15} />
+              Sessions
+              <span className={`text-xs rounded-full px-1.5 py-0.5 font-bold ${view === "liste" ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30" : "bg-slate-800 text-slate-400"}`}>
+                {event.sessions.length}
+              </span>
+            </button>
+            <button
+              onClick={() => setView("planning")}
+              className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-t-lg border-b-2 transition-all -mb-px ${
+                view === "planning"
+                  ? "border-cyan-400 text-cyan-300"
+                  : "border-transparent text-slate-500 hover:text-slate-300"
+              }`}>
+              <LayoutGrid size={15} />
+              Planning
+            </button>
+          </div>
+        </div>
+
+        {/* ── LISTE VIEW ──────────────────────────────────────────────────────── */}
+        <AnimatePresence mode="wait">
+          {view === "liste" && (
+            <motion.div key="liste" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.18 }}>
+              <div className="flex items-center justify-between mb-5">
+                <h2 className="text-lg font-bold text-white">Sessions</h2>
+                <button
+                  onClick={() => { setEditingSession(null); setSessionModalOpen(true); }}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-cyan-500 text-slate-950 text-sm font-bold hover:bg-cyan-400 active:scale-[0.98] transition-all shadow-sm shadow-cyan-500/20">
+                  <Plus size={14} strokeWidth={2.5} /> Nouvelle session
+                </button>
+              </div>
+
+              {sortedSessions.length === 0 ? (
+                <div className="rounded-3xl border border-dashed border-slate-700 bg-slate-900/50 py-16 text-center">
+                  <p className="text-slate-500 text-sm mb-4">Aucune session pour le moment.</p>
+                  <button
+                    onClick={() => { setEditingSession(null); setSessionModalOpen(true); }}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl border border-slate-700 text-sm text-slate-400 hover:text-white font-semibold transition-colors">
+                    <Plus size={13} /> Créer la première session
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  <AnimatePresence initial={false}>
+                    {sortedSessions.map((s) => (
+                      <motion.div key={s.id} layout initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.98 }} transition={{ duration: 0.18 }}
+                        className="flex items-center justify-between gap-4 rounded-2xl border border-slate-800 bg-slate-900/80 px-5 py-4 hover:border-slate-700 hover:bg-slate-900 transition-all group">
+                        <div className="flex-1 min-w-0">
+                          <Link href={`/events/${event.slug}/sessions/${s.id}`}
+                            className="text-sm font-semibold text-cyan-400 hover:text-cyan-300 transition-colors truncate block">
+                            {s.title}
+                          </Link>
+                          <div className="flex items-center gap-3 mt-1.5 flex-wrap">
+                            <span className="text-xs text-slate-500 flex items-center gap-1">
+                              <Clock size={10} className="text-slate-600" />
+                              {formatTime(s.startTime)}–{formatTime(s.endTime)}
+                              <span className="text-slate-700 ml-0.5">· {duration(s.startTime, s.endTime)}</span>
+                            </span>
+                            {s.room && (
+                              <span className="text-xs text-slate-500 flex items-center gap-1">
+                                <Building2 size={10} className="text-slate-600" /> {s.room.name}
+                              </span>
+                            )}
+                            {s.capacity && (
+                              <span className="text-xs text-slate-500 flex items-center gap-1">
+                                <Users size={10} className="text-slate-600" /> {s.capacity} places
+                              </span>
+                            )}
+                            {s.speakers.length > 0 && (
+                              <span className="text-xs text-slate-500">
+                                {s.speakers.map((sp) => sp.fullName).join(", ")}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1 shrink-0">
+                          {s.isLive && (
+                            <span className="mr-2 inline-flex items-center gap-1.5 text-[10px] font-bold text-rose-300 bg-rose-500/10 border border-rose-500/20 rounded-full px-2 py-0.5">
+                              <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse inline-block" /> Live
+                            </span>
+                          )}
+                          <button
+                            onClick={() => { setEditingSession(s); setSessionModalOpen(true); }}
+                            className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-600 hover:text-cyan-400 hover:bg-cyan-500/10 transition-all"
+                            aria-label="Modifier">
+                            <Pencil size={14} />
+                          </button>
+                          <button
+                            onClick={() => setDeletingSession(s)}
+                            className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-600 hover:text-rose-400 hover:bg-rose-500/10 transition-all"
+                            aria-label="Supprimer">
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+              )}
+            </motion.div>
+          )}
+
+          {/* ── PLANNING VIEW ─────────────────────────────────────────────────── */}
+          {view === "planning" && (
+            <motion.div key="planning" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.18 }}>
+              <div className="flex items-center justify-end gap-2 mb-6 flex-wrap">
+                <button
+                  onClick={() => setSelectedRoom(null)}
+                  className={`px-4 py-2 rounded-2xl text-sm font-semibold transition-all ${selectedRoom === null ? "bg-cyan-500 text-slate-950 shadow-sm shadow-cyan-500/20" : "border border-slate-700 text-slate-400 hover:text-white hover:border-slate-500"}`}>
+                  Toutes les salles
+                </button>
+                {planRooms.map((r) => (
+                  <button key={r}
+                    onClick={() => setSelectedRoom(r)}
+                    className={`px-4 py-2 rounded-2xl text-sm font-semibold transition-all ${selectedRoom === r ? "bg-cyan-500 text-slate-950 shadow-sm shadow-cyan-500/20" : "border border-slate-700 text-slate-400 hover:text-white hover:border-slate-500"}`}>
+                    {r}
+                  </button>
+                ))}
+              </div>
+
+              {planLoading ? (
+                <div className="flex items-center justify-center h-48">
+                  <div className="w-8 h-8 border-2 border-slate-700 border-t-cyan-400 rounded-full animate-spin" />
+                </div>
+              ) : (
+                <div className="rounded-3xl border border-slate-800 bg-slate-900/80 overflow-hidden">
+                  <PlanningGrid
+                    sessions={planSessions}
+                    selectedRoom={selectedRoom}
+                    toggle={toggle}
+                    isFavorite={isFavorite}
+                    slug={event.slug}
+                  />
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
-    </>
+    </div>
   );
 }
