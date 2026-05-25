@@ -229,6 +229,12 @@ export default function SessionsPage() {
             .finally(() => setLoading(false));
     }, [slug]);
 
+    useEffect(() => {
+        if (event?.title) {
+            document.title = event.title;
+        }
+    }, [event]);
+
     const filtered =
         activeRoom === "all"
             ? sessions

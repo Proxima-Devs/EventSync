@@ -67,7 +67,7 @@ function Field({ label, required, hint, children }: {
 
 function SessionModal({ open, onClose, onSaved, editingSession, allSpeakers, allRooms, eventId }: {
   open: boolean; onClose: () => void; onSaved: (s: Session) => void;
-  editingSession: Session | null; allSpeakers: Speaker[]; allRooms: Room[]; eventId: string;
+  editingSession: Session | null; allSpeakers: Speaker[]; allRooms: Room[]; eventId: string | null;
 }) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const isEdit = !!editingSession;
@@ -111,6 +111,9 @@ function SessionModal({ open, onClose, onSaved, editingSession, allSpeakers, all
     if (form.speakerIds.length === 0) { setError("Sélectionnez au moins un intervenant."); return; }
     setLoading(true);
     try {
+      if (!eventId) {
+        throw new Error("Impossible d'enregistrer : événement non chargé.");
+      }
       const url = isEdit ? `/api/sessions/${editingSession!.id}` : `/api/events/${eventId}/sessions`;
       const res = await fetch(url, {
         method: isEdit ? "PUT" : "POST",
@@ -452,7 +455,7 @@ function PlanningGrid({ sessions, selectedRoom, toggle, isFavorite, slug }: {
                 return (
                   <td key={room} className="py-3 px-3 border-l border-slate-800 min-w-[200px]">
                     {roomSessions.map((s) => (
-                      <Link key={s.id} href={`/events/${slug}/sessions/${s.id}`}
+                      <Link key={s.id} href={`/events/${slug}/sessions/${s.slug}`}
                         className="block rounded-2xl border border-slate-700 bg-slate-900/80 p-3 mb-2 hover:border-cyan-500/40 hover:bg-slate-800/80 transition-all group">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1 min-w-0">
@@ -489,7 +492,7 @@ function PlanningGrid({ sessions, selectedRoom, toggle, isFavorite, slug }: {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function EventDetailPage() {
-  const { eventId } = useParams<{ eventId: string }>();
+  const { slug } = useParams<{ slug: string }>();
 
   const [event, setEvent] = useState<Event | null>(null);
   const [allSpeakers, setAllSpeakers] = useState<Speaker[]>([]);
@@ -512,7 +515,7 @@ export default function EventDetailPage() {
   const load = useCallback(async () => {
     try {
       const [evtRes, spkRes, roomRes] = await Promise.all([
-        fetch(`/api/events/${eventId}`), fetch("/api/speakers"), fetch("/api/rooms"),
+        fetch(`/api/events/slug/${slug}`), fetch("/api/speakers"), fetch("/api/rooms"),
       ]);
       const [evtData, spkData, roomData] = await Promise.all([evtRes.json(), spkRes.json(), roomRes.json()]);
       if (!evtRes.ok) throw new Error(evtData.error ?? "Erreur");
@@ -520,19 +523,25 @@ export default function EventDetailPage() {
       setAllSpeakers(Array.isArray(spkData) ? spkData : []);
       setAllRooms(Array.isArray(roomData) ? roomData : []);
     } catch { setPageError("Impossible de charger l'événement."); } finally { setLoading(false); }
-  }, [eventId]);
+  }, [slug]);
 
   useEffect(() => { load(); }, [load]);
 
   useEffect(() => {
-    if (view !== "planning" || !eventId) return;
+    if (event?.title) {
+      document.title = event.title;
+    }
+  }, [event]);
+
+  useEffect(() => {
+    if (view !== "planning" || !event?.id) return;
     setPlanLoading(true);
-    fetch(`/api/events/${eventId}/sessions`)
+    fetch(`/api/events/${event.id}/sessions`)
       .then((r) => r.json())
       .then((d) => { if (Array.isArray(d)) setPlanSessions(d); })
       .catch(() => {})
       .finally(() => setPlanLoading(false));
-  }, [view, eventId]);
+  }, [view, event?.id]);
 
   const handleSessionSaved = (saved: Session) => {
     setEvent((prev) => {
@@ -586,7 +595,7 @@ export default function EventDetailPage() {
       {/* Modals */}
       <EditEventModal open={editEventOpen} onClose={() => setEditEventOpen(false)} event={event} onSaved={setEvent} />
       <SessionModal open={sessionModalOpen} onClose={() => setSessionModalOpen(false)} onSaved={handleSessionSaved}
-        editingSession={editingSession} allSpeakers={allSpeakers} allRooms={allRooms} eventId={eventId} />
+        editingSession={editingSession} allSpeakers={allSpeakers} allRooms={allRooms} eventId={event?.id ?? null} />
       <DeleteSessionModal session={deletingSession} onClose={() => setDeletingSession(null)} onDeleted={handleSessionDeleted} />
 
       {/* ── Cover Image ─────────────────────────────────────────────────────── */}
@@ -711,7 +720,7 @@ export default function EventDetailPage() {
                       <motion.div key={s.id} layout initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.98 }} transition={{ duration: 0.18 }}
                         className="flex items-center justify-between gap-4 rounded-2xl border border-slate-800 bg-slate-900/80 px-5 py-4 hover:border-slate-700 hover:bg-slate-900 transition-all group">
                         <div className="flex-1 min-w-0">
-                          <Link href={`/events/${event.slug}/sessions/${s.id}`}
+                          <Link href={`/events/${event.slug}/sessions/${s.slug}`}
                             className="text-sm font-semibold text-cyan-400 hover:text-cyan-300 transition-colors truncate block">
                             {s.title}
                           </Link>

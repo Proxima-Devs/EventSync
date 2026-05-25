@@ -493,7 +493,7 @@ function AdminEventCard({
 
           {/* Gérer l'événement */}
           <Link
-            href={`/admin/events/${event.id}`}
+            href={`/admin/events/${event.slug}`}
             className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-[#1e2530] bg-[#ffffff05] text-[#aaa] text-xs font-bold hover:bg-[#ffffff0d] hover:border-[#2e3a4a] hover:text-white transition-all duration-200"
           >
             <Settings2 size={12} />
