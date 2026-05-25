@@ -1,15 +1,51 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
+import { Search, Star } from "lucide-react";
 import { useFavorites } from "@/hooks/useFavorites";
 import { apiFetch } from "@/lib/api";
 import { SessionFavorite } from "@/types";
+
+const FILTERS = ["All", "Live", "Upcoming", "Past"];
 
 export default function FavoritesPage() {
   const { favorites, toggle } = useFavorites();
   const [sessions, setSessions] = useState<SessionFavorite[]>([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [submitted, setSubmitted] = useState("");
+  const [activeFilter, setActiveFilter] = useState("All");
+
+  const filteredSessions = useMemo(() => {
+    const query = submitted.trim().toLowerCase();
+    const now = new Date();
+
+    return sessions.filter((session) => {
+      const searchMatch =
+        query === "" ||
+        session.title.toLowerCase().includes(query) ||
+        session.event.title.toLowerCase().includes(query) ||
+        session.speakers.some((speaker) => speaker.fullName.toLowerCase().includes(query)) ||
+        session.room?.name.toLowerCase().includes(query);
+
+      if (!searchMatch) return false;
+
+      if (activeFilter === "Live") {
+        return session.isLive;
+      }
+
+      const start = new Date(session.startTime);
+      if (activeFilter === "Upcoming") {
+        return start >= now;
+      }
+      if (activeFilter === "Past") {
+        return start < now;
+      }
+
+      return true;
+    });
+  }, [sessions, submitted, activeFilter]);
 
   useEffect(() => {
     if (favorites.length === 0) {
@@ -52,13 +88,56 @@ export default function FavoritesPage() {
           </Link>
         </div>
       ) : (
-        <div className="flex flex-col gap-3">
-          {sessions.map((session) => (
-            <div key={session.id} className="relative">
-              <Link
-                href={`/events/${session.event.slug}/sessions/${session.slug}`}
-                className="block rounded-2xl border border-[#1e2530] bg-[#0d1117] p-5 hover:border-[#00E5FF44] transition-colors pr-14"
-              >
+        <>
+          <div className="mb-6 flex flex-col gap-30 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-wrap gap-2 order-1 sm:order-1">
+              {FILTERS.map((filter) => (
+                <button
+                  key={filter}
+                  onClick={() => setActiveFilter(filter)}
+                  className={`cursor-pointer px-4 py-2 rounded-full text-sm font-semibold border transition-all duration-200 ${
+                    activeFilter === filter
+                      ? "bg-[#00E5FF] border-[#00E5FF] text-black shadow-lg shadow-[#00E5FF33]"
+                      : "bg-transparent border-[#1e2530] text-[#cbd5e1] hover:text-white hover:border-[#00E5FF44]"
+                  }`}
+                >
+                  {filter === "All" ? "Tous" : filter === "Live" ? "En direct" : filter === "Upcoming" ? "À venir" : "Passé"}
+                </button>
+              ))}
+            </div>
+            <div className="flex-1 min-w-0 order-2 sm:order-2">
+              <div className="relative rounded-full border border-[#1e2530] bg-[#0d1117] flex items-center overflow-hidden max-w-2xl ml-auto">
+                <input
+                  type="text"
+                  placeholder="Rechercher un favori..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && setSubmitted(search)}
+                  className="w-full bg-transparent px-4 py-3 text-sm text-white placeholder-[#64748b] focus:outline-none"
+                />
+                <button
+                  onClick={() => setSubmitted(search)}
+                  className="inline-flex h-11 w-11 items-center justify-center text-white rounded-full cursor-pointer"
+                  aria-label="Rechercher"
+                >
+                  <Search className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {filteredSessions.length === 0 ? (
+            <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] py-20 text-center text-[#3a4550] italic text-sm">
+              Aucun favori ne correspond à ces filtres.
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {filteredSessions.map((session) => (
+                <div key={session.id} className="relative">
+                  <Link
+                    href={`/events/${session.event.slug}/sessions/${session.slug}`}
+                    className="block rounded-2xl border border-[#1e2530] bg-[#0d1117] p-5 hover:border-[#00E5FF44] transition-colors pr-14"
+                  >
                 <p className="text-xs text-[#00E5FF] mb-1">{session.event.title}</p>
                 <div className="flex items-center gap-2 mb-1">
                   {session.isLive && (
@@ -92,14 +171,17 @@ export default function FavoritesPage() {
               </Link>
               <button
                 onClick={() => toggle(session.id)}
-                className="absolute top-4 right-4 text-xl"
+                className="absolute top-4 right-4 rounded-full bg-[#0d1117] p-2 text-[#00E5FF] shadow-lg shadow-[#00E5FF33]"
                 title="Retirer des favoris"
+                aria-label="Retirer des favoris"
               >
-                ⭐
+                <Star className="h-5 w-5" fill="currentColor" />
               </button>
             </div>
           ))}
         </div>
+      )}
+    </>
       )}
     </main>
   );
