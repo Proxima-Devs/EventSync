@@ -68,6 +68,14 @@ export interface Stats {
   };
   live: { activeSessions: number };
   upcoming: { events: number };
+  recentEvents: {
+    id: string;
+    title: string;
+    startDate: string;
+    endDate: string;
+    location?: string;
+    _count: { sessions: number };
+  }[];
   recentQuestions: {
     id: string;
     content: string;

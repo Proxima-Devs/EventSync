@@ -2,7 +2,23 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-import { Calendar, Mic, Building2, MessageSquare, Radio, LayoutDashboard, TrendingUp, X, Plus, ArrowUpRight, Clock, Users } from "lucide-react";
+import {
+  Calendar,
+  Mic,
+  Building2,
+  MessageSquare,
+  Radio,
+  LayoutDashboard,
+  TrendingUp,
+  X,
+  Plus,
+  ArrowUpRight,
+  Users,
+  Zap,
+  ChevronRight,
+  MapPin,
+  ArrowLeft,
+} from "lucide-react";
 import { EventPayload, Stats } from "@/types";
 
 
@@ -47,21 +63,17 @@ function StatCard({
           {label}
         </span>
         <div
-          className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300 ${
-            accent
-              ? "bg-[#00E5FF15] border border-[#00E5FF30] text-[#00E5FF] group-hover:bg-[#00E5FF20]"
-              : "bg-[#ffffff08] border border-[#1e2530] text-[#3a4a5a] group-hover:text-[#00E5FF] group-hover:border-[#00E5FF30]"
-          }`}
+          className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300 ${accent
+            ? "bg-[#00E5FF15] border border-[#00E5FF30] text-[#00E5FF] group-hover:bg-[#00E5FF20]"
+            : "bg-[#ffffff08] border border-[#1e2530] text-[#3a4a5a] group-hover:text-[#00E5FF] group-hover:border-[#00E5FF30]"
+            }`}
         >
           <Icon size={16} />
         </div>
       </div>
       <div
-        className={`text-4xl font-black tracking-tight mb-1 transition-colors duration-300 ${
-          accent
-            ? "text-[#00E5FF]"
-            : "text-white group-hover:text-[#eee]"
-        }`}
+        className={`text-4xl font-black tracking-tight mb-1 transition-colors duration-300 ${accent ? "text-[#00E5FF]" : "text-white group-hover:text-[#eee]"
+          }`}
       >
         {value}
       </div>
@@ -163,7 +175,6 @@ function CreateEventModal({
         className="relative w-full max-w-lg rounded-2xl border border-[#1e2530] bg-[#0a0e14] shadow-2xl"
         style={{ animation: "slideUp 0.2s ease" }}
       >
-        {/* Glow top */}
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-[#00E5FF40] to-transparent" />
 
         <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#1e2530]">
@@ -180,7 +191,6 @@ function CreateEventModal({
         </div>
 
         <form onSubmit={handleSubmit} className="px-6 py-5 flex flex-col gap-4">
-          {/* Title */}
           <div>
             <label className="block text-xs font-semibold uppercase tracking-widest text-[#3a4a5a] mb-1.5">
               Titre <span className="text-[#00E5FF]">*</span>
@@ -194,7 +204,6 @@ function CreateEventModal({
             />
           </div>
 
-          {/* Description */}
           <div>
             <label className="block text-xs font-semibold uppercase tracking-widest text-[#3a4a5a] mb-1.5">
               Description
@@ -208,7 +217,6 @@ function CreateEventModal({
             />
           </div>
 
-          {/* Dates */}
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold uppercase tracking-widest text-[#3a4a5a] mb-1.5">
@@ -234,7 +242,6 @@ function CreateEventModal({
             </div>
           </div>
 
-          {/* Location */}
           <div>
             <label className="block text-xs font-semibold uppercase tracking-widest text-[#3a4a5a] mb-1.5">
               Lieu
@@ -248,7 +255,6 @@ function CreateEventModal({
             />
           </div>
 
-          {/* Cover Image URL */}
           <div>
             <label className="block text-xs font-semibold uppercase tracking-widest text-[#3a4a5a] mb-1.5">
               Image de couverture (URL)
@@ -262,14 +268,12 @@ function CreateEventModal({
             />
           </div>
 
-          {/* Error */}
           {error && (
             <div className="rounded-xl border border-red-900/60 bg-red-500/10 px-4 py-2.5 text-sm text-red-400">
               {error}
             </div>
           )}
 
-          {/* Actions */}
           <div className="flex gap-3 pt-1">
             <button
               type="button"
@@ -297,6 +301,82 @@ function CreateEventModal({
   );
 }
 
+// ─── Event Card ───────────────────────────────────────────────────────────────
+
+function EventCard({
+  event,
+}: {
+  event: {
+    id: string;
+    title: string;
+    startDate: string;
+    endDate: string;
+    location?: string;
+    _count?: { sessions?: number };
+  };
+}) {
+  const start = new Date(event.startDate);
+  const now = new Date();
+  const isLive = start <= now && now <= new Date(event.endDate);
+  const isPast = new Date(event.endDate) < now;
+
+  return (
+    <Link
+      href={`/admin/events/${event.id}`}
+      className="group flex items-center gap-4 p-4 rounded-xl border border-[#1e2530] bg-[#0a0e14] hover:border-[#00E5FF33] hover:bg-[#00E5FF05] transition-all duration-200"
+    >
+      {/* Date badge */}
+      <div className="shrink-0 flex flex-col items-center justify-center w-11 h-11 rounded-xl bg-[#1e2530] text-center">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-[#3a4a5a] leading-none">
+          {start.toLocaleDateString("fr-FR", { month: "short" })}
+        </span>
+        <span className="text-base font-black text-white leading-tight">
+          {start.getDate()}
+        </span>
+      </div>
+
+      {/* Info */}
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-bold text-white truncate group-hover:text-[#00E5FF] transition-colors">
+          {event.title}
+        </p>
+        <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+          {event.location && (
+            <span className="flex items-center gap-1 text-[10px] text-[#3a4a5a] font-semibold">
+              <MapPin size={9} /> {event.location}
+            </span>
+          )}
+          {event._count?.sessions !== undefined && (
+            <span className="flex items-center gap-1 text-[10px] text-[#3a4a5a] font-semibold">
+              <Mic size={9} /> {event._count.sessions} session{event._count.sessions !== 1 ? "s" : ""}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Status badge */}
+      <div className="shrink-0">
+        {isLive ? (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/15 border border-red-500/30 text-[10px] font-bold text-red-400">
+            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+            LIVE
+          </span>
+        ) : isPast ? (
+          <span className="px-2 py-0.5 rounded-full bg-[#1e2530] text-[10px] font-bold text-[#3a4a5a]">
+            Terminé
+          </span>
+        ) : (
+          <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-[10px] font-bold text-emerald-400">
+            À venir
+          </span>
+        )}
+      </div>
+
+      <ChevronRight size={14} className="shrink-0 text-[#3a4a5a] group-hover:text-[#00E5FF] transition-colors" />
+    </Link>
+  );
+}
+
 // ─── Main Dashboard Page ──────────────────────────────────────────────────────
 
 export default function DashboardPage() {
@@ -311,7 +391,6 @@ export default function DashboardPage() {
       const data = await res.json();
       return data;
     } catch {
-      // silent
       return null;
     }
   }, []);
@@ -331,47 +410,72 @@ export default function DashboardPage() {
 
   const statCards = stats
     ? [
-        {
-          label: "Événements",
-          value: stats.totals.events,
-          icon: Calendar,
-          href: "/admin/events",
-          sub: `${stats.upcoming.events} à venir`,
-        },
-        {
-          label: "Intervenants",
-          value: stats.totals.speakers,
-          icon: Users,
-          href: "/admin/speakers",
-        },
-        {
-          label: "Sessions",
-          value: stats.totals.sessions,
-          icon: Mic,
-          href: "/admin/events",
-        },
-        {
-          label: "Salles",
-          value: stats.totals.rooms,
-          icon: Building2,
-          href: "/admin/rooms",
-        },
-        {
-          label: "Questions",
-          value: stats.totals.questions,
-          icon: MessageSquare,
-          href: "/admin/events",
-        },
-        {
-          label: "Sessions live",
-          value: stats.live.activeSessions,
-          icon: Radio,
-          href: "/admin/events",
-          accent: stats.live.activeSessions > 0,
-          sub: stats.live.activeSessions > 0 ? "En cours maintenant" : undefined,
-        },
-      ]
+      {
+        label: "Événements",
+        value: stats.totals.events,
+        icon: Calendar,
+        href: "/admin/events",
+        sub: `${stats.upcoming.events} à venir`,
+      },
+      {
+        label: "Intervenants",
+        value: stats.totals.speakers,
+        icon: Users,
+        href: "/admin/speakers",
+      },
+      {
+        label: "Sessions",
+        value: stats.totals.sessions,
+        icon: Mic,
+        href: "/admin/events",
+      },
+      {
+        label: "Salles",
+        value: stats.totals.rooms,
+        icon: Building2,
+        href: "/admin/rooms",
+      },
+      {
+        label: "Questions",
+        value: stats.totals.questions,
+        icon: MessageSquare,
+        href: "/admin/events",
+      },
+      {
+        label: "Sessions live",
+        value: stats.live.activeSessions,
+        icon: Radio,
+        href: "/admin/events",
+        accent: stats.live.activeSessions > 0,
+        sub: stats.live.activeSessions > 0 ? "En cours maintenant" : undefined,
+      },
+    ]
     : [];
+
+  // Quick actions config
+  const quickActions = [
+    {
+      label: "Nouvel événement",
+      description: "Créer un nouvel événement",
+      icon: Calendar,
+      href: "/admin/events",
+      accent: true,
+    },
+    {
+      label: "Nouvel intervenant",
+      description: "Ajouter un intervenant",
+      icon: Users,
+      href: "/admin/speakers",
+      accent: false,
+    },
+    {
+      label: "Gérer les salles",
+      description: "Configurer les salles",
+      icon: Building2,
+      href: "/admin/rooms",
+      accent: false,
+    },
+  ];
 
   return (
     <>
@@ -380,18 +484,18 @@ export default function DashboardPage() {
         onClose={() => setModalOpen(false)}
         onCreated={() => {
           setLoading(true);
-          fetchStats();
+          fetchStats().then(setStats);
         }}
       />
 
       <main className="flex-1 px-8 py-12 max-w-6xl mx-auto w-full">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-[#4a5568] mb-8">
-          <Link href="/admin" className="hover:text-[#00E5FF] transition-colors">
-            Admin
+          <Link href="/" className="hover:text-[#00E5FF] transition-colors flex items-center gap-1">
+            <ArrowLeft size={10} />
+            <span>Home</span>
           </Link>
-          <span>/</span>
-          <span className="text-white">Dashboard</span>
+
         </div>
 
         {/* Header */}
@@ -426,14 +530,15 @@ export default function DashboardPage() {
             : statCards.map((c) => <StatCard key={c.label} {...c} />)}
         </div>
 
-        {/* Bottom grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          {/* Recent Questions */}
-          <div className="lg:col-span-3 rounded-2xl border border-[#1e2530] bg-[#0d1117] overflow-hidden">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-[#1e2530]">
+        {/* ── Middle row : Events list + Quick Actions (same height) ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-6">
+
+          {/* Events list — 3 cols */}
+          <div className="lg:col-span-3 rounded-2xl border border-[#1e2530] bg-[#0d1117] overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[#1e2530] shrink-0">
               <div className="flex items-center gap-2">
-                <MessageSquare size={15} className="text-[#00E5FF]" />
-                <h2 className="text-sm font-black text-white tracking-tight">Questions récentes</h2>
+                <Calendar size={15} className="text-[#00E5FF]" />
+                <h2 className="text-sm font-black text-white tracking-tight">Événements récents</h2>
               </div>
               <Link
                 href="/admin/events"
@@ -443,121 +548,153 @@ export default function DashboardPage() {
               </Link>
             </div>
 
-            <div className="divide-y divide-[#1e2530]">
+            <div className="flex-1 flex flex-col p-4 gap-2">
+              {/* Skeletons */}
               {loading &&
-                Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="px-6 py-4 animate-pulse flex gap-3">
-                    <div className="w-2 h-2 rounded-full bg-[#1e2530] mt-1.5 shrink-0" />
+                Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="animate-pulse flex items-center gap-4 p-4 rounded-xl border border-[#1e2530]">
+                    <div className="w-11 h-11 rounded-xl bg-[#1e2530] shrink-0" />
                     <div className="flex-1 space-y-2">
-                      <div className="h-3 w-4/5 bg-[#1e2530] rounded-lg" />
+                      <div className="h-3 w-3/4 bg-[#1e2530] rounded-lg" />
                       <div className="h-2.5 w-1/2 bg-[#1e2530] rounded-lg" />
                     </div>
+                    <div className="w-14 h-5 bg-[#1e2530] rounded-full shrink-0" />
                   </div>
                 ))}
 
-              {!loading && (!stats || stats.recentQuestions.length === 0) && (
-                <div className="px-6 py-12 text-center">
-                  <MessageSquare size={24} className="mx-auto text-[#1e2530] mb-3" />
-                  <p className="text-[#3a4a5a] italic text-sm">Aucune question pour le moment.</p>
+              {/* Empty state */}
+              {!loading && (!stats?.recentEvents || stats.recentEvents.length === 0) && (
+                <div className="flex-1 flex flex-col items-center justify-center py-10">
+                  <Calendar size={28} className="text-[#1e2530] mb-3" />
+                  <p className="text-[#3a4a5a] italic text-sm">Aucun événement pour le moment.</p>
                 </div>
               )}
 
+              {/* Event cards — max 5 */}
               {!loading &&
-                stats?.recentQuestions.map((q) => (
-                  <div key={q.id} className="px-6 py-4 group hover:bg-[#ffffff03] transition-colors">
-                    <p className="text-sm text-[#ccc] leading-relaxed mb-1.5">{q.content}</p>
-                    <div className="flex items-center gap-3 flex-wrap">
-                      <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full border border-[#1e2530] text-[#3a4a5a] font-semibold">
-                        📍 {q.session.event.title}
-                      </span>
-                      <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full border border-[#1e2530] text-[#3a4a5a] font-semibold">
-                        🎙️ {q.session.title}
-                      </span>
-                      <span className="text-[10px] text-[#3a4a5a] ml-auto font-semibold">
-                        ▲ {q.upvotes} vote{q.upvotes !== 1 ? "s" : ""}
-                      </span>
-                    </div>
-                  </div>
+                stats?.recentEvents?.slice(0, 5).map((event) => (
+                  <EventCard key={event.id} event={event} />
                 ))}
             </div>
           </div>
 
-          {/* Right column */}
-          <div className="lg:col-span-2 flex flex-col gap-4">
-            {/* Live Sessions */}
-            <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-6 relative overflow-hidden">
-              <div className="pointer-events-none absolute inset-0 bg-[radial-linear(ellipse_at_bottom_right,#00E5FF06_0%,transparent_70%)]" />
-              <div className="flex items-center gap-2 mb-4">
-                <Radio size={14} className="text-[#00E5FF]" />
-                <h2 className="text-sm font-black text-white tracking-tight">En direct</h2>
+          {/* Quick Actions — 2 cols */}
+          <div className="lg:col-span-2 rounded-2xl border border-[#1e2530] bg-[#0d1117] overflow-hidden flex flex-col">
+            <div className="flex items-center gap-2 px-6 py-4 border-b border-[#1e2530] shrink-0">
+              <Zap size={15} className="text-[#00E5FF]" />
+              <h2 className="text-sm font-black text-white tracking-tight">Actions rapides</h2>
+            </div>
+
+            <div className="flex-1 flex flex-col p-4 gap-3">
+              {quickActions.map((action) => (
+                <Link
+                  key={action.href}
+                  href={action.href}
+                  className={`group flex items-center gap-4 p-4 rounded-xl border transition-all duration-200 ${action.accent
+                    ? "border-[#00E5FF33] bg-[#00E5FF08] hover:bg-[#00E5FF12] hover:border-[#00E5FF55]"
+                    : "border-[#1e2530] bg-[#0a0e14] hover:border-[#00E5FF33] hover:bg-[#00E5FF05]"
+                    }`}
+                >
+                  <div
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all duration-200 ${action.accent
+                      ? "bg-[#00E5FF15] border border-[#00E5FF30] text-[#00E5FF] group-hover:bg-[#00E5FF25]"
+                      : "bg-[#1e2530] border border-[#2a3545] text-[#3a4a5a] group-hover:text-[#00E5FF] group-hover:border-[#00E5FF33]"
+                      }`}
+                  >
+                    <action.icon size={16} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p
+                      className={`text-sm font-bold transition-colors duration-200 ${action.accent
+                        ? "text-[#00E5FF]"
+                        : "text-white group-hover:text-[#00E5FF]"
+                        }`}
+                    >
+                      {action.label}
+                    </p>
+                    <p className="text-[10px] text-[#3a4a5a] font-semibold mt-0.5">
+                      {action.description}
+                    </p>
+                  </div>
+                  <ChevronRight
+                    size={15}
+                    className={`shrink-0 transition-colors duration-200 ${action.accent ? "text-[#00E5FF80]" : "text-[#3a4a5a] group-hover:text-[#00E5FF]"
+                      }`}
+                  />
+                </Link>
+              ))}
+
+              {/* Filler area to stretch card to full height */}
+              <div className="flex-1 mt-2 rounded-xl border border-dashed border-[#1e2530] flex flex-col items-center justify-center gap-2 p-6 text-center">
+                <div className="w-9 h-9 rounded-xl bg-[#1e2530] flex items-center justify-center">
+                  <TrendingUp size={15} className="text-[#3a4a5a]" />
+                </div>
+                <p className="text-xs text-[#3a4a5a] font-semibold">
+                  {loading ? "—" : `${stats?.live.activeSessions ?? 0} session${(stats?.live.activeSessions ?? 0) !== 1 ? "s" : ""} en direct`}
+                </p>
                 {stats && stats.live.activeSessions > 0 && (
-                  <span className="ml-auto flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                    <span className="text-xs text-red-400 font-bold">LIVE</span>
+                  <span className="flex items-center gap-1.5 text-[10px] font-bold text-red-400">
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                    LIVE
                   </span>
                 )}
               </div>
-              <div className="text-5xl font-black text-[#00E5FF] mb-1">
-                {loading ? "—" : stats?.live.activeSessions ?? 0}
-              </div>
-              <p className="text-xs text-[#3a4a5a]">sessions actives en ce moment</p>
             </div>
+          </div>
+        </div>
 
-            {/* Upcoming */}
-            <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-6">
-              <div className="flex items-center gap-2 mb-4">
-                <Clock size={14} className="text-[#3a4a5a]" />
-                <h2 className="text-sm font-black text-white tracking-tight">À venir</h2>
-              </div>
-              <div className="text-5xl font-black text-white mb-1">
-                {loading ? "—" : stats?.upcoming.events ?? 0}
-              </div>
-              <p className="text-xs text-[#3a4a5a]">événements planifiés</p>
-
-              <div className="mt-4 pt-4 border-t border-[#1e2530]">
-                <Link
-                  href="/admin/events"
-                  className="inline-flex items-center gap-1.5 text-xs text-[#00E5FF] font-bold hover:text-[#00cfea] transition-colors"
-                >
-                  Voir le calendrier <ArrowUpRight size={11} />
-                </Link>
-              </div>
+        {/* ── Bottom row : Recent Questions ── */}
+        <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] overflow-hidden">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-[#1e2530]">
+            <div className="flex items-center gap-2">
+              <MessageSquare size={15} className="text-[#00E5FF]" />
+              <h2 className="text-sm font-black text-white tracking-tight">Questions récentes</h2>
             </div>
+            <Link
+              href="/admin/events"
+              className="text-xs font-semibold text-[#00E5FF] uppercase tracking-widest hover:text-[#00cfea] transition-colors flex items-center gap-1"
+            >
+              Voir tout <ArrowUpRight size={11} />
+            </Link>
+          </div>
 
-            {/* Engagement summary */}
-            <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-6">
-              <div className="flex items-center gap-2 mb-4">
-                <TrendingUp size={14} className="text-[#3a4a5a]" />
-                <h2 className="text-sm font-black text-white tracking-tight">Engagement</h2>
-              </div>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-[#3a4a5a] font-semibold uppercase tracking-widest">Live Q&A</span>
-                  <span className="text-sm font-black text-white">
-                    {loading ? "—" : stats?.totals.questions ?? 0}
-                  </span>
+          <div className="divide-y divide-[#1e2530]">
+            {loading &&
+              Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="px-6 py-4 animate-pulse flex gap-3">
+                  <div className="w-2 h-2 rounded-full bg-[#1e2530] mt-1.5 shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-3 w-4/5 bg-[#1e2530] rounded-lg" />
+                    <div className="h-2.5 w-1/2 bg-[#1e2530] rounded-lg" />
+                  </div>
                 </div>
-                <div className="w-full h-1.5 rounded-full bg-[#1e2530] overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-linear-to-r from-[#00E5FF] to-[#0066ff] transition-all duration-700"
-                    style={{ width: stats ? `${Math.min(100, (stats.totals.questions / 200) * 100)}%` : "0%" }}
-                  />
-                </div>
+              ))}
 
-                <div className="flex items-center justify-between pt-1">
-                  <span className="text-xs text-[#3a4a5a] font-semibold uppercase tracking-widest">Sessions</span>
-                  <span className="text-sm font-black text-white">
-                    {loading ? "—" : stats?.totals.sessions ?? 0}
-                  </span>
-                </div>
-                <div className="w-full h-1.5 rounded-full bg-[#1e2530] overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-linear-to-r from-[#00E5FF] to-[#0066ff] transition-all duration-700"
-                    style={{ width: stats ? `${Math.min(100, (stats.totals.sessions / 50) * 100)}%` : "0%" }}
-                  />
-                </div>
+            {!loading && (!stats || stats.recentQuestions.length === 0) && (
+              <div className="px-6 py-12 text-center">
+                <MessageSquare size={24} className="mx-auto text-[#1e2530] mb-3" />
+                <p className="text-[#3a4a5a] italic text-sm">Aucune question pour le moment.</p>
               </div>
-            </div>
+            )}
+
+            {/* max 5 questions */}
+            {!loading &&
+              stats?.recentQuestions.slice(0, 5).map((q) => (
+                <div key={q.id} className="px-6 py-4 group hover:bg-[#ffffff03] transition-colors">
+                  <p className="text-sm text-[#ccc] leading-relaxed mb-1.5">{q.content}</p>
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full border border-[#1e2530] text-[#3a4a5a] font-semibold">
+                      📍 {q.session.event.title}
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full border border-[#1e2530] text-[#3a4a5a] font-semibold">
+                      🎙️ {q.session.title}
+                    </span>
+                    <span className="text-[10px] text-[#3a4a5a] ml-auto font-semibold">
+                      ▲ {q.upvotes} vote{q.upvotes !== 1 ? "s" : ""}
+                    </span>
+                  </div>
+                </div>
+              ))}
           </div>
         </div>
       </main>
