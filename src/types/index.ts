@@ -70,6 +70,7 @@ export interface Stats {
   upcoming: { events: number };
   recentEvents: {
     id: string;
+    slug: string;
     title: string;
     startDate: string;
     endDate: string;

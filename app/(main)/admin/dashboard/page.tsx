@@ -308,6 +308,7 @@ function EventCard({
 }: {
   event: {
     id: string;
+    slug: string;
     title: string;
     startDate: string;
     endDate: string;
@@ -322,7 +323,7 @@ function EventCard({
 
   return (
     <Link
-      href={`/admin/events/${event.id}`}
+      href={`/admin/events/${event.slug}`}
       className="group flex items-center gap-4 p-4 rounded-xl border border-[#1e2530] bg-[#0a0e14] hover:border-[#00E5FF33] hover:bg-[#00E5FF05] transition-all duration-200"
     >
       {/* Date badge */}
