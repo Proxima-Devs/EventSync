@@ -1,6 +1,6 @@
 "use client";
 
-import { Pencil, Trash2, Layers, Mic } from "lucide-react";
+import { Pencil, Trash2, Layers, Mic, User } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SpeakerLinks } from "@/types";
@@ -39,19 +39,12 @@ export function SpeakerCard({
     <div className="relative mt-27">
       {/* Avatar */}
       <div className="absolute z-10 -top-20 left-1/2 -translate-x-1/2">
-        <div className="w-40 h-40 rounded-full bg-[#ffffff06] border-2 border-[#1e2530] group-hover:border-[#00E5FF40] transition-colors duration-300 overflow-hidden flex items-center justify-center shrink-0">
-          {speaker.photo ? (
-            // eslint-disable-next-line @next/next/no-img-element
+        <div className="w-40 h-40 rounded-full bg-[#0a0e14] border-2 border-[#1e2530] group-hover:border-[#00E5FF40] transition-colors duration-300 overflow-hidden flex items-center justify-center shrink-0">
             <img
-              src={speaker.photo}
+              src={speaker.photo ?? `https://api.dicebear.com/7.x/adventurer/svg?seed=${speaker.fullName}&flip=true&radius=50`}
               alt={speaker.fullName}
               className="w-full h-full object-cover"
             />
-          ) : (
-            <span className="text-[#3a4a5a] text-xl font-black">
-              {initials}
-            </span>
-          )}
         </div>
 
         {/* Sessions badge */}
