@@ -43,12 +43,6 @@ function SpeakerCardSkeleton() {
 }
 
 function SpeakerCard({ speaker }: { speaker: Speaker }) {
-    const initials = speaker.fullName
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2);
 
     const links = speaker.links ?? {};
     const activeSocials = Object.entries(links).filter(([, url]) => !!url);
@@ -61,20 +55,14 @@ function SpeakerCard({ speaker }: { speaker: Speaker }) {
             <div className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-[radial-gradient(ellipse_at_top_left,#00E5FF08_0%,transparent_60%)]" />
 
             <div className="flex items-start gap-4">
-                {speaker.photo ? (
                     <Image
-                        src={speaker.photo}
+                        src={speaker.photo ?? `https://api.dicebear.com/7.x/adventurer/svg?seed=${speaker.fullName}&flip=true&radius=50`}
                         alt={speaker.fullName}
                         width={56}
                         height={56}
                         unoptimized
                         className="w-14 h-14 rounded-full object-cover shrink-0 ring-2 ring-[#1e2530] group-hover:ring-[#00E5FF33] transition-all duration-300"
                     />
-                ) : (
-                    <div className="w-14 h-14 rounded-full bg-linear-to-br from-[#00E5FF22] to-[#0066ff22] border border-[#00E5FF22] flex items-center justify-center text-[#00E5FF] font-black text-lg shrink-0 group-hover:from-[#00E5FF33] group-hover:to-[#0066ff33] transition-all duration-300">
-                        {initials}
-                    </div>
-                )}
 
                 <div className="flex-1 min-w-0 pt-0.5">
                     <h2 className="font-bold text-[#eee] truncate group-hover:text-white transition-colors leading-tight">
