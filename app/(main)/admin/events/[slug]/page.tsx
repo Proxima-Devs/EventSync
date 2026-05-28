@@ -184,7 +184,7 @@ function SessionModal({ open, onClose, onSaved, editingSession, allSpeakers, all
                           <button key={sp.id} type="button" onClick={() => toggleSpeaker(sp.id)}
                             className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${checked ? "bg-cyan-500/10" : "hover:bg-slate-800"}`}>
                             <div className="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center text-[10px] font-bold text-slate-300 shrink-0 overflow-hidden">
-                              {sp.photo ? <img src={sp.photo} alt={sp.fullName} className="w-full h-full object-cover" /> : sp.fullName.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()}
+                              <img src={sp.photo ?? `https://api.dicebear.com/7.x/adventurer/svg?seed=${sp.fullName}&flip=true&radius=50`} alt={sp.fullName} className="w-full h-full object-cover" />
                             </div>
                             <span className={`flex-1 text-sm font-medium ${checked ? "text-cyan-300" : "text-slate-300"}`}>{sp.fullName}</span>
                             {checked ? <CheckSquare size={15} className="text-cyan-400" /> : <Square size={15} className="text-slate-600" />}
@@ -438,7 +438,7 @@ function PlanningGrid({ sessions, selectedRoom, toggle, isFavorite, slug }: {
               Heure
             </th>
             {visibleRooms.map((room) => (
-              <th key={room} className="py-3 px-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-800 bg-slate-900/50 border-l border-slate-800">
+              <th key={room} className="py-3 px-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-800 bg-slate-900/50 border-l">
                 {room}
               </th>
             ))}
@@ -453,13 +453,13 @@ function PlanningGrid({ sessions, selectedRoom, toggle, isFavorite, slug }: {
               {visibleRooms.map((room) => {
                 const roomSessions = sessionsByTimeAndRoom[time]?.[room] ?? [];
                 return (
-                  <td key={room} className="py-3 px-3 border-l border-slate-800 min-w-[200px]">
+                  <td key={room} className="py-3 px-3 border-l border-slate-800 min-w-50">
                     {roomSessions.map((s) => (
                       <Link key={s.id} href={`/events/${slug}/sessions/${s.slug}`}
                         className="block rounded-2xl border border-slate-700 bg-slate-900/80 p-3 mb-2 hover:border-cyan-500/40 hover:bg-slate-800/80 transition-all group">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-slate-200 leading-snug group-hover:text-cyan-300 transition-colors">{s.title}</p>
+                            <p className="text-base font-semibold text-slate-200 leading-snug group-hover:text-cyan-300 transition-colors">{s.title}</p>
                             <p className="text-xs text-slate-500 mt-0.5">
                               {formatTime(s.startTime)}–{formatTime(s.endTime)}
                             </p>
@@ -609,9 +609,9 @@ export default function EventDetailPage() {
           />
         </div>
         {/* gradient overlay bottom */}
-        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-slate-950 via-slate-950/70 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-32 bg-linear-to-t from-slate-950 via-slate-950/70 to-transparent" />
         {/* gradient overlay top (for back link readability) */}
-        <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-slate-950/60 to-transparent" />
+        <div className="absolute inset-x-0 top-0 h-20 bg-linear-to-b from-slate-950/60 to-transparent" />
 
         {/* Back link floating on image */}
         <div className="absolute top-5 left-0 right-0 px-6 max-w-5xl mx-auto">
@@ -721,7 +721,7 @@ export default function EventDetailPage() {
                         className="flex items-center justify-between gap-4 rounded-2xl border border-slate-800 bg-slate-900/80 px-5 py-4 hover:border-slate-700 hover:bg-slate-900 transition-all group">
                         <div className="flex-1 min-w-0">
                           <Link href={`/events/${event.slug}/sessions/${s.slug}`}
-                            className="text-sm font-semibold text-cyan-400 hover:text-cyan-300 transition-colors truncate block">
+                            className="text-lg font-semibold text-cyan-400 hover:text-cyan-300 transition-colors truncate block">
                             {s.title}
                           </Link>
                           <div className="flex items-center gap-3 mt-1.5 flex-wrap">
@@ -761,7 +761,7 @@ export default function EventDetailPage() {
                           </button>
                           <button
                             onClick={() => setDeletingSession(s)}
-                            className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg border border-[#1e2530] text-[#3a4a5a] text-[11px] font-semibold hover:text-red-400 hover:border-red-900/50 hover:bg-red-500/05 transition-all duration-200"
+                            className="flex-1 flex items-center justify-center gap-1.5 p-2 rounded-lg border border-[#1e2530] text-[#3a4a5a] text-[11px] font-semibold hover:text-red-400 hover:border-red-900/50 hover:bg-red-500/05 transition-all duration-200"
                           >
                             <Trash2 size={11} />
                             Supprimer
