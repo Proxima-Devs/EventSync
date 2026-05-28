@@ -46,16 +46,6 @@ export function SpeakerCard({
               className="w-full h-full object-cover"
             />
         </div>
-
-        {/* Sessions badge */}
-        {speaker._count.sessions > 0 && (
-          <div className="absolute -bottom-1 -right-1 flex items-center gap-1 px-1.5 py-0.5 rounded-full border border-[#1e2530] bg-[#0a0e14] shadow">
-            <Layers size={9} className="text-[#3a4a5a]" />
-            <span className="text-[10px] text-[#3a4a5a] font-bold leading-none">
-              {speaker._count.sessions}
-            </span>
-          </div>
-        )}
       </div>
 
       <motion.div
@@ -81,14 +71,14 @@ export function SpeakerCard({
           className="flex flex-col items-center pt-24 pb-5 px-5 flex-1 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00E5FF44] rounded-t-2xl"
         >
           {/* Name */}
-          <h3 className="text-sm font-black text-[#eee] text-center leading-tight mb-1 group-hover:text-white transition-colors duration-200">
+          <h3 className="text-xl font-black text-[#eee] text-center leading-tight mb-1 group-hover:text-white transition-colors duration-200">
             {speaker.fullName}
           </h3>
 
           {/* Sessions label */}
           <div className="flex items-center gap-1 mb-3">
             <Mic size={10} className="text-[#3a4a5a]" />
-            <span className="text-[11px] text-[#3a4a5a]">
+            <span className="text-sm text-[#3a4a5a]">
               {speaker._count.sessions} session
               {speaker._count.sessions !== 1 ? "s" : ""}
             </span>
@@ -96,11 +86,11 @@ export function SpeakerCard({
 
           {/* Bio */}
           {speaker.bio ? (
-            <p className="text-[11px] text-[#4a5568] text-center leading-relaxed line-clamp-3">
+            <p className="text-sm text-[#4a5568] text-center leading-relaxed line-clamp-1">
               {speaker.bio}
             </p>
           ) : (
-            <p className="text-[11px] text-[#2a3a4a] italic text-center">
+            <p className="text-sm text-[#2a3a4a] italic text-center">
               Aucune biographie
             </p>
           )}

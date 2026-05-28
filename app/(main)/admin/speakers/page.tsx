@@ -534,8 +534,8 @@ export default function AdminSpeakersPage() {
       <main className="flex-1 px-8 py-12 max-w-7xl mx-auto w-full">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-[#4a5568] mb-8">
-          <Link href="/admin" className="hover:text-[#00E5FF] transition-colors">
-            Admin
+          <Link href="/" className="hover:text-[#00E5FF] transition-colors">
+            Home
           </Link>
           <ChevronRight size={13} />
           <span className="text-white">Intervenants</span>
@@ -550,9 +550,6 @@ export default function AdminSpeakersPage() {
               </div>
               <h1 className="text-3xl font-black text-white tracking-tight">
                 Intervenants
-                {!loading && speakers.length > 0 && (
-                  <span className="ml-3 text-base font-normal text-[#3a4a5a]">{speakers.length}</span>
-                )}
               </h1>
             </div>
             <p className="text-sm text-[#4a5568] ml-11">

@@ -471,8 +471,8 @@ export default function AdminRoomsPage() {
       <main className="flex-1 px-8 py-12 max-w-4xl mx-auto w-full">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-[#4a5568] mb-8">
-          <Link href="/admin" className="hover:text-[#00E5FF] transition-colors">
-            Admin
+          <Link href="/" className="hover:text-[#00E5FF] transition-colors">
+            Home
           </Link>
           <ChevronRight size={13} />
           <span className="text-white">Salles</span>
@@ -487,9 +487,6 @@ export default function AdminRoomsPage() {
               </div>
               <h1 className="text-3xl font-black text-white tracking-tight">
                 Salles
-                {!loading && rooms.length > 0 && (
-                  <span className="ml-3 text-base font-normal text-[#3a4a5a]">{rooms.length}</span>
-                )}
               </h1>
             </div>
             <p className="text-sm text-[#4a5568] ml-11">

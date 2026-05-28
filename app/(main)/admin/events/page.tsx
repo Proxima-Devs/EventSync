@@ -595,7 +595,7 @@ export default function AdminEventsPage() {
       <main className="flex-1 px-8 py-12 max-w-6xl mx-auto w-full">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-[#4a5568] mb-8">
-          <Link href="/admin" className="hover:text-[#00E5FF] transition-colors">Admin</Link>
+          <Link href="/" className="hover:text-[#00E5FF] transition-colors">Home</Link>
           <ChevronRight size={13} />
           <span className="text-white">Événements</span>
         </div>
