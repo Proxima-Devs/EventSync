@@ -3,6 +3,7 @@
 import { Home, Heart, LayoutDashboard, Calendar, Users, Building2, LogOut, PanelLeft, Settings, LogIn, Trash2, X, AlertTriangle } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { useSidebar } from "./sidebar-context";
 import { authClient } from "@/lib/auth-client";
 import Image from "next/image";
@@ -11,21 +12,21 @@ import { ThemeCustomizer } from "./settings/ThemeCustomizer";
 
 type NavItem = { href: string; icon: React.ElementType; label: string };
 
-function getNavItems(role?: string | null): NavItem[] {
+function getNavItems(role?: string | null, t?: (key: string) => string): NavItem[] {
     if (role === "ADMIN") {
         return [
-            { href: "/admin/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-            { href: "/", icon: Home, label: "Home" },
-            { href: "/favorites", icon: Heart, label: "Favorites" },
-            { href: "/admin/events", icon: Calendar, label: "Events" },
-            { href: "/admin/speakers", icon: Users, label: "Speakers" },
-            { href: "/admin/rooms", icon: Building2, label: "Rooms" },
+            { href: "/admin/dashboard", icon: LayoutDashboard, label: t?.("nav.dashboard") ?? "Dashboard" },
+            { href: "/", icon: Home, label: t?.("nav.home") ?? "Home" },
+            { href: "/favorites", icon: Heart, label: t?.("nav.favorites") ?? "Favorites" },
+            { href: "/admin/events", icon: Calendar, label: t?.("nav.events") ?? "Events" },
+            { href: "/admin/speakers", icon: Users, label: t?.("nav.speakers") ?? "Speakers" },
+            { href: "/admin/rooms", icon: Building2, label: t?.("nav.rooms") ?? "Rooms" },
         ];
     }
     return [
-        { href: "/", icon: Calendar, label: "Events" },
-        { href: "/favorites", icon: Heart, label: "Favorites" },
-        { href: "/speakers", icon: Users, label: "Speakers" },
+        { href: "/", icon: Calendar, label: t?.("nav.events") ?? "Events" },
+        { href: "/favorites", icon: Heart, label: t?.("nav.favorites") ?? "Favorites" },
+        { href: "/speakers", icon: Users, label: t?.("nav.speakers") ?? "Speakers" },
     ];
 
 }
@@ -34,10 +35,12 @@ function DeleteConfirmDialog({
     onConfirm,
     onCancel,
     loading,
+    t,
 }: {
     onConfirm: () => void;
     onCancel: () => void;
     loading: boolean;
+    t: (key: string) => string;
 }) {
     return (
         <div className="fixed inset-0 z-300 flex items-center justify-center bg-black/70 backdrop-blur-sm">
@@ -46,13 +49,11 @@ function DeleteConfirmDialog({
                     <div className="w-9 h-9 rounded-xl bg-red-500/15 flex items-center justify-center shrink-0">
                         <AlertTriangle size={18} className="text-red-400" />
                     </div>
-                    <h3 className="text-base font-bold text-[#eee]">Supprimer le compte</h3>
+                    <h3 className="text-base font-bold text-[#eee]">{t("deleteAccount")}</h3>
                 </div>
 
                 <p className="text-sm text-[#777] leading-relaxed mb-6">
-                    Cette action est <span className="text-[#aaa] font-semibold">irréversible</span>.
-                    Toutes vos données seront définitivement supprimées et vous ne pourrez pas
-                    récupérer votre compte.
+                    {t("deleteConfirmationIntro")} <span className="text-[#aaa] font-semibold">{t("deleteConfirmationIrreversible")}</span>. {t("deleteConfirmationOutro")}
                 </p>
 
                 <div className="flex gap-2 justify-end">
@@ -61,7 +62,7 @@ function DeleteConfirmDialog({
                         disabled={loading}
                         className="cursor-pointer px-4 py-2 rounded-xl text-sm font-semibold text-[#777] hover:text-[#aaa] hover:bg-white/4 transition-colors disabled:opacity-50"
                     >
-                        Annuler
+                        {t("cancel")}
                     </button>
                     <button
                         onClick={onConfirm}
@@ -71,12 +72,12 @@ function DeleteConfirmDialog({
                         {loading ? (
                             <>
                                 <span className="w-3.5 h-3.5 border-2 border-red-400/40 border-t-red-400 rounded-full animate-spin" />
-                                Suppression…
+                                {t("deleting")}
                             </>
                         ) : (
                             <>
                                 <Trash2 size={14} />
-                                Supprimer définitivement
+                                {t("deletePermanently")}
                             </>
                         )}
                     </button>
@@ -94,14 +95,26 @@ function SettingsModal({
     onClose: () => void;
 }) {
     const router = useRouter();
+    const locale = useLocale() as "fr" | "en";
+    const t = useTranslations("Sidebar");
     const [theme, setTheme] = useState<"dark" | "light" | "system">("dark");
     const [tab, setTab] = useState<"profile" | "general" | "appearance">("profile");
-    const [lang, setLang] = useState<"fr" | "en">("fr");
+    const [lang, setLang] = useState<"fr" | "en">(locale);
     const overlayRef = useRef<HTMLDivElement>(null);
 
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [deleteLoading, setDeleteLoading] = useState(false);
     const [deleteError, setDeleteError] = useState<string | null>(null);
+
+    useEffect(() => {
+        setLang(locale);
+    }, [locale]);
+
+    const handleLanguageChange = (newLocale: "fr" | "en") => {
+        setLang(newLocale);
+        document.cookie = `locale=${newLocale}; path=/; max-age=31536000`;
+        router.refresh();
+    };
 
     useEffect(() => {
         const handler = (e: KeyboardEvent) => e.key === "Escape" && !showDeleteConfirm && onClose();
@@ -139,19 +152,19 @@ function SettingsModal({
 
                     <div className="w-44 shrink-0 bg-[#080a0c] border-r border-[#1a1a1a] flex flex-col px-2 py-5 gap-1">
                         <p className="px-3 pb-2 text-[10px] font-bold tracking-widest uppercase text-[#444]">
-                            Compte
+                            {t("account")}
                         </p>
-                        {(["profile", "general", "appearance"] as const).map((t) => (
+                        {(["profile", "general", "appearance"] as const).map((tabKey) => (
                             <button
-                                key={t}
-                                onClick={() => setTab(t)}
+                                key={tabKey}
+                                onClick={() => setTab(tabKey)}
                                 className={`cursor-pointer w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors duration-150
-                                    ${tab === t
+                                    ${tab === tabKey
                                         ? "bg-primary-light text-primary"
                                         : "text-[#666] hover:text-[#aaa] hover:bg-white/4"
                                     }`}
                             >
-                                {t === "profile" ? "Profil" : t === "general" ? "Général" : "Apparence"}
+                                {tabKey === "profile" ? t("profileTitle") : tabKey === "general" ? t("general") : t("appearance")}
                             </button>
                         ))}
                     </div>
@@ -159,24 +172,24 @@ function SettingsModal({
                     <div className="flex-1 overflow-y-auto p-7">
                         {tab === "profile" && (
                             <div>
-                                <h2 className="text-base font-bold text-[#eee] mb-6">Profil</h2>
+                                <h2 className="text-base font-bold text-[#eee] mb-6">{t("profileTitle")}</h2>
 
                                 <div className="space-y-4">
                                     <div>
                                         <p className="text-[10px] font-bold uppercase tracking-widest text-[#555] mb-1.5">
-                                            Nom complet
+                                            {t("fullName")}
                                         </p>
                                         <div className="bg-[#111316] border border-[#1e2226] rounded-xl px-4 py-2.5 text-sm text-[#ccc]">
-                                            {user.name ?? "—"}
+                                            {user.name ?? t("noValue")}
                                         </div>
                                     </div>
 
                                     <div>
                                         <p className="text-[10px] font-bold uppercase tracking-widest text-[#555] mb-1.5">
-                                            Adresse email
+                                            {t("emailAddress")}
                                         </p>
                                         <div className="bg-[#111316] border border-[#1e2226] rounded-xl px-4 py-2.5 text-sm text-[#ccc]">
-                                            {user.email ?? "—"}
+                                            {user.email ?? t("noValue")}
                                         </div>
                                     </div>
                                 </div>
@@ -184,9 +197,9 @@ function SettingsModal({
                                 <div className="mt-8 pt-5 border-t border-[#1a1a1a]">
                                     <div className="flex items-center justify-between gap-4">
                                         <div>
-                                            <p className="text-sm font-semibold text-[#666]">Supprimer le compte</p>
+                                            <p className="text-sm font-semibold text-[#666]">{t("deleteAccount")}</p>
                                             <p className="text-xs text-[#444] mt-0.5">
-                                                Action irréversible — toutes les données seront perdues.
+                                                {t("deleteAccountDescription")}
                                             </p>
                                         </div>
                                         <button
@@ -197,7 +210,7 @@ function SettingsModal({
                                             className="cursor-pointer flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/10 border border-red-500/25 text-red-400 text-sm font-semibold hover:bg-red-500/20 transition-colors shrink-0"
                                         >
                                             <Trash2 size={14} />
-                                            Supprimer
+                                            {t("deleteAccount")}
                                         </button>
                                     </div>
 
@@ -212,18 +225,18 @@ function SettingsModal({
 
                         {tab === "general" && (
                             <div>
-                                <h2 className="text-base font-bold text-[#eee] mb-6">Général</h2>
+                                <h2 className="text-base font-bold text-[#eee] mb-6">{t("general")}</h2>
 
                                 <div className="mb-6">
                                     <p className="text-[10px] font-bold uppercase tracking-widest text-[#555] mb-3">
-                                        Thème
+                                        {t("theme")}
                                     </p>
                                     <div className="grid grid-cols-3 gap-2">
                                         {(
                                             [
-                                                { value: "dark", label: "Sombre", emoji: "🌑" },
-                                                { value: "light", label: "Clair", emoji: "☀️" },
-                                                { value: "system", label: "Système", emoji: "💻" },
+                                                { value: "dark", labelKey: "themeOption.dark", emoji: "🌑" },
+                                                { value: "light", labelKey: "themeOption.light", emoji: "☀️" },
+                                                { value: "system", labelKey: "themeOption.system", emoji: "💻" },
                                             ] as const
                                         ).map((opt) => (
                                             <button
@@ -236,7 +249,7 @@ function SettingsModal({
                                                     }`}
                                             >
                                                 <span className="mr-1.5">{opt.emoji}</span>
-                                                {opt.label}
+                                                {t(opt.labelKey)}
                                             </button>
                                         ))}
                                     </div>
@@ -244,18 +257,18 @@ function SettingsModal({
 
                                 <div>
                                     <p className="text-[10px] font-bold uppercase tracking-widest text-[#555] mb-3">
-                                        Langue
+                                        {t("language")}
                                     </p>
                                     <div className="grid grid-cols-2 gap-2">
                                         {(
                                             [
-                                                { value: "fr", label: "Français", flag: "🇫🇷" },
-                                                { value: "en", label: "English", flag: "🇬🇧" },
+                                                { value: "fr", labelKey: "languageOption.fr", flag: "🇫🇷" },
+                                                { value: "en", labelKey: "languageOption.en", flag: "🇬🇧" },
                                             ] as const
                                         ).map((opt) => (
                                             <button
                                                 key={opt.value}
-                                                onClick={() => setLang(opt.value)}
+                                                onClick={() => handleLanguageChange(opt.value)}
                                                 className={`cursor-pointer py-2.5 rounded-xl border text-sm font-bold transition-all
                                                     ${lang === opt.value
                                                         ? "border-primary-light bg-primary-light text-primary"
@@ -263,7 +276,7 @@ function SettingsModal({
                                                     }`}
                                             >
                                                 <span className="mr-2">{opt.flag}</span>
-                                                {opt.label}
+                                                {t(opt.labelKey)}
                                             </button>
                                         ))}
                                     </div>
@@ -273,8 +286,8 @@ function SettingsModal({
 
                         {tab === "appearance" && (
                             <div>
-                                <h2 className="text-base font-bold text-[#eee] mb-6">Personnaliser l'apparence</h2>
-                                <p className="text-sm text-[#999] mb-6">Choisissez vos propres couleurs pour personnaliser votre interface.</p>
+                                <h2 className="text-base font-bold text-[#eee] mb-6">{t("appearanceTitle")}</h2>
+                                <p className="text-sm text-[#999] mb-6">{t("appearanceDescription")}</p>
                                 <ThemeCustomizer />
                             </div>
                         )}
@@ -287,6 +300,7 @@ function SettingsModal({
                     loading={deleteLoading}
                     onConfirm={handleDeleteAccount}
                     onCancel={() => setShowDeleteConfirm(false)}
+                    t={t}
                 />
             )}
         </>
@@ -305,6 +319,7 @@ function UserPopup({
     onClose: () => void;
 }) {
     const popupRef = useRef<HTMLDivElement>(null);
+    const t = useTranslations("Sidebar");
 
     useEffect(() => {
         const handler = (e: MouseEvent) => {
@@ -322,7 +337,7 @@ function UserPopup({
             className="absolute bottom-[calc(100%+8px)] left-0 right-0 mx-2 bg-[#111316] border border-[#1e2024] rounded-2xl overflow-hidden shadow-xl shadow-black/60 z-100 animate-fade-up"
         >
             <div className="px-4 py-3 border-b border-[#1a1a1a]">
-                <p className="text-[11px] text-[#555] truncate">{user.email ?? "—"}</p>
+                <p className="text-[11px] text-[#555] truncate">{user.email ?? t("noValue")}</p>
             </div>
 
             <div className="p-1">
@@ -331,14 +346,14 @@ function UserPopup({
                     className="cursor-pointer flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-[#aaa] hover:text-[#eee] hover:bg-white/4 transition-colors"
                 >
                     <Settings size={15} className="shrink-0" />
-                    Paramètres
+                    {t("auth.settings")}
                 </button>
                 <button
                     onClick={onLogout}
                     className="cursor-pointer flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-[#aaa] hover:text-red-400 hover:bg-red-400/[0.07] transition-colors"
                 >
                     <LogOut size={15} className="shrink-0" />
-                    Déconnexion
+                    {t("auth.logout")}
                 </button>
             </div>
         </div>
@@ -350,6 +365,8 @@ export default function Sidebar() {
     const { expanded, setExpanded } = useSidebar();
     const { data: session } = authClient.useSession();
     const router = useRouter();
+    const locale = useLocale();
+    const t = useTranslations("Sidebar");
 
     const [popupOpen, setPopupOpen] = useState(false);
     const [settingsOpen, setSettingsOpen] = useState(false);
@@ -357,7 +374,7 @@ export default function Sidebar() {
     const user = session?.user;
     const isLoggedIn = !!user;
     const role = (user as { role?: string } | undefined)?.role ?? null;
-    const navItems = getNavItems(role);
+    const navItems = getNavItems(role, t);
 
     const initials = user?.name
         ? user.name
@@ -463,7 +480,7 @@ export default function Sidebar() {
                               className={`absolute left-full ml-3 px-2.5 py-1 rounded-md z-50 text-black text-xs font-bold whitespace-nowrap pointer-events-none transition-all duration-200 ${expanded ? "opacity-0 invisible" : "opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0"}`}
                               style={{ backgroundColor: 'var(--color-primary)', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.6), 0 0 20px color-mix(in srgb, var(--color-primary) 13%)' }}
                             >
-                                {user.name ?? "Profil"}
+                                {user.name ?? t("auth.profile")}
                             </span>
                         </button>
                     ) : (
@@ -473,10 +490,10 @@ export default function Sidebar() {
                         >
                             <LogIn size={19} className="shrink-0" />
                             <span className={`text-sm font-semibold whitespace-nowrap overflow-hidden transition-all duration-300 ease-in-out ${expanded ? "max-w-40 opacity-100 pl-3" : "max-w-0 opacity-0 pl-0"}`}>
-                                Se connecter
+                                {t("auth.login")}
                             </span>
                             <span className={`absolute left-full ml-3 px-2.5 py-1 rounded-md z-50 bg-[#00E5FF] text-black text-xs font-bold whitespace-nowrap pointer-events-none shadow-lg shadow-[#00E5FF22] transition-all duration-200 ${expanded ? "opacity-0 invisible" : "opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0"}`}>
-                                Se connecter
+                                {t("auth.login")}
                             </span>
                         </Link>
                     )}

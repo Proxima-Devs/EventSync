@@ -1,0 +1,49 @@
+{
+  "HomePage": {
+    "title": "Hello world!"
+  },
+  "Sidebar": {
+    "nav": {
+      "dashboard": "Tableau de bord",
+      "home": "Accueil",
+      "favorites": "Favoris",
+      "events": "Événements",
+      "speakers": "Intervenants",
+      "rooms": "Salles"
+    },
+    "auth": {
+      "login": "Se connecter",
+      "profile": "Profil",
+      "settings": "Paramètres",
+      "logout": "Déconnexion"
+    },
+    "account": "Compte",
+    "deleteAccount": "Supprimer le compte",
+    "deleteAccountDescription": "Action irréversible — toutes vos données seront perdues.",
+    "deleteConfirmationIntro": "Cette action est",
+    "deleteConfirmationIrreversible": "irréversible",
+    "deleteConfirmationOutro": "Toutes vos données seront définitivement supprimées et vous ne pourrez pas récupérer votre compte.",
+    "cancel": "Annuler",
+    "deletePermanently": "Supprimer définitivement",
+    "deleting": "Suppression…",
+    "general": "Général",
+    "appearance": "Apparence",
+    "theme": "Thème",
+    "language": "Langue",
+    "languageOption": {
+      "fr": "Français",
+      "en": "English"
+    },
+    "themeOption": {
+      "dark": "Sombre",
+      "light": "Clair",
+      "system": "Système"
+    },
+    "profileTitle": "Profil",
+    "appearanceTitle": "Personnaliser l'apparence",
+    "appearanceDescription": "Choisissez vos propres couleurs pour personnaliser votre interface.",
+    "fullName": "Nom complet",
+    "emailAddress": "Adresse email",
+    "noValue": "—"
+  }
+}

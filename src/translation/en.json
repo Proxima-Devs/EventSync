@@ -1,0 +1,49 @@
+{
+  "HomePage": {
+    "title": "Hello world!"
+  },
+  "Sidebar": {
+    "nav": {
+      "dashboard": "Dashboard",
+      "home": "Home",
+      "favorites": "Favorites",
+      "events": "Events",
+      "speakers": "Speakers",
+      "rooms": "Rooms"
+    },
+    "auth": {
+      "login": "Log in",
+      "profile": "Profile",
+      "settings": "Settings",
+      "logout": "Logout"
+    },
+    "account": "Account",
+    "deleteAccount": "Delete account",
+    "deleteAccountDescription": "This action is irreversible — all your data will be lost.",
+    "deleteConfirmationIntro": "This action is",
+    "deleteConfirmationIrreversible": "irreversible",
+    "deleteConfirmationOutro": "All your data will be permanently deleted and you won't be able to recover your account.",
+    "cancel": "Cancel",
+    "deletePermanently": "Delete permanently",
+    "deleting": "Deleting…",
+    "general": "General",
+    "appearance": "Appearance",
+    "theme": "Theme",
+    "language": "Language",
+    "languageOption": {
+      "fr": "Français",
+      "en": "English"
+    },
+    "themeOption": {
+      "dark": "Dark",
+      "light": "Light",
+      "system": "System"
+    },
+    "profileTitle": "Profile",
+    "appearanceTitle": "Customize appearance",
+    "appearanceDescription": "Choose your own colors to personalize the interface.",
+    "fullName": "Full name",
+    "emailAddress": "Email address",
+    "noValue": "—"
+  }
+}
