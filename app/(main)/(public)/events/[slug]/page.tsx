@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
@@ -54,6 +55,7 @@ function PlanningGrid({ sessions, selectedRoom, toggle, isFavorite, slug }: {
   isFavorite: (id: string) => boolean;
   slug: string;
 }) {
+  const t = useTranslations("EventDetailPage");
   const rooms = [...new Set(sessions.flatMap((session) => (session.room ? [session.room.name] : [])))];
   const visibleRooms = selectedRoom ? [selectedRoom] : rooms;
 
@@ -76,7 +78,7 @@ function PlanningGrid({ sessions, selectedRoom, toggle, isFavorite, slug }: {
   if (timeSlots.length === 0) {
     return (
       <div className="p-10 text-center text-sm text-slate-500">
-        Aucune session disponible pour cette sélection.
+        {t("noSessionSelection")}
       </div>
     );
   }
@@ -86,7 +88,7 @@ function PlanningGrid({ sessions, selectedRoom, toggle, isFavorite, slug }: {
       <table className="w-full min-w-[720px] border-collapse text-left">
         <thead>
           <tr>
-            <th className="py-3 px-4 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 border-b border-slate-800">Heure</th>
+            <th className="py-3 px-4 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 border-b border-slate-800">{t("timeHeader")}</th>
             {visibleRooms.map((room) => (
               <th key={room} className="py-3 px-4 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 border-b border-slate-800 bg-slate-900/60 border-l border-slate-800 text-center">
                 {room}
@@ -137,6 +139,7 @@ function PlanningGrid({ sessions, selectedRoom, toggle, isFavorite, slug }: {
 }
 
 export default function EventDetailPage() {
+  const t = useTranslations("EventDetailPage");
   const { slug } = useParams<{ slug: string }>();
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
@@ -148,9 +151,9 @@ export default function EventDetailPage() {
   useEffect(() => {
     apiFetch<Event>(`/api/events/slug/${slug}`)
       .then(setEvent)
-      .catch(() => setError("Événement introuvable"))
+      .catch(() => setError(t("eventNotFound")))
       .finally(() => setLoading(false));
-  }, [slug]);
+  }, [slug, t]);
 
   useEffect(() => {
     if (event?.title) {
@@ -189,7 +192,7 @@ export default function EventDetailPage() {
     return (
       <main className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center px-6 py-10">
         <div className="rounded-3xl border border-rose-500/20 bg-rose-500/10 px-8 py-6 text-rose-200">
-          <p className="text-sm font-semibold">{error || "Événement introuvable"}</p>
+          <p className="text-sm font-semibold">{error || t("eventNotFound")}</p>
         </div>
       </main>
     );
@@ -219,7 +222,7 @@ export default function EventDetailPage() {
       <div className="mx-auto max-w-5xl px-6 py-10 lg:px-8">
         <Link href="/" className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.35em] text-slate-500 transition hover:text-cyan-300">
           <FontAwesomeIcon icon={faArrowLeft} className="text-[10px]" />
-          Retour aux événements
+          {t("backToEvents")}
         </Link>
 
         <div className="mt-8 rounded-4xl border border-slate-800 bg-slate-900/95 p-8 shadow-2xl shadow-black/20 backdrop-blur-xl">
@@ -228,18 +231,18 @@ export default function EventDetailPage() {
               <div className="h-2.5 w-20 rounded-full bg-cyan-400/25" />
               <h1 className="text-4xl font-black tracking-tight text-white sm:text-5xl lg:text-6xl">{event.title}</h1>
               <p className="max-w-3xl text-slate-400 leading-8">
-                {event.description || "Aucune description disponible pour cet événement."}
+                {event.description || t("descriptionMissing")}
               </p>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="rounded-3xl border border-slate-800 bg-slate-950/90 px-4 py-4 text-sm text-slate-300">
-                <div className="text-xs uppercase tracking-[0.3em] text-slate-500">Dates</div>
+                <div className="text-xs uppercase tracking-[0.3em] text-slate-500">{t("dates")}</div>
                 <div className="mt-3 text-base font-semibold text-white">{formattedDate}</div>
               </div>
               {event.location && (
                 <div className="rounded-3xl border border-slate-800 bg-slate-950/90 px-4 py-4 text-sm text-slate-300">
-                  <div className="text-xs uppercase tracking-[0.3em] text-slate-500">Lieu</div>
+                  <div className="text-xs uppercase tracking-[0.3em] text-slate-500">{t("location")}</div>
                   <div className="mt-3 flex items-center gap-2 font-semibold text-white">
                     <FontAwesomeIcon icon={faMapPin} className="text-cyan-400" />
                     {event.location}
@@ -251,11 +254,11 @@ export default function EventDetailPage() {
 
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href={`/events/${slug}/sessions`} className="inline-flex items-center gap-2 rounded-2xl bg-cyan-500 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400">
-              Toutes les sessions
+              {t("allSessions")}
               <FontAwesomeIcon icon={faChevronRight} className="text-xs" />
             </Link>
             <Link href={`/events/${slug}/rooms`} className="inline-flex items-center gap-2 rounded-2xl border border-slate-800 bg-slate-950 px-5 py-3 text-sm font-semibold text-slate-200 transition hover:border-cyan-400 hover:text-white">
-              Voir les salles
+              {t("seeRooms")}
             </Link>
           </div>
 
@@ -266,14 +269,14 @@ export default function EventDetailPage() {
                   onClick={() => setView("liste")}
                   className={`inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-semibold transition ${view === "liste" ? "bg-cyan-500 text-slate-950 shadow-sm shadow-cyan-500/20" : "border border-slate-700 text-slate-400 hover:text-white hover:border-slate-500"}`}>
                   <FontAwesomeIcon icon={faList} className="text-[14px]" />
-                  Sessions
+                  {t("sessionsTab")}
                   <span className="rounded-full bg-slate-800 px-2 py-0.5 text-[11px] font-semibold text-slate-300">{event.sessions.length}</span>
                 </button>
                 <button
                   onClick={() => setView("planning")}
                   className={`inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-semibold transition ${view === "planning" ? "bg-cyan-500 text-slate-950 shadow-sm shadow-cyan-500/20" : "border border-slate-700 text-slate-400 hover:text-white hover:border-slate-500"}`}>
                   <FontAwesomeIcon icon={faThLarge} className="text-[14px]" />
-                  Planning
+                  {t("planningTab")}
                 </button>
               </div>
             </div>
@@ -291,7 +294,7 @@ export default function EventDetailPage() {
                           {session.isLive && (
                             <span className="inline-flex items-center gap-2 rounded-full bg-rose-500/15 px-3 py-1 text-rose-200">
                               <span className="h-2.5 w-2.5 rounded-full bg-rose-400 animate-pulse" />
-                              LIVE
+                              {t("live")}
                             </span>
                           )}
                           <span>{new Date(session.startTime).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })} → {new Date(session.endTime).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}</span>
@@ -314,7 +317,7 @@ export default function EventDetailPage() {
                   <button
                     onClick={() => setSelectedRoom(null)}
                     className={`px-4 py-2 rounded-2xl text-sm font-semibold transition ${selectedRoom === null ? "bg-cyan-500 text-slate-950 shadow-sm shadow-cyan-500/20" : "border border-slate-700 text-slate-400 hover:text-white hover:border-slate-500"}`}>
-                    Toutes les salles
+                    {t("allRooms")}
                   </button>
                   {planRooms.map((room) => (
                     <button key={room}

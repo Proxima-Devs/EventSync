@@ -1,6 +1,142 @@
 {
   "HomePage": {
-    "title": "Hello world!"
+    "heroBadge": "✦ MadaTechEvent",
+    "titlePart1": "Synchronisez",
+    "titlePart2": "Votre",
+    "titleEvent": "Événement",
+    "titleExperience": "Expérience",
+    "description": "Découvrez les conférences tech, ateliers et meetups les plus excitants à Madagascar. Gérez votre planning, connectez-vous avec les intervenants et ne manquez rien.",
+    "searchPlaceholder": "Recherchez des événements par titre ou lieu...",
+    "searchButton": "Rechercher",
+    "featuredEvents": "Événements en vedette",
+    "eventCount": "{count} événement |||| {count} événements",
+    "allFilter": "Tous",
+    "upcomingFilter": "À venir",
+    "pastFilter": "Passés",
+    "noEventsFound": "Aucun événement trouvé.",
+    "errorLoad": "Échec du chargement des événements"
+  },
+  "FavoritesPage": {
+    "title": "⭐ Mes favoris",
+    "description": "Sessions sauvegardées localement sur cet appareil.",
+    "emptyState": "Aucun favori pour le moment.",
+    "discoverEvents": "Découvrir les événements →",
+    "filter": {
+      "all": "Tous",
+      "live": "En direct",
+      "upcoming": "À venir",
+      "past": "Passés"
+    },
+    "searchPlaceholder": "Rechercher un favori...",
+    "noMatches": "Aucun favori ne correspond à ces filtres.",
+    "live": "LIVE",
+    "removeFavorite": "Retirer des favoris"
+  },
+  "SpeakersPage": {
+    "breadcrumbHome": "Accueil",
+    "pageTitle": "Intervenants",
+    "description": "Découvrez les experts qui interviennent lors de nos événements.",
+    "searchPlaceholder": "Rechercher des intervenants...",
+    "noSpeakers": "Aucun intervenant pour le moment.",
+    "noResults": "Aucun intervenant ne correspond à «{query}».",
+    "errorLoad": "Impossible de charger les intervenants.",
+    "sessionsZero": "Aucune session",
+    "sessionsOne": "1 session",
+    "sessionsMany": "{count} sessions",
+    "social": {
+      "twitter": "Twitter / X",
+      "linkedin": "LinkedIn",
+      "github": "GitHub",
+      "website": "Site web"
+    }
+  },
+  "SpeakerPage": {
+    "breadcrumbHome": "Accueil",
+    "breadcrumbSpeakers": "Intervenants",
+    "notFound": "Intervenant introuvable.",
+    "noSessions": "Aucune session assignée.",
+    "sessionsTitle": "Sessions",
+    "viewProgram": "Voir le programme",
+    "speakerRemoved": "Intervenant introuvable",
+    "social": {
+      "twitter": "Twitter / X",
+      "linkedin": "LinkedIn",
+      "github": "GitHub",
+      "website": "Site web"
+    }
+  },
+  "EventDetailPage": {
+    "backToEvents": "Retour aux événements",
+    "descriptionMissing": "Aucune description disponible pour cet événement.",
+    "dates": "Dates",
+    "location": "Lieu",
+    "allSessions": "Toutes les sessions",
+    "seeRooms": "Voir les salles",
+    "sessionsTab": "Sessions",
+    "planningTab": "Planning",
+    "allRooms": "Toutes les salles",
+    "noSessionSelection": "Aucune session disponible pour cette sélection.",
+    "timeHeader": "Heure",
+    "eventNotFound": "Événement introuvable.",
+    "live": "LIVE",
+    "ended": "Terminé",
+    "upcoming": "À venir"
+  },
+  "AdminDashboardPage": {
+    "breadcrumbHome": "Accueil",
+    "breadcrumbDashboard": "Dashboard",
+    "pageTitle": "Console admin",
+    "pageDescription": "Gérez vos événements, intervenants et planning.",
+    "createEventButton": "Créer un événement",
+    "stats": {
+      "events": "Événements",
+      "speakers": "Intervenants",
+      "sessions": "Sessions",
+      "rooms": "Salles",
+      "questions": "Questions",
+      "liveSessions": "Sessions live",
+      "eventsSub": "{count} à venir",
+      "liveSessionsSub": "{count} en direct"
+    },
+    "quickActions": {
+      "title": "Actions rapides",
+      "newEvent": "Créer un nouvel événement",
+      "newEventDescription": "Créer rapidement un événement",
+      "newSpeaker": "Ajouter un intervenant",
+      "newSpeakerDescription": "Ajouter un nouvel intervenant",
+      "manageRooms": "Configurer les salles",
+      "manageRoomsDescription": "Configurer et gérer les salles"
+    },
+    "recentEventsTitle": "Événements récents",
+    "recentQuestionsTitle": "Questions récentes",
+    "seeAll": "Voir tout",
+    "noRecentEvents": "Aucun événement pour le moment.",
+    "noQuestions": "Aucune question pour le moment.",
+    "live": "LIVE",
+    "ended": "Terminé",
+    "upcoming": "À venir",
+    "sessionsCount": "{count} session |||| {count} sessions"
+    ,"createEventModal": {
+      "title": "Créer un événement",
+      "description": "Remplissez les informations ci-dessous",
+      "titleLabel": "Titre",
+      "titlePlaceholder": "Ex: DevConf Paris 2026",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Décrivez l'événement…",
+      "startDateLabel": "Début",
+      "endDateLabel": "Fin",
+      "locationLabel": "Lieu",
+      "locationPlaceholder": "Ex: Grande Halle de la Villette, Paris",
+      "coverImageLabel": "Image de couverture (URL)",
+      "coverImagePlaceholder": "https://…",
+      "cancel": "Annuler",
+      "submitButton": "Créer l'événement",
+      "creating": "Création…",
+      "errors": {
+        "requiredFields": "Titre, date de début et date de fin sont obligatoires.",
+        "startBeforeEnd": "La date de début doit être antérieure à la date de fin."
+      }
+    }
   },
   "Sidebar": {
     "nav": {

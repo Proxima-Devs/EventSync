@@ -1,6 +1,142 @@
 {
   "HomePage": {
-    "title": "Hello world!"
+    "heroBadge": "✦ MadaTechEvent",
+    "titlePart1": "Synchronize",
+    "titlePart2": "Your",
+    "titleEvent": "Event",
+    "titleExperience": "Experience",
+    "description": "Discover the most exciting tech conferences, workshops, and meetups in Madagascar. Manage your schedule, connect with speakers, and never miss a beat.",
+    "searchPlaceholder": "Search events by title or location...",
+    "searchButton": "Search",
+    "featuredEvents": "Featured Events",
+    "eventCount": "{count} event |||| {count} events",
+    "allFilter": "All",
+    "upcomingFilter": "Upcoming",
+    "pastFilter": "Past",
+    "noEventsFound": "No events found.",
+    "errorLoad": "Failed to load events"
+  },
+  "FavoritesPage": {
+    "title": "⭐ My favorites",
+    "description": "Sessions saved locally on this device.",
+    "emptyState": "No favorites yet.",
+    "discoverEvents": "Discover events →",
+    "filter": {
+      "all": "All",
+      "live": "Live",
+      "upcoming": "Upcoming",
+      "past": "Past"
+    },
+    "searchPlaceholder": "Search a favorite...",
+    "noMatches": "No favorite matches these filters.",
+    "live": "LIVE",
+    "removeFavorite": "Remove from favorites"
+  },
+  "SpeakersPage": {
+    "breadcrumbHome": "Home",
+    "pageTitle": "Speakers",
+    "description": "Discover the experts speaking at our events.",
+    "searchPlaceholder": "Search speakers...",
+    "noSpeakers": "No speakers yet.",
+    "noResults": "No speakers match “{query}”.",
+    "errorLoad": "Failed to load speakers.",
+    "sessionsZero": "No sessions",
+    "sessionsOne": "1 session",
+    "sessionsMany": "{count} sessions",
+    "social": {
+      "twitter": "Twitter / X",
+      "linkedin": "LinkedIn",
+      "github": "GitHub",
+      "website": "Website"
+    }
+  },
+  "SpeakerPage": {
+    "breadcrumbHome": "Home",
+    "breadcrumbSpeakers": "Speakers",
+    "notFound": "Speaker not found.",
+    "noSessions": "No assigned sessions.",
+    "sessionsTitle": "Sessions",
+    "viewProgram": "View program",
+    "speakerRemoved": "Speaker not found",
+    "social": {
+      "twitter": "Twitter / X",
+      "linkedin": "LinkedIn",
+      "github": "GitHub",
+      "website": "Website"
+    }
+  },
+  "EventDetailPage": {
+    "backToEvents": "Back to events",
+    "descriptionMissing": "No description available for this event.",
+    "dates": "Dates",
+    "location": "Location",
+    "allSessions": "All sessions",
+    "seeRooms": "See rooms",
+    "sessionsTab": "Sessions",
+    "planningTab": "Planning",
+    "allRooms": "All rooms",
+    "noSessionSelection": "No session available for this selection.",
+    "timeHeader": "Time",
+    "eventNotFound": "Event not found.",
+    "live": "LIVE",
+    "ended": "Ended",
+    "upcoming": "Upcoming"
+  },
+  "AdminDashboardPage": {
+    "breadcrumbHome": "Home",
+    "breadcrumbDashboard": "Dashboard",
+    "pageTitle": "Admin Console",
+    "pageDescription": "Manage your events, speakers and schedule.",
+    "createEventButton": "Create Event",
+    "stats": {
+      "events": "Events",
+      "speakers": "Speakers",
+      "sessions": "Sessions",
+      "rooms": "Rooms",
+      "questions": "Questions",
+      "liveSessions": "Live sessions",
+      "eventsSub": "{count} upcoming",
+      "liveSessionsSub": "{count} live now"
+    },
+    "quickActions": {
+      "title": "Quick actions",
+      "newEvent": "Create a new event",
+      "newEventDescription": "Quickly create an event",
+      "newSpeaker": "Add a speaker",
+      "newSpeakerDescription": "Add a new speaker to your lineup",
+      "manageRooms": "Configure rooms",
+      "manageRoomsDescription": "Set up and manage rooms"
+    },
+    "recentEventsTitle": "Recent events",
+    "recentQuestionsTitle": "Recent questions",
+    "seeAll": "See all",
+    "noRecentEvents": "No recent events yet.",
+    "noQuestions": "No questions yet.",
+    "live": "LIVE",
+    "ended": "Ended",
+    "upcoming": "Upcoming",
+    "sessionsCount": "{count} session |||| {count} sessions"
+    ,"createEventModal": {
+      "title": "Create an event",
+      "description": "Fill in the details below",
+      "titleLabel": "Title",
+      "titlePlaceholder": "Ex: DevConf Paris 2026",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Describe the event…",
+      "startDateLabel": "Start date",
+      "endDateLabel": "End date",
+      "locationLabel": "Location",
+      "locationPlaceholder": "Ex: Grande Halle de la Villette, Paris",
+      "coverImageLabel": "Cover image (URL)",
+      "coverImagePlaceholder": "https://…",
+      "cancel": "Cancel",
+      "submitButton": "Create event",
+      "creating": "Creating…",
+      "errors": {
+        "requiredFields": "Title, start date, and end date are required.",
+        "startBeforeEnd": "The start date must be before the end date."
+      }
+    }
   },
   "Sidebar": {
     "nav": {

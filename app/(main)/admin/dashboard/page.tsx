@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import {
   Calendar,
@@ -98,6 +99,7 @@ function CreateEventModal({
   onClose: () => void;
   onCreated: () => void;
 }) {
+  const t = useTranslations("AdminDashboardPage");
   const overlayRef = useRef<HTMLDivElement>(null);
   const [form, setForm] = useState<EventPayload>({
     title: "",
@@ -135,11 +137,11 @@ function CreateEventModal({
     e.preventDefault();
     setError("");
     if (!form.title || !form.startDate || !form.endDate) {
-      setError("Titre, date de début et date de fin sont obligatoires.");
+      setError(t("createEventModal.errors.requiredFields"));
       return;
     }
     if (new Date(form.startDate) >= new Date(form.endDate)) {
-      setError("La date de début doit être antérieure à la date de fin.");
+      setError(t("createEventModal.errors.startBeforeEnd"));
       return;
     }
     setLoading(true);
@@ -179,8 +181,8 @@ function CreateEventModal({
 
         <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#1e2530]">
           <div>
-            <h2 className="text-lg font-black text-white tracking-tight">Nouvel événement</h2>
-            <p className="text-xs text-[#3a4a5a] mt-0.5">Remplissez les informations ci-dessous</p>
+            <h2 className="text-lg font-black text-white tracking-tight">{t("createEventModal.title")}</h2>
+            <p className="text-xs text-[#3a4a5a] mt-0.5">{t("createEventModal.description")}</p>
           </div>
           <button
             onClick={handleClose}
@@ -193,25 +195,25 @@ function CreateEventModal({
         <form onSubmit={handleSubmit} className="px-6 py-5 flex flex-col gap-4">
           <div>
             <label className="block text-xs font-semibold uppercase tracking-widest text-[#3a4a5a] mb-1.5">
-              Titre <span className="text-[#00E5FF]">*</span>
+              {t("createEventModal.titleLabel")} <span className="text-[#00E5FF]">*</span>
             </label>
             <input
               type="text"
               value={form.title}
               onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-              placeholder="Ex: DevConf Paris 2026"
+              placeholder={t("createEventModal.titlePlaceholder")}
               className="w-full px-4 py-2.5 rounded-xl bg-[#0d1117] border border-[#1e2530] text-sm text-[#ccc] placeholder-[#3a4a5a] focus:outline-none focus:border-[#00E5FF44] focus:ring-1 focus:ring-[#00E5FF22] transition-all"
             />
           </div>
 
           <div>
             <label className="block text-xs font-semibold uppercase tracking-widest text-[#3a4a5a] mb-1.5">
-              Description
+              {t("createEventModal.descriptionLabel")}
             </label>
             <textarea
               value={form.description}
               onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-              placeholder="Décrivez l'événement…"
+              placeholder={t("createEventModal.descriptionPlaceholder")}
               rows={3}
               className="w-full px-4 py-2.5 rounded-xl bg-[#0d1117] border border-[#1e2530] text-sm text-[#ccc] placeholder-[#3a4a5a] focus:outline-none focus:border-[#00E5FF44] focus:ring-1 focus:ring-[#00E5FF22] transition-all resize-none"
             />
@@ -220,7 +222,7 @@ function CreateEventModal({
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold uppercase tracking-widest text-[#3a4a5a] mb-1.5">
-                Début <span className="text-[#00E5FF]">*</span>
+                {t("createEventModal.startDateLabel")} <span className="text-[#00E5FF]">*</span>
               </label>
               <input
                 type="datetime-local"
@@ -231,7 +233,7 @@ function CreateEventModal({
             </div>
             <div>
               <label className="block text-xs font-semibold uppercase tracking-widest text-[#3a4a5a] mb-1.5">
-                Fin <span className="text-[#00E5FF]">*</span>
+                {t("createEventModal.endDateLabel")} <span className="text-[#00E5FF]">*</span>
               </label>
               <input
                 type="datetime-local"
@@ -244,26 +246,26 @@ function CreateEventModal({
 
           <div>
             <label className="block text-xs font-semibold uppercase tracking-widest text-[#3a4a5a] mb-1.5">
-              Lieu
+              {t("createEventModal.locationLabel")}
             </label>
             <input
               type="text"
               value={form.location}
               onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))}
-              placeholder="Ex: Grande Halle de la Villette, Paris"
+              placeholder={t("createEventModal.locationPlaceholder")}
               className="w-full px-4 py-2.5 rounded-xl bg-[#0d1117] border border-[#1e2530] text-sm text-[#ccc] placeholder-[#3a4a5a] focus:outline-none focus:border-[#00E5FF44] focus:ring-1 focus:ring-[#00E5FF22] transition-all"
             />
           </div>
 
           <div>
             <label className="block text-xs font-semibold uppercase tracking-widest text-[#3a4a5a] mb-1.5">
-              Image de couverture (URL)
+              {t("createEventModal.coverImageLabel")}
             </label>
             <input
               type="url"
               value={form.coverImage}
               onChange={(e) => setForm((f) => ({ ...f, coverImage: e.target.value }))}
-              placeholder="https://…"
+              placeholder={t("createEventModal.coverImagePlaceholder")}
               className="w-full px-4 py-2.5 rounded-xl bg-[#0d1117] border border-[#1e2530] text-sm text-[#ccc] placeholder-[#3a4a5a] focus:outline-none focus:border-[#00E5FF44] focus:ring-1 focus:ring-[#00E5FF22] transition-all"
             />
           </div>
@@ -280,14 +282,14 @@ function CreateEventModal({
               onClick={handleClose}
               className="flex-1 py-2.5 rounded-xl border border-[#1e2530] text-sm text-[#4a5568] hover:text-white hover:border-[#2e3a4a] transition-all duration-200 font-semibold"
             >
-              Annuler
+              {t("createEventModal.cancel")}
             </button>
             <button
               type="submit"
               disabled={loading}
               className="flex-1 py-2.5 rounded-xl bg-[#00E5FF] text-black text-sm font-black tracking-wide hover:bg-[#00cfea] active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? "Création…" : "Créer l'événement"}
+              {loading ? t("createEventModal.creating") : t("createEventModal.submitButton")}
             </button>
           </div>
         </form>
@@ -316,6 +318,7 @@ function EventCard({
     _count?: { sessions?: number };
   };
 }) {
+  const t = useTranslations("AdminDashboardPage");
   const start = new Date(event.startDate);
   const now = new Date();
   const isLive = start <= now && now <= new Date(event.endDate);
@@ -360,15 +363,15 @@ function EventCard({
         {isLive ? (
           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/15 border border-red-500/30 text-[10px] font-bold text-red-400">
             <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-            LIVE
+              {t("live")}
           </span>
         ) : isPast ? (
           <span className="px-2 py-0.5 rounded-full bg-[#1e2530] text-[10px] font-bold text-[#3a4a5a]">
-            Terminé
+              {t("ended")}
           </span>
         ) : (
           <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-[10px] font-bold text-emerald-400">
-            À venir
+              {t("upcoming")}
           </span>
         )}
       </div>
@@ -381,6 +384,7 @@ function EventCard({
 // ─── Main Dashboard Page ──────────────────────────────────────────────────────
 
 export default function DashboardPage() {
+  const t = useTranslations("AdminDashboardPage");
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
@@ -456,22 +460,22 @@ export default function DashboardPage() {
   // Quick actions config
   const quickActions = [
     {
-      label: "Nouvel événement",
-      description: "Créer un nouvel événement",
+      label: t("quickActions.newEvent"),
+      description: t("quickActions.newEventDescription"),
       icon: Calendar,
       href: "/admin/events",
       accent: true,
     },
     {
-      label: "Nouvel intervenant",
-      description: "Ajouter un intervenant",
+      label: t("quickActions.newSpeaker"),
+      description: t("quickActions.newSpeakerDescription"),
       icon: Users,
       href: "/admin/speakers",
       accent: false,
     },
     {
-      label: "Gérer les salles",
-      description: "Configurer les salles",
+      label: t("quickActions.manageRooms"),
+      description: t("quickActions.manageRoomsDescription"),
       icon: Building2,
       href: "/admin/rooms",
       accent: false,
@@ -491,15 +495,12 @@ export default function DashboardPage() {
 
       <main className="flex-1 px-8 py-12 max-w-6xl mx-auto w-full">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-[#4a5568] mb-8">
-
           <div className="flex items-center gap-2 text-sm text-[#4a5568] mb-8">
-            <Link href="/" className="hover:text-[#00E5FF] transition-colors">Home</Link>
+            <Link href="/" className="hover:text-[#00E5FF] transition-colors">{t("breadcrumbHome")}</Link>
             <ChevronRight size={13} />
-            <span className="text-white">Dashboard</span>
+            <span className="text-white">{t("breadcrumbDashboard")}</span>
           </div>
 
-        </div>
 
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-end gap-4 mb-10">
@@ -508,13 +509,9 @@ export default function DashboardPage() {
               <div className="w-8 h-8 rounded-xl bg-[#00E5FF15] border border-[#00E5FF30] flex items-center justify-center">
                 <LayoutDashboard size={16} className="text-[#00E5FF]" />
               </div>
-              <h1 className="text-3xl font-black text-white tracking-tight">
-                Admin Console
-              </h1>
+              <h1 className="text-3xl font-black text-white tracking-tight">{t("pageTitle")}</h1>
             </div>
-            <p className="text-sm text-[#4a5568] ml-11">
-              Gérez vos événements, intervenants et planning.
-            </p>
+            <p className="text-sm text-[#4a5568] ml-11">{t("pageDescription")}</p>
           </div>
 
           <button
@@ -522,7 +519,7 @@ export default function DashboardPage() {
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#00E5FF] text-black text-sm font-black tracking-wide hover:bg-[#00cfea] active:scale-95 transition-all duration-200 shadow-[0_0_24px_#00E5FF30]"
           >
             <Plus size={15} strokeWidth={3} />
-            Create Event
+            {t("createEventButton")}
           </button>
         </div>
 
@@ -541,13 +538,13 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between px-6 py-4 border-b border-[#1e2530] shrink-0">
               <div className="flex items-center gap-2">
                 <Calendar size={15} className="text-[#00E5FF]" />
-                <h2 className="text-sm font-black text-white tracking-tight">Événements récents</h2>
+                <h2 className="text-sm font-black text-white tracking-tight">{t("recentEventsTitle")}</h2>
               </div>
               <Link
                 href="/admin/events"
                 className="text-xs font-semibold text-[#00E5FF] uppercase tracking-widest hover:text-[#00cfea] transition-colors flex items-center gap-1"
               >
-                Voir tout <ArrowUpRight size={11} />
+                {t("seeAll")} <ArrowUpRight size={11} />
               </Link>
             </div>
 
@@ -569,7 +566,7 @@ export default function DashboardPage() {
               {!loading && (!stats?.recentEvents || stats.recentEvents.length === 0) && (
                 <div className="flex-1 flex flex-col items-center justify-center py-10">
                   <Calendar size={28} className="text-[#1e2530] mb-3" />
-                  <p className="text-[#3a4a5a] italic text-sm">Aucun événement pour le moment.</p>
+                  <p className="text-[#3a4a5a] italic text-sm">{t("noRecentEvents")}</p>
                 </div>
               )}
 
@@ -585,7 +582,7 @@ export default function DashboardPage() {
           <div className="lg:col-span-2 rounded-2xl border border-[#1e2530] bg-[#0d1117] overflow-hidden flex flex-col">
             <div className="flex items-center gap-2 px-6 py-4 border-b border-[#1e2530] shrink-0">
               <Zap size={15} className="text-[#00E5FF]" />
-              <h2 className="text-sm font-black text-white tracking-tight">Actions rapides</h2>
+              <h2 className="text-sm font-black text-white tracking-tight">{t("quickActions.title")}</h2>
             </div>
 
             <div className="flex-1 flex flex-col p-4 gap-3">
@@ -633,32 +630,16 @@ export default function DashboardPage() {
                   <TrendingUp size={15} className="text-[#3a4a5a]" />
                 </div>
                 <p className="text-xs text-[#3a4a5a] font-semibold">
-                  {loading ? "—" : `${stats?.live.activeSessions ?? 0} session${(stats?.live.activeSessions ?? 0) !== 1 ? "s" : ""} en direct`}
+                  {loading ? "—" : t("stats.liveSessionsSub", { count: stats?.live.activeSessions ?? 0 })}
                 </p>
                 {stats && stats.live.activeSessions > 0 && (
                   <span className="flex items-center gap-1.5 text-[10px] font-bold text-red-400">
                     <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-                    LIVE
+                    {t("live")}
                   </span>
                 )}
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* ── Bottom row : Recent Questions ── */}
-        <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-[#1e2530]">
-            <div className="flex items-center gap-2">
-              <MessageSquare size={15} className="text-[#00E5FF]" />
-              <h2 className="text-sm font-black text-white tracking-tight">Questions récentes</h2>
-            </div>
-            <Link
-              href="/admin/events"
-              className="text-xs font-semibold text-[#00E5FF] uppercase tracking-widest hover:text-[#00cfea] transition-colors flex items-center gap-1"
-            >
-              Voir tout <ArrowUpRight size={11} />
-            </Link>
           </div>
 
           <div className="divide-y divide-[#1e2530]">
@@ -676,7 +657,7 @@ export default function DashboardPage() {
             {!loading && (!stats || stats.recentQuestions.length === 0) && (
               <div className="px-6 py-12 text-center">
                 <MessageSquare size={24} className="mx-auto text-[#1e2530] mb-3" />
-                <p className="text-[#3a4a5a] italic text-sm">Aucune question pour le moment.</p>
+                <p className="text-[#3a4a5a] italic text-sm">{t("noQuestions")}</p>
               </div>
             )}
 

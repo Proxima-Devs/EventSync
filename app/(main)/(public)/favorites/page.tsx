@@ -1,13 +1,12 @@
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { Search, Star } from "lucide-react";
 import { useFavorites } from "@/hooks/useFavorites";
 import { apiFetch } from "@/lib/api";
 import { SessionFavorite } from "@/types";
-
-const FILTERS = ["All", "Live", "Upcoming", "Past"];
 
 function SessionSkeleton() {
   return (
@@ -28,11 +27,19 @@ function SessionSkeleton() {
 }
 
 export default function FavoritesPage() {
+  const t = useTranslations("FavoritesPage");
   const { favorites, toggle } = useFavorites();
   const [sessions, setSessions] = useState<SessionFavorite[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [activeFilter, setActiveFilter] = useState("All");
+  const [activeFilter, setActiveFilter] = useState("all");
+
+  const FILTERS = [
+    { value: "all", label: t("filter.all") },
+    { value: "live", label: t("filter.live") },
+    { value: "upcoming", label: t("filter.upcoming") },
+    { value: "past", label: t("filter.past") },
+  ];
 
   const filteredSessions = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -48,12 +55,12 @@ export default function FavoritesPage() {
 
       if (!searchMatch) return false;
 
-      if (activeFilter === "Live") {
+      if (activeFilter === "live") {
         return session.isLive;
       }
 
       const start = new Date(session.startTime);
-      if (activeFilter === "Upcoming") {
+      if (activeFilter === "upcoming") {
         return start >= now;
       }
       if (activeFilter === "Past") {
@@ -64,6 +71,7 @@ export default function FavoritesPage() {
     });
   }, [sessions, search, activeFilter]);
 
+  const favoritesKey = favorites.join(",");
   useEffect(() => {
     if (favorites.length === 0) {
       setLoading(false);
@@ -86,20 +94,20 @@ export default function FavoritesPage() {
         setSessions(all);
       })
       .finally(() => setLoading(false));
-  }, [favorites.join(",")]);
+  }, [favoritesKey]);
 
   return (
     <main className="flex-1 px-8 py-12 max-w-3xl mx-auto w-full">
-      <h1 className="text-3xl font-black mb-2">⭐ Mes favoris</h1>
+      <h1 className="text-3xl font-black mb-2">{t("title")}</h1>
       <p className="text-[#4a5568] text-sm mb-8">
-        Sessions sauvegardées localement sur cet appareil.
+        {t("description")}
       </p>
 
       {favorites.length === 0 && !loading ? (
         <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] py-20 text-center text-[#3a4550] italic text-sm">
-          Aucun favori pour le moment.{" "}
+          {t("emptyState")} {" "}
           <Link href="/" className="text-[#00E5FF] not-italic hover:underline">
-            Découvrir les événements →
+            {t("discoverEvents")}
           </Link>
         </div>
       ) : (
@@ -108,15 +116,15 @@ export default function FavoritesPage() {
             <div className="flex flex-wrap gap-2 order-1 sm:order-1">
               {FILTERS.map((filter) => (
                 <button
-                  key={filter}
-                  onClick={() => setActiveFilter(filter)}
+                  key={filter.value}
+                  onClick={() => setActiveFilter(filter.value)}
                   disabled={loading}
-                  className={`cursor-pointer px-4 py-2 rounded-full text-sm font-semibold border transition-all duration-200 ${activeFilter === filter
+                  className={`cursor-pointer px-4 py-2 rounded-full text-sm font-semibold border transition-all duration-200 ${activeFilter === filter.value
                     ? "bg-[#00E5FF] border-[#00E5FF] text-black shadow-lg shadow-[#00E5FF33]"
                     : "bg-transparent border-[#1e2530] text-[#cbd5e1] hover:text-white hover:border-[#00E5FF44]"
                     } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
-                  {filter === "All" ? "Tous" : filter === "Live" ? "En direct" : filter === "Upcoming" ? "À venir" : "Passé"}
+                  {filter.label}
                 </button>
               ))}
             </div>
@@ -124,7 +132,7 @@ export default function FavoritesPage() {
               <div className="relative rounded-full border border-[#1e2530] bg-[#0d1117] flex items-center overflow-hidden max-w-2xl ml-auto">
                 <input
                   type="text"
-                  placeholder="Rechercher un favori..."
+                  placeholder={t("searchPlaceholder")}
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   disabled={loading}
@@ -133,7 +141,7 @@ export default function FavoritesPage() {
                 <button
                   disabled={loading}
                   className="inline-flex h-11 w-11 items-center justify-center text-white rounded-full cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
-                  aria-label="Rechercher"
+                  aria-label={t("searchPlaceholder")}
                 >
                   <Search className="h-4 w-4" />
                 </button>
@@ -149,7 +157,7 @@ export default function FavoritesPage() {
             </div>
           ) : filteredSessions.length === 0 ? (
             <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] py-20 text-center text-[#3a4550] italic text-sm">
-              Aucun favori ne correspond à ces filtres.
+              {t("noMatches")}
             </div>
           ) : (
             <div className="flex flex-col gap-3">

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 import Image from "next/image";
@@ -72,6 +73,7 @@ const SOCIAL_ICONS: Record<string, { icon: React.ReactNode; label: string }> = {
 };
 
 export default function SpeakerPage() {
+    const t = useTranslations("SpeakerPage");
     const { speakerId } = useParams<{ speakerId: string }>();
     const [speaker, setSpeaker] = useState<Speaker | null>(null);
     const [loading, setLoading] = useState(true);
@@ -80,7 +82,7 @@ export default function SpeakerPage() {
     useEffect(() => {
         apiFetch<Speaker>(`/api/speakers/${speakerId}`)
             .then(setSpeaker)
-            .catch(() => setError("Intervenant introuvable"))
+            .catch(() => setError(t("notFound")))
             .finally(() => setLoading(false));
     }, [speakerId]);
 
@@ -111,7 +113,7 @@ export default function SpeakerPage() {
         return (
             <main className="flex-1 px-8 py-12 max-w-3xl mx-auto w-full">
                 <div className="rounded-2xl border border-red-900 bg-red-500/10 py-12 text-center text-red-400 text-sm">
-                    {error || "Intervenant introuvable"}
+                    {error || t("notFound")}
                 </div>
             </main>
         );
@@ -123,7 +125,11 @@ export default function SpeakerPage() {
         <main className="flex-1 px-8 py-12 max-w-3xl mx-auto w-full">
             <div className="flex items-center gap-2 text-sm text-[#4a5568] mb-8">
                 <Link href="/" className="hover:text-[#00E5FF] transition-colors">
-                    Accueil
+                    {t("breadcrumbHome")}
+                </Link>
+                <span>/</span>
+                <Link href="/speakers" className="hover:text-[#00E5FF] transition-colors">
+                    {t("breadcrumbSpeakers")}
                 </Link>
                 <span>/</span>
                 <span className="text-white">{speaker.fullName}</span>
@@ -161,7 +167,7 @@ export default function SpeakerPage() {
                                                     <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
                                                 </svg>
                                             )}
-                                            {meta?.label ?? key}
+                                            {t(`social.${key}` as any) || key}
                                         </a>
                                     );
                                 })}
@@ -178,7 +184,7 @@ export default function SpeakerPage() {
             </div>
 
             <h2 className="text-xl font-black mb-4">
-                Sessions{" "}
+                {t("sessionsTitle")} {" "}
                 <span className="text-[#4a5568] font-normal text-base">
                     ({sessions.length})
                 </span>
@@ -186,7 +192,7 @@ export default function SpeakerPage() {
 
             {sessions.length === 0 ? (
                 <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] py-16 text-center text-[#3a4550] italic text-sm">
-                    Aucune session assignée.
+                    {t("noSessions")}
                 </div>
             ) : (
                 <div className="flex flex-col gap-3">
