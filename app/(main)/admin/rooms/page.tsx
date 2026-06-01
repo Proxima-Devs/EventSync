@@ -4,6 +4,7 @@ import { Building2, Plus, X, Pencil, Trash2, Layers, AlertTriangle, ChevronRight
 import { useEffect, useState, useRef, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 // ─── Types ───
 
@@ -49,6 +50,7 @@ function RoomModal({
   onSaved: (room: Room) => void;
   editingRoom: Room | null;
 }) {
+  const t = useTranslations("AdminRoomsPage");
   const overlayRef = useRef<HTMLDivElement>(null);
   const isEdit = !!editingRoom;
   const [name, setName] = useState("");
@@ -81,7 +83,7 @@ function RoomModal({
     e.preventDefault();
     setError("");
     if (!name.trim()) {
-      setError("Le nom de la salle est obligatoire.");
+      setError(t("modal.nameRequired"));
       return;
     }
     setLoading(true);
@@ -94,11 +96,11 @@ function RoomModal({
         body: JSON.stringify({ name: name.trim() }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Erreur serveur");
+      if (!res.ok) throw new Error(data.error ?? t("errors.server"));
       onSaved({ _count: { sessions: 0 }, ...data });
       onClose();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      setError(err instanceof Error ? err.message : t("errors.unknown"));
     } finally {
       setLoading(false);
     }
@@ -144,10 +146,10 @@ function RoomModal({
                 </div>
                 <div>
                   <h2 className="text-base font-black text-white tracking-tight">
-                    {isEdit ? "Modifier la salle" : "Nouvelle salle"}
+                    {isEdit ? t("modal.editTitle") : t("modal.createTitle")}
                   </h2>
                   <p className="text-xs text-[#3a4a5a]">
-                    {isEdit ? `ID : ${editingRoom?.id.slice(0, 8)}…` : "Donnez un nom à votre salle"}
+                    {isEdit ? t("modal.editSubtitle", { id: editingRoom?.id.slice(0, 8) ?? "" }) : t("modal.createSubtitle")}
                   </p>
                 </div>
               </div>
@@ -166,13 +168,13 @@ function RoomModal({
             >
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-semibold uppercase tracking-widest text-[#3a4a5a]">
-                  Nom de la salle <span className="text-[#00E5FF]">*</span>
+                  {t("modal.nameLabel")} <span className="text-[#00E5FF]">*</span>
                 </label>
                 <input
                   className={inputClass}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Ex : Salle A — Amphithéâtre"
+                  placeholder={t("modal.namePlaceholder")}
                   autoFocus
                 />
               </div>
@@ -199,7 +201,7 @@ function RoomModal({
                   }}
                   className="flex-1 py-2.5 rounded-xl border border-[#1e2530] text-sm text-[#4a5568] hover:text-white hover:border-[#2e3a4a] transition-all duration-200 font-semibold"
                 >
-                  Annuler
+                  {t("modal.cancel")}
                 </button>
                 <button
                   type="submit"
@@ -208,8 +210,8 @@ function RoomModal({
                   style={{ boxShadow: "0 0 20px #00E5FF30" }}
                 >
                   {loading
-                    ? isEdit ? "Sauvegarde…" : "Création…"
-                    : isEdit ? "Sauvegarder" : "Créer la salle"}
+                    ? isEdit ? t("modal.saving") : t("modal.creating")
+                    : isEdit ? t("modal.save") : t("modal.create")}
                 </button>
               </div>
             </form>
@@ -231,6 +233,7 @@ function DeleteModal({
   onClose: () => void;
   onDeleted: (id: string) => void;
 }) {
+  const t = useTranslations("AdminRoomsPage");
   const overlayRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -250,12 +253,12 @@ function DeleteModal({
       const res = await fetch(`/api/rooms/${room.id}`, { method: "DELETE" });
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error ?? "Erreur lors de la suppression");
+        throw new Error(data.error ?? t("deleteModal.deleteError"));
       }
       onDeleted(room.id);
       onClose();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      setError(err instanceof Error ? err.message : t("errors.unknown"));
       setLoading(false);
     }
   };
@@ -289,12 +292,12 @@ function DeleteModal({
               <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-900/40 flex items-center justify-center mb-4">
                 <Trash2 size={18} className="text-red-400" />
               </div>
-              <h2 className="text-base font-black text-white mb-1">Supprimer la salle ?</h2>
+              <h2 className="text-base font-black text-white mb-1">{t("deleteModal.title")}</h2>
               <p className="text-sm text-[#4a5568] leading-relaxed">
-                <span className="text-[#ccc] font-semibold">{room.name}</span> sera supprimée.
+                {t("deleteModal.body", { name: room.name })}
                 {room._count.sessions > 0 && (
                   <span className="text-amber-400 block mt-1.5">
-                    ⚠️ {room._count.sessions} session{room._count.sessions !== 1 ? "s" : ""} associée{room._count.sessions !== 1 ? "s" : ""} seront dissociées.
+                    {t("deleteModal.sessionsWarning", { count: room._count.sessions })}
                   </span>
                 )}
               </p>
@@ -311,14 +314,14 @@ function DeleteModal({
                 onClick={onClose}
                 className="flex-1 py-2.5 rounded-xl border border-[#1e2530] text-sm text-[#4a5568] hover:text-white hover:border-[#2e3a4a] transition-all duration-200 font-semibold"
               >
-                Annuler
+                {t("deleteModal.cancel")}
               </button>
               <button
                 onClick={handleDelete}
                 disabled={loading}
                 className="flex-1 py-2.5 rounded-xl bg-red-500/90 text-white text-sm font-black tracking-wide hover:bg-red-500 active:scale-95 transition-all duration-200 disabled:opacity-50"
               >
-                {loading ? "Suppression…" : "Supprimer"}
+                {loading ? t("deleteModal.deleting") : t("deleteModal.confirm")}
               </button>
             </div>
           </motion.div>
@@ -339,6 +342,7 @@ function RoomRow({
   onEdit: (r: Room) => void;
   onDelete: (r: Room) => void;
 }) {
+  const t = useTranslations("AdminRoomsPage");
   return (
     <motion.div
       layout
@@ -359,34 +363,32 @@ function RoomRow({
         <div className="flex items-center gap-1.5 mt-0.5">
           <Layers size={10} className="text-[#3a4a5a]" />
           <span className="text-[11px] text-[#3a4a5a]">
-            {room._count.sessions} session{room._count.sessions !== 1 ? "s" : ""}
+            {t("sessionsCount", { count: room._count.sessions })}
           </span>
         </div>
       </div>
 
-      {/* Sessions badge */}
       {room._count.sessions > 0 && (
         <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#1e2530] bg-[#ffffff04]">
           <Layers size={11} className="text-[#3a4a5a]" />
           <span className="text-xs text-[#3a4a5a] font-semibold">
-            {room._count.sessions} session{room._count.sessions !== 1 ? "s" : ""}
+            {t("sessionsCount", { count: room._count.sessions })}
           </span>
         </div>
       )}
 
-      {/* Actions */}
       <div className="flex items-center gap-2 shrink-0">
         <button
           onClick={() => onEdit(room)}
           className="w-8 h-8 rounded-xl border border-[#1e2530] flex items-center justify-center text-[#3a4a5a] hover:text-white hover:border-[#2e3a4a] transition-all duration-200"
-          title="Modifier"
+          title={t("editTitle")}
         >
           <Pencil size={13} />
         </button>
         <button
           onClick={() => onDelete(room)}
           className="w-8 h-8 rounded-xl border border-[#1e2530] flex items-center justify-center text-[#3a4a5a] hover:text-red-400 hover:border-red-900/50 transition-all duration-200"
-          title="Supprimer"
+          title={t("deleteTitle")}
         >
           <Trash2 size={13} />
         </button>
@@ -398,6 +400,7 @@ function RoomRow({
 // ─── Main Page ───
 
 export default function AdminRoomsPage() {
+  const t = useTranslations("AdminRoomsPage");
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -413,7 +416,7 @@ export default function AdminRoomsPage() {
       const data = await res.json();
       setRooms(Array.isArray(data) ? data : []);
     } catch {
-      setError("Erreur lors du chargement des salles.");
+      setError(t("loadError"));
     } finally {
       setLoading(false);
     }
@@ -472,10 +475,10 @@ export default function AdminRoomsPage() {
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-[#4a5568] mb-8">
           <Link href="/" className="hover:text-[#00E5FF] transition-colors">
-            Home
+            {t("breadcrumbHome")}
           </Link>
           <ChevronRight size={13} />
-          <span className="text-white">Salles</span>
+          <span className="text-white">{t("breadcrumbRooms")}</span>
         </div>
 
         {/* Header */}
@@ -486,11 +489,11 @@ export default function AdminRoomsPage() {
                 <Building2 size={16} className="text-[#00E5FF]" />
               </div>
               <h1 className="text-3xl font-black text-white tracking-tight">
-                Salles
+                {t("pageTitle")}
               </h1>
             </div>
             <p className="text-sm text-[#4a5568] ml-11">
-              Gérez les espaces et amphithéâtres de vos événements.
+              {t("pageDescription")}
             </p>
           </div>
 
@@ -500,7 +503,7 @@ export default function AdminRoomsPage() {
             style={{ boxShadow: "0 0 24px #00E5FF30" }}
           >
             <Plus size={15} strokeWidth={3} />
-            Ajouter une salle
+            {t("addRoom")}
           </button>
         </div>
 
@@ -510,13 +513,13 @@ export default function AdminRoomsPage() {
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#1e2530] bg-[#0d1117]">
               <Building2 size={11} className="text-[#3a4a5a]" />
               <span className="text-xs text-[#3a4a5a] font-semibold">
-                {rooms.length} salle{rooms.length !== 1 ? "s" : ""}
+                {t("roomCount", { count: rooms.length })}
               </span>
             </div>
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#1e2530] bg-[#0d1117]">
               <Layers size={11} className="text-[#3a4a5a]" />
               <span className="text-xs text-[#3a4a5a] font-semibold">
-                {totalSessions} session{totalSessions !== 1 ? "s" : ""} au total
+                {t("totalSessions", { count: totalSessions })}
               </span>
             </div>
 
@@ -527,7 +530,7 @@ export default function AdminRoomsPage() {
               />
               <input
                 type="text"
-                placeholder="Rechercher…"
+                placeholder={t("searchPlaceholder")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-48 pl-9 pr-4 py-2 rounded-xl bg-[#0d1117] border border-[#1e2530] text-sm text-[#ccc] placeholder-[#3a4a5a] focus:outline-none focus:border-[#00E5FF44] focus:ring-1 focus:ring-[#00E5FF22] transition-all"
@@ -542,10 +545,10 @@ export default function AdminRoomsPage() {
           <div className="flex items-center gap-4 px-6 py-3 border-b border-[#1e2530] bg-[#060a0f]">
             <div className="w-10 shrink-0" />
             <span className="flex-1 text-[10px] font-bold uppercase tracking-widest text-[#2a3a4a]">
-              Salle
+              {t("tableRoom")}
             </span>
             <span className="hidden sm:block text-[10px] font-bold uppercase tracking-widest text-[#2a3a4a]">
-              Sessions
+              {t("tableSessions")}
             </span>
             <span className="w-20 shrink-0" />
           </div>
@@ -567,14 +570,14 @@ export default function AdminRoomsPage() {
             <div className="py-20 text-center">
               <Building2 size={28} className="mx-auto text-[#1e2530] mb-3" />
               <p className="text-[#3a4a5a] italic text-sm mb-4">
-                Aucune salle pour le moment.
+                {t("emptyState")}
               </p>
               <button
                 onClick={openCreate}
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#00E5FF15] border border-[#00E5FF30] text-[#00E5FF] text-sm font-bold hover:bg-[#00E5FF20] transition-all"
               >
                 <Plus size={13} />
-                Créer la première salle
+                {t("createFirst")}
               </button>
             </div>
           )}
@@ -583,7 +586,7 @@ export default function AdminRoomsPage() {
           {!loading && !error && rooms.length > 0 && filtered.length === 0 && (
             <div className="py-12 text-center">
               <p className="text-[#3a4a5a] italic text-sm">
-                Aucune salle ne correspond à «&nbsp;{search}&nbsp;».
+                {t("noSearchResults", { query: search })}
               </p>
             </div>
           )}

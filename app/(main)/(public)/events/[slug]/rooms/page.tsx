@@ -3,10 +3,12 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { apiFetch } from "@/lib/api";
 import { Room, EventMeta} from "@/types";
 
 export default function RoomsPage() {
+  const t = useTranslations("EventRoomsPage");
   const { slug } = useParams<{ slug: string }>();
   const [event, setEvent] = useState<EventMeta | null>(null);
   const [rooms, setRooms] = useState<Room[]>([]);
@@ -22,18 +24,18 @@ export default function RoomsPage() {
       .finally(() => setLoading(false));
   }, [slug]);
 
-  if (loading) return <div className="p-8 text-[#4a5568]">Chargement...</div>;
+  if (loading) return <div className="p-8 text-[#4a5568]">{t("loading")}</div>;
 
   return (
     <main className="flex-1 px-8 py-12 max-w-3xl mx-auto w-full">
       <Link href={`/events/${slug}`} className="text-[#00E5FF] text-sm hover:underline">
         ← {event?.title}
       </Link>
-      <h1 className="text-3xl font-black mt-4 mb-8">Salles</h1>
+      <h1 className="text-3xl font-black mt-4 mb-8">{t("pageTitle")}</h1>
 
       {rooms.length === 0 ? (
         <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] py-16 text-center text-[#3a4550] italic text-sm">
-          Aucune salle assignée pour cet événement.
+          {t("emptyState")}
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
@@ -45,7 +47,7 @@ export default function RoomsPage() {
             >
               <div className="text-2xl mb-2">🏛️</div>
               <p className="font-bold text-lg">{room.name}</p>
-              <p className="text-xs text-[#4a5568] mt-1">Voir les sessions →</p>
+              <p className="text-xs text-[#4a5568] mt-1">{t("viewSessions")}</p>
             </Link>
           ))}
         </div>

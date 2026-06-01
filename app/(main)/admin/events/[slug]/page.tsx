@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { AnimatePresence, motion } from "framer-motion";
 import { useFavorites } from "@/hooks/useFavorites";
 import Link from "next/link";
@@ -24,14 +25,14 @@ function toDatetimeLocal(iso: string) {
   return new Date(iso).toISOString().slice(0, 16);
 }
 
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("fr-FR", {
+function formatDate(iso: string, locale: string) {
+  return new Date(iso).toLocaleDateString(locale, {
     day: "numeric", month: "long", year: "numeric",
   });
 }
 
-function formatTime(iso: string) {
-  return new Date(iso).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+function formatTime(iso: string, locale: string) {
+  return new Date(iso).toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
 }
 
 function duration(start: string, end: string) {
@@ -69,6 +70,7 @@ function SessionModal({ open, onClose, onSaved, editingSession, allSpeakers, all
   open: boolean; onClose: () => void; onSaved: (s: Session) => void;
   editingSession: Session | null; allSpeakers: Speaker[]; allRooms: Room[]; eventId: string | null;
 }) {
+  const t = useTranslations("AdminEventDetailPage");
   const overlayRef = useRef<HTMLDivElement>(null);
   const isEdit = !!editingSession;
   const [form, setForm] = useState<SessionFormData>(EMPTY_SESSION);
@@ -106,13 +108,13 @@ function SessionModal({ open, onClose, onSaved, editingSession, allSpeakers, all
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setError("");
-    if (!form.title || !form.startTime || !form.endTime) { setError("Titre, début et fin sont obligatoires."); return; }
-    if (new Date(form.startTime) >= new Date(form.endTime)) { setError("Le début doit être avant la fin."); return; }
-    if (form.speakerIds.length === 0) { setError("Sélectionnez au moins un intervenant."); return; }
+    if (!form.title || !form.startTime || !form.endTime) { setError(t("sessionModal.requiredFields")); return; }
+    if (new Date(form.startTime) >= new Date(form.endTime)) { setError(t("sessionModal.startBeforeEnd")); return; }
+    if (form.speakerIds.length === 0) { setError(t("sessionModal.speakerRequired")); return; }
     setLoading(true);
     try {
       if (!eventId) {
-        throw new Error("Impossible d'enregistrer : événement non chargé.");
+        throw new Error(t("sessionModal.eventNotLoaded"));
       }
       const url = isEdit ? `/api/sessions/${editingSession!.id}` : `/api/events/${eventId}/sessions`;
       const res = await fetch(url, {
@@ -126,10 +128,10 @@ function SessionModal({ open, onClose, onSaved, editingSession, allSpeakers, all
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Erreur serveur");
+      if (!res.ok) throw new Error(data.error ?? t("errors.server"));
       onSaved(data); onClose();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      setError(err instanceof Error ? err.message : t("errors.unknown"));
     } finally { setLoading(false); }
   };
 
@@ -143,38 +145,38 @@ function SessionModal({ open, onClose, onSaved, editingSession, allSpeakers, all
             exit={{ opacity: 0, y: 8, scale: 0.98 }} transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="relative w-full max-w-lg rounded-3xl border border-slate-700 bg-slate-900 shadow-2xl shadow-black/40 overflow-hidden max-h-[90vh] flex flex-col">
             <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-slate-800">
-              <h2 className="text-base font-bold text-white">{isEdit ? "Modifier la session" : "Nouvelle session"}</h2>
+              <h2 className="text-base font-bold text-white">{isEdit ? t("sessionModal.editTitle") : t("sessionModal.createTitle")}</h2>
               <button onClick={onClose} className="w-8 h-8 rounded-lg border border-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition-colors">
                 <X size={14} />
               </button>
             </div>
             <form onSubmit={handleSubmit} className="flex flex-col overflow-hidden flex-1">
               <div className="overflow-y-auto flex-1 px-6 py-5 flex flex-col gap-4">
-                <Field label="Titre" required>
-                  <input className={inputCls} value={form.title} onChange={(e) => set("title", e.target.value)} placeholder="Ex : Keynote d'ouverture" />
+                <Field label={t("sessionModal.titleLabel")} required>
+                  <input className={inputCls} value={form.title} onChange={(e) => set("title", e.target.value)} placeholder={t("sessionModal.titlePlaceholder")} />
                 </Field>
-                <Field label="Description">
-                  <textarea className={`${inputCls} resize-none`} rows={2} value={form.description} onChange={(e) => set("description", e.target.value)} placeholder="Résumé…" />
+                <Field label={t("sessionModal.descriptionLabel")}>
+                  <textarea className={`${inputCls} resize-none`} rows={2} value={form.description} onChange={(e) => set("description", e.target.value)} placeholder={t("sessionModal.descriptionPlaceholder")} />
                 </Field>
                 <div className="grid grid-cols-2 gap-3">
-                  <Field label="Début" required><input className={inputCls} type="datetime-local" value={form.startTime} onChange={(e) => set("startTime", e.target.value)} /></Field>
-                  <Field label="Fin" required><input className={inputCls} type="datetime-local" value={form.endTime} onChange={(e) => set("endTime", e.target.value)} /></Field>
+                  <Field label={t("sessionModal.startLabel")} required><input className={inputCls} type="datetime-local" value={form.startTime} onChange={(e) => set("startTime", e.target.value)} /></Field>
+                  <Field label={t("sessionModal.endLabel")} required><input className={inputCls} type="datetime-local" value={form.endTime} onChange={(e) => set("endTime", e.target.value)} /></Field>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <Field label="Salle">
+                  <Field label={t("sessionModal.roomLabel")}>
                     <select className={inputCls} value={form.roomId} onChange={(e) => set("roomId", e.target.value)}>
-                      <option value="" disabled>Choisir une salle</option>
+                      <option value="" disabled>{t("sessionModal.roomPlaceholder")}</option>
                       {allRooms.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
                     </select>
                   </Field>
-                  <Field label="Capacité" hint="(optionnel)">
-                    <input className={inputCls} type="number" min="1" value={form.capacity} onChange={(e) => set("capacity", e.target.value)} placeholder="Ex : 150" />
+                  <Field label={t("sessionModal.capacityLabel")} hint={t("sessionModal.capacityHint")}>
+                    <input className={inputCls} type="number" min="1" value={form.capacity} onChange={(e) => set("capacity", e.target.value)} placeholder={t("sessionModal.capacityPlaceholder")} />
                   </Field>
                 </div>
-                <Field label="Intervenants" required>
+                <Field label={t("sessionModal.speakersLabel")} required>
                   {allSpeakers.length === 0 ? (
                     <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-300 text-sm">
-                      <AlertTriangle size={14} /><span>Aucun intervenant. <Link href="/admin/speakers" className="underline">En créer un</Link> d&apos;abord.</span>
+                      <AlertTriangle size={14} /><span>{t("sessionModal.noSpeakers")} <Link href="/admin/speakers" className="underline">{t("sessionModal.createSpeakerLink")}</Link>{t("sessionModal.createSpeakerFirst")}</span>
                     </div>
                   ) : (
                     <div className="rounded-xl border border-slate-700 divide-y divide-slate-800 overflow-hidden">
@@ -194,7 +196,7 @@ function SessionModal({ open, onClose, onSaved, editingSession, allSpeakers, all
                     </div>
                   )}
                   {form.speakerIds.length > 0 && (
-                    <p className="text-[11px] text-cyan-400 mt-1">{form.speakerIds.length} intervenant{form.speakerIds.length !== 1 ? "s" : ""} sélectionné{form.speakerIds.length !== 1 ? "s" : ""}</p>
+                    <p className="text-[11px] text-cyan-400 mt-1">{t("sessionModal.speakersSelected", { count: form.speakerIds.length })}</p>
                   )}
                 </Field>
                 <AnimatePresence>
@@ -207,9 +209,9 @@ function SessionModal({ open, onClose, onSaved, editingSession, allSpeakers, all
                 </AnimatePresence>
               </div>
               <div className="px-6 pb-6 pt-4 border-t border-slate-800 flex gap-3">
-                <button type="button" onClick={onClose} className="flex-1 py-2.5 rounded-2xl border border-slate-700 text-sm text-slate-400 hover:text-white transition-colors font-semibold">Annuler</button>
+                <button type="button" onClick={onClose} className="flex-1 py-2.5 rounded-2xl border border-slate-700 text-sm text-slate-400 hover:text-white transition-colors font-semibold">{t("sessionModal.cancel")}</button>
                 <button type="submit" disabled={loading} className="flex-1 py-2.5 rounded-2xl bg-cyan-500 text-slate-950 text-sm font-bold hover:bg-cyan-400 active:scale-[0.98] transition-all disabled:opacity-50">
-                  {loading ? (isEdit ? "Sauvegarde…" : "Création…") : (isEdit ? "Sauvegarder" : "Ajouter")}
+                  {loading ? (isEdit ? t("sessionModal.saving") : t("sessionModal.creating")) : (isEdit ? t("sessionModal.save") : t("sessionModal.add"))}
                 </button>
               </div>
             </form>
@@ -227,6 +229,7 @@ function SessionModal({ open, onClose, onSaved, editingSession, allSpeakers, all
 function DeleteSessionModal({ session, onClose, onDeleted }: {
   session: Session | null; onClose: () => void; onDeleted: (id: string) => void;
 }) {
+  const t = useTranslations("AdminEventDetailPage");
   const overlayRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -244,12 +247,12 @@ function DeleteSessionModal({ session, onClose, onDeleted }: {
       const res = await fetch(`/api/sessions/${session.id}`, { method: "DELETE" });
       if (!res.ok) {
         const d = await res.json();
-        throw new Error(d.error ?? "Erreur lors de la suppression");
+        throw new Error(d.error ?? t("deleteSessionModal.deleteError"));
       }
       onDeleted(session.id);
       onClose();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      setError(err instanceof Error ? err.message : t("errors.unknown"));
       setLoading(false);
     }
   };
@@ -279,9 +282,9 @@ function DeleteSessionModal({ session, onClose, onDeleted }: {
               <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-900/40 flex items-center justify-center mb-4">
                 <Trash2 size={18} className="text-red-400" />
               </div>
-              <h2 className="text-base font-black text-white mb-1">Supprimer la session ?</h2>
+              <h2 className="text-base font-black text-white mb-1">{t("deleteSessionModal.title")}</h2>
               <p className="text-sm text-[#4a5568] leading-relaxed">
-                <span className="text-[#ccc] font-semibold">{session.title}</span> sera définitivement supprimée.
+                {t("deleteSessionModal.body", { title: session.title })}
               </p>
               {error && (
                 <div className="mt-3 flex items-center gap-2 text-sm text-red-400 bg-red-500/10 border border-red-900/40 rounded-xl px-3 py-2">
@@ -295,14 +298,14 @@ function DeleteSessionModal({ session, onClose, onDeleted }: {
                 onClick={onClose}
                 className="flex-1 py-2.5 rounded-xl border border-[#1e2530] text-sm text-[#4a5568] hover:text-white hover:border-[#2e3a4a] transition-all duration-200 font-semibold"
               >
-                Annuler
+                {t("deleteSessionModal.cancel")}
               </button>
               <button
                 onClick={handleDelete}
                 disabled={loading}
                 className="flex-1 py-2.5 rounded-xl bg-red-500/90 text-white text-sm font-black tracking-wide hover:bg-red-500 active:scale-95 transition-all duration-200 disabled:opacity-50"
               >
-                {loading ? "Suppression…" : "Supprimer"}
+                {loading ? t("deleteSessionModal.deleting") : t("deleteSessionModal.confirm")}
               </button>
             </div>
           </motion.div>
@@ -317,6 +320,7 @@ function DeleteSessionModal({ session, onClose, onDeleted }: {
 function EditEventModal({ open, onClose, event, onSaved }: {
   open: boolean; onClose: () => void; event: Event; onSaved: (e: Event) => void;
 }) {
+  const t = useTranslations("AdminEventDetailPage");
   const overlayRef = useRef<HTMLDivElement>(null);
   const [form, setForm] = useState({ title: "", description: "", startDate: "", endDate: "", location: "", coverImage: "" });
   const [loading, setLoading] = useState(false);
@@ -342,14 +346,14 @@ function EditEventModal({ open, onClose, event, onSaved }: {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setError("");
-    if (!form.title || !form.startDate || !form.endDate) { setError("Titre, début et fin sont obligatoires."); return; }
+    if (!form.title || !form.startDate || !form.endDate) { setError(t("editEventModal.requiredFields")); return; }
     setLoading(true);
     try {
       const res = await fetch(`/api/events/${event.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title: form.title, description: form.description || undefined, startDate: form.startDate, endDate: form.endDate, location: form.location || undefined, coverImage: form.coverImage || undefined }) });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Erreur serveur");
+      if (!res.ok) throw new Error(data.error ?? t("errors.server"));
       onSaved({ ...event, ...data }); onClose();
-    } catch (err: unknown) { setError(err instanceof Error ? err.message : "Erreur inconnue"); } finally { setLoading(false); }
+    } catch (err: unknown) { setError(err instanceof Error ? err.message : t("errors.unknown")); } finally { setLoading(false); }
   };
 
   return (
@@ -362,18 +366,18 @@ function EditEventModal({ open, onClose, event, onSaved }: {
             exit={{ opacity: 0, y: 8, scale: 0.98 }} transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="w-full max-w-lg rounded-3xl border border-slate-700 bg-slate-900 shadow-2xl shadow-black/40 overflow-hidden">
             <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-slate-800">
-              <h2 className="text-base font-bold text-white">Modifier l&apos;événement</h2>
+              <h2 className="text-base font-bold text-white">{t("editEventModal.title")}</h2>
               <button onClick={onClose} className="w-8 h-8 rounded-lg border border-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition-colors"><X size={14} /></button>
             </div>
             <form onSubmit={handleSubmit} className="px-6 py-5 flex flex-col gap-4">
-              <Field label="Titre" required><input className={inputCls} value={form.title} onChange={(e) => set("title", e.target.value)} placeholder="Titre de l'événement" /></Field>
-              <Field label="Description"><textarea className={`${inputCls} resize-none`} rows={3} value={form.description} onChange={(e) => set("description", e.target.value)} placeholder="Description…" /></Field>
+              <Field label={t("editEventModal.titleLabel")} required><input className={inputCls} value={form.title} onChange={(e) => set("title", e.target.value)} placeholder={t("editEventModal.titlePlaceholder")} /></Field>
+              <Field label={t("editEventModal.descriptionLabel")}><textarea className={`${inputCls} resize-none`} rows={3} value={form.description} onChange={(e) => set("description", e.target.value)} placeholder={t("editEventModal.descriptionPlaceholder")} /></Field>
               <div className="grid grid-cols-2 gap-3">
-                <Field label="Début" required><input className={inputCls} type="datetime-local" value={form.startDate} onChange={(e) => set("startDate", e.target.value)} /></Field>
-                <Field label="Fin" required><input className={inputCls} type="datetime-local" value={form.endDate} onChange={(e) => set("endDate", e.target.value)} /></Field>
+                <Field label={t("editEventModal.startLabel")} required><input className={inputCls} type="datetime-local" value={form.startDate} onChange={(e) => set("startDate", e.target.value)} /></Field>
+                <Field label={t("editEventModal.endLabel")} required><input className={inputCls} type="datetime-local" value={form.endDate} onChange={(e) => set("endDate", e.target.value)} /></Field>
               </div>
-              <Field label="Lieu"><input className={inputCls} value={form.location} onChange={(e) => set("location", e.target.value)} placeholder="Ex : Paris, France" /></Field>
-              <Field label="Image de couverture (URL)"><input className={inputCls} type="url" value={form.coverImage} onChange={(e) => set("coverImage", e.target.value)} placeholder="https://…" /></Field>
+              <Field label={t("editEventModal.locationLabel")}><input className={inputCls} value={form.location} onChange={(e) => set("location", e.target.value)} placeholder={t("editEventModal.locationPlaceholder")} /></Field>
+              <Field label={t("editEventModal.coverLabel")}><input className={inputCls} type="url" value={form.coverImage} onChange={(e) => set("coverImage", e.target.value)} placeholder={t("editEventModal.coverPlaceholder")} /></Field>
               <AnimatePresence>
                 {error && (
                   <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
@@ -383,9 +387,9 @@ function EditEventModal({ open, onClose, event, onSaved }: {
                 )}
               </AnimatePresence>
               <div className="flex gap-3 pt-1">
-                <button type="button" onClick={onClose} className="flex-1 py-2.5 rounded-2xl border border-slate-700 text-sm text-slate-400 hover:text-white font-semibold transition-colors">Annuler</button>
+                <button type="button" onClick={onClose} className="flex-1 py-2.5 rounded-2xl border border-slate-700 text-sm text-slate-400 hover:text-white font-semibold transition-colors">{t("editEventModal.cancel")}</button>
                 <button type="submit" disabled={loading} className="flex-1 py-2.5 rounded-2xl bg-cyan-500 text-slate-950 text-sm font-bold hover:bg-cyan-400 active:scale-[0.98] transition-all disabled:opacity-50">
-                  {loading ? "Sauvegarde…" : "Sauvegarder"}
+                  {loading ? t("editEventModal.saving") : t("editEventModal.save")}
                 </button>
               </div>
             </form>
@@ -402,19 +406,21 @@ function PlanningGrid({ sessions, selectedRoom, toggle, isFavorite, slug }: {
   sessions: Session[]; selectedRoom: string | null;
   toggle: (id: string) => void; isFavorite: (id: string) => boolean; slug: string;
 }) {
+  const t = useTranslations("AdminEventDetailPage");
+  const locale = useLocale();
   const allRooms = [...new Set(sessions.flatMap((s) => s.room ? [s.room.name] : []))];
   const visibleRooms = selectedRoom ? [selectedRoom] : allRooms;
 
   const timeSlots = [...new Set(
     sessions
       .filter((s) => !selectedRoom || s.room?.name === selectedRoom)
-      .map((s) => formatTime(s.startTime))
+      .map((s) => formatTime(s.startTime, locale))
   )].sort();
 
   const sessionsByTimeAndRoom: Record<string, Record<string, Session[]>> = {};
   sessions.forEach((s) => {
     if (selectedRoom && s.room?.name !== selectedRoom) return;
-    const time = formatTime(s.startTime);
+    const time = formatTime(s.startTime, locale);
     const room = s.room?.name ?? "__no_room__";
     if (!sessionsByTimeAndRoom[time]) sessionsByTimeAndRoom[time] = {};
     if (!sessionsByTimeAndRoom[time][room]) sessionsByTimeAndRoom[time][room] = [];
@@ -424,7 +430,7 @@ function PlanningGrid({ sessions, selectedRoom, toggle, isFavorite, slug }: {
   if (timeSlots.length === 0) {
     return (
       <div className="text-center py-20 text-slate-500 text-sm">
-        Aucune session pour cette salle.
+        {t("noSessionsForRoom")}
       </div>
     );
   }
@@ -435,7 +441,7 @@ function PlanningGrid({ sessions, selectedRoom, toggle, isFavorite, slug }: {
         <thead>
           <tr>
             <th className="w-20 py-3 px-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-800">
-              Heure
+              {t("timeHeader")}
             </th>
             {visibleRooms.map((room) => (
               <th key={room} className="py-3 px-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-800 bg-slate-900/50 border-l">
@@ -461,7 +467,7 @@ function PlanningGrid({ sessions, selectedRoom, toggle, isFavorite, slug }: {
                           <div className="flex-1 min-w-0">
                             <p className="text-base font-semibold text-slate-200 leading-snug group-hover:text-cyan-300 transition-colors">{s.title}</p>
                             <p className="text-xs text-slate-500 mt-0.5">
-                              {formatTime(s.startTime)}–{formatTime(s.endTime)}
+                              {formatTime(s.startTime, locale)}–{formatTime(s.endTime, locale)}
                             </p>
                             {s.speakers.length > 0 && (
                               <p className="text-xs text-cyan-400 mt-1">
@@ -472,7 +478,7 @@ function PlanningGrid({ sessions, selectedRoom, toggle, isFavorite, slug }: {
                           <button
                             onClick={(e) => { e.preventDefault(); toggle(s.id); }}
                             className="shrink-0 mt-0.5 text-slate-600 hover:text-rose-400 transition-colors"
-                            aria-label="Favori">
+                            aria-label={t("favoriteAria")}>
                             <Heart size={15} className={isFavorite(s.id) ? "fill-rose-400 text-rose-400" : ""} />
                           </button>
                         </div>
@@ -492,6 +498,8 @@ function PlanningGrid({ sessions, selectedRoom, toggle, isFavorite, slug }: {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function EventDetailPage() {
+  const t = useTranslations("AdminEventDetailPage");
+  const locale = useLocale();
   const { slug } = useParams<{ slug: string }>();
 
   const [event, setEvent] = useState<Event | null>(null);
@@ -518,12 +526,12 @@ export default function EventDetailPage() {
         fetch(`/api/events/slug/${slug}`), fetch("/api/speakers"), fetch("/api/rooms"),
       ]);
       const [evtData, spkData, roomData] = await Promise.all([evtRes.json(), spkRes.json(), roomRes.json()]);
-      if (!evtRes.ok) throw new Error(evtData.error ?? "Erreur");
+      if (!evtRes.ok) throw new Error(evtData.error ?? t("errors.server"));
       setEvent(evtData);
       setAllSpeakers(Array.isArray(spkData) ? spkData : []);
       setAllRooms(Array.isArray(roomData) ? roomData : []);
-    } catch { setPageError("Impossible de charger l'événement."); } finally { setLoading(false); }
-  }, [slug]);
+    } catch { setPageError(t("loadError")); } finally { setLoading(false); }
+  }, [slug, t]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -584,7 +592,7 @@ export default function EventDetailPage() {
     return (
       <main className="flex-1 min-h-screen bg-slate-950 px-6 py-8 max-w-5xl mx-auto w-full">
         <div className="flex items-center gap-2 text-rose-300 text-sm bg-rose-500/10 border border-rose-500/20 rounded-2xl px-4 py-3">
-          <AlertTriangle size={15} />{pageError || "Événement introuvable."}
+          <AlertTriangle size={15} />{pageError || t("notFound")}
         </div>
       </main>
     );
@@ -617,7 +625,7 @@ export default function EventDetailPage() {
         <div className="absolute top-5 left-0 right-0 px-6 max-w-5xl mx-auto">
           <Link href="/admin/events"
             className="inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.3em] text-slate-300 hover:text-cyan-300 transition-colors">
-            <ArrowLeft size={12} /> Événements
+            <ArrowLeft size={12} /> {t("backToEvents")}
           </Link>
         </div>
       </div>
@@ -634,7 +642,7 @@ export default function EventDetailPage() {
               <div className="flex items-center gap-4 mt-3 flex-wrap">
                 <span className="flex items-center gap-1.5 text-sm text-slate-400">
                   <Calendar size={13} className="text-cyan-400" />
-                  {formatDate(event.startDate)}
+                  {formatDate(event.startDate, locale)}
                 </span>
                 {event.location && (
                   <span className="flex items-center gap-1.5 text-sm text-slate-400">
@@ -652,11 +660,11 @@ export default function EventDetailPage() {
             <div className="flex items-center gap-2 shrink-0">
               <Link href={`/events/${event.slug}`} target="_blank"
                 className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl border border-slate-700 text-sm text-slate-300 hover:text-white hover:border-slate-500 transition-all font-medium">
-                <Eye size={14} /> Voir
+                <Eye size={14} /> {t("view")}
               </Link>
               <button onClick={() => setEditEventOpen(true)}
                 className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-slate-800 border border-slate-700 text-sm text-slate-300 hover:text-white hover:border-slate-500 transition-all font-medium">
-                <Pencil size={14} /> Modifier
+                <Pencil size={14} /> {t("edit")}
               </button>
             </div>
           </div>
@@ -673,7 +681,7 @@ export default function EventDetailPage() {
                   : "border-transparent text-slate-500 hover:text-slate-300"
               }`}>
               <List size={15} />
-              Sessions
+              {t("sessionsTab")}
               <span className={`text-xs rounded-full px-1.5 py-0.5 font-bold ${view === "liste" ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30" : "bg-slate-800 text-slate-400"}`}>
                 {event.sessions.length}
               </span>
@@ -686,7 +694,7 @@ export default function EventDetailPage() {
                   : "border-transparent text-slate-500 hover:text-slate-300"
               }`}>
               <LayoutGrid size={15} />
-              Planning
+              {t("planningTab")}
             </button>
           </div>
         </div>
@@ -696,21 +704,21 @@ export default function EventDetailPage() {
           {view === "liste" && (
             <motion.div key="liste" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.18 }}>
               <div className="flex items-center justify-between mb-5">
-                <h2 className="text-lg font-bold text-white">Sessions</h2>
+                <h2 className="text-lg font-bold text-white">{t("sessionsTab")}</h2>
                 <button
                   onClick={() => { setEditingSession(null); setSessionModalOpen(true); }}
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-cyan-500 text-slate-950 text-sm font-bold hover:bg-cyan-400 active:scale-[0.98] transition-all shadow-sm shadow-cyan-500/20">
-                  <Plus size={14} strokeWidth={2.5} /> Nouvelle session
+                  <Plus size={14} strokeWidth={2.5} /> {t("newSession")}
                 </button>
               </div>
 
               {sortedSessions.length === 0 ? (
                 <div className="rounded-3xl border border-dashed border-slate-700 bg-slate-900/50 py-16 text-center">
-                  <p className="text-slate-500 text-sm mb-4">Aucune session pour le moment.</p>
+                  <p className="text-slate-500 text-sm mb-4">{t("emptySessions")}</p>
                   <button
                     onClick={() => { setEditingSession(null); setSessionModalOpen(true); }}
                     className="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl border border-slate-700 text-sm text-slate-400 hover:text-white font-semibold transition-colors">
-                    <Plus size={13} /> Créer la première session
+                    <Plus size={13} /> {t("createFirstSession")}
                   </button>
                 </div>
               ) : (
@@ -727,7 +735,7 @@ export default function EventDetailPage() {
                           <div className="flex items-center gap-3 mt-1.5 flex-wrap">
                             <span className="text-xs text-slate-500 flex items-center gap-1">
                               <Clock size={10} className="text-slate-600" />
-                              {formatTime(s.startTime)}–{formatTime(s.endTime)}
+                              {formatTime(s.startTime, locale)}–{formatTime(s.endTime, locale)}
                               <span className="text-slate-700 ml-0.5">· {duration(s.startTime, s.endTime)}</span>
                             </span>
                             {s.room && (
@@ -737,7 +745,7 @@ export default function EventDetailPage() {
                             )}
                             {s.capacity && (
                               <span className="text-xs text-slate-500 flex items-center gap-1">
-                                <Users size={10} className="text-slate-600" /> {s.capacity} places
+                                <Users size={10} className="text-slate-600" /> {t("places", { count: s.capacity })}
                               </span>
                             )}
                             {s.speakers.length > 0 && (
@@ -750,13 +758,13 @@ export default function EventDetailPage() {
                         <div className="flex items-center gap-1 shrink-0">
                           {s.isLive && (
                             <span className="mr-2 inline-flex items-center gap-1.5 text-[10px] font-bold text-rose-300 bg-rose-500/10 border border-rose-500/20 rounded-full px-2 py-0.5">
-                              <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse inline-block" /> Live
+                              <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse inline-block" /> {t("live")}
                             </span>
                           )}
                           <button
                             onClick={() => { setEditingSession(s); setSessionModalOpen(true); }}
                             className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-600 hover:text-cyan-400 hover:bg-cyan-500/10 transition-all"
-                            aria-label="Modifier">
+                            aria-label={t("editSessionAria")}>
                             <Pencil size={14} />
                           </button>
                           <button
@@ -764,7 +772,7 @@ export default function EventDetailPage() {
                             className="flex-1 flex items-center justify-center gap-1.5 p-2 rounded-lg border border-[#1e2530] text-[#3a4a5a] text-[11px] font-semibold hover:text-red-400 hover:border-red-900/50 hover:bg-red-500/05 transition-all duration-200"
                           >
                             <Trash2 size={11} />
-                            Supprimer
+                            {t("deleteSession")}
                           </button>
                         </div>
                       </motion.div>
@@ -782,7 +790,7 @@ export default function EventDetailPage() {
                 <button
                   onClick={() => setSelectedRoom(null)}
                   className={`px-4 py-2 rounded-2xl text-sm font-semibold transition-all ${selectedRoom === null ? "bg-cyan-500 text-slate-950 shadow-sm shadow-cyan-500/20" : "border border-slate-700 text-slate-400 hover:text-white hover:border-slate-500"}`}>
-                  Toutes les salles
+                  {t("allRooms")}
                 </button>
                 {planRooms.map((r) => (
                   <button key={r}

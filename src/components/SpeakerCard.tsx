@@ -1,6 +1,7 @@
 "use client";
 
-import { Pencil, Trash2, Layers, Mic, User } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { Pencil, Trash2, Mic } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SpeakerLinks } from "@/types";
@@ -26,6 +27,7 @@ export function SpeakerCard({
   onEdit,
   onDelete,
 }: SpeakerCardProps) {
+  const t = useTranslations("AdminSpeakersPage.speakerCard");
   const initials = speaker.fullName
     .split(" ")
     .map((n) => n[0])
@@ -79,8 +81,7 @@ export function SpeakerCard({
           <div className="flex items-center gap-1 mb-3">
             <Mic size={10} className="text-[#3a4a5a]" />
             <span className="text-sm text-[#3a4a5a]">
-              {speaker._count.sessions} session
-              {speaker._count.sessions !== 1 ? "s" : ""}
+              {t("sessionsCount", { count: speaker._count.sessions })}
             </span>
           </div>
 
@@ -91,7 +92,7 @@ export function SpeakerCard({
             </p>
           ) : (
             <p className="text-sm text-[#2a3a4a] italic text-center">
-              Aucune biographie
+              {t("noBio")}
             </p>
           )}
         </Link>
@@ -107,7 +108,7 @@ export function SpeakerCard({
             className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl border border-[#1e2530] text-xs text-[#3a4a5a] hover:text-white hover:border-[#2e3a4a] hover:bg-[#ffffff04] transition-all duration-200 font-semibold"
           >
             <Pencil size={11} />
-            Modifier
+            {t("edit")}
           </button>
 
           <button
@@ -119,7 +120,7 @@ export function SpeakerCard({
             className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl border border-[#1e2530] text-xs text-[#3a4a5a] hover:text-red-400 hover:border-red-900/50 hover:bg-red-500/5 transition-all duration-200 font-semibold"
           >
             <Trash2 size={11} />
-            Supprimer
+            {t("delete")}
           </button>
         </div>
       </motion.div>

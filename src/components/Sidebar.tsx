@@ -129,7 +129,7 @@ function SettingsModal({
             await authClient.deleteUser();
             router.push("/");
         } catch (err) {
-            setDeleteError(err instanceof Error ? err.message : "Une erreur est survenue.");
+            setDeleteError(err instanceof Error ? err.message : t("genericError"));
             setDeleteLoading(false);
         }
     };

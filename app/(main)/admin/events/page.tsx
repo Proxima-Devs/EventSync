@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
+import { useLocale, useTranslations } from "next-intl";
 import { Calendar, MapPin, Layers, Pencil, Trash2, Plus, X, ExternalLink, Search, AlertTriangle, ChevronRight, Settings2 } from "lucide-react";
 import { Event, EventFormData } from "@/types";
 
@@ -18,8 +19,8 @@ const EMPTY_FORM: EventFormData = {
 
 // ─── Helpers ───
 
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("fr-FR", {
+function formatDate(iso: string, locale: string) {
+  return new Date(iso).toLocaleDateString(locale, {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -42,24 +43,25 @@ function isOngoing(start: string, end: string) {
 // ─── Status Badge ───
 
 function StatusBadge({ start, end }: { start: string; end: string }) {
+  const t = useTranslations("AdminEventsPage");
   if (isOngoing(start, end)) {
     return (
       <span className="inline-flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full border border-[#00E5FF30] bg-[#00E5FF10] text-[#00E5FF] font-bold uppercase tracking-widest">
         <span className="w-1.5 h-1.5 rounded-full bg-[#00E5FF] animate-pulse" />
-        Live
+        {t("statusLive")}
       </span>
     );
   }
   if (isUpcoming(start)) {
     return (
       <span className="inline-flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full border border-emerald-900/40 bg-emerald-500/10 text-emerald-400 font-bold uppercase tracking-widest">
-        À venir
+        {t("statusUpcoming")}
       </span>
     );
   }
   return (
     <span className="inline-flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full border border-[#1e2530] bg-[#ffffff05] text-[#3a4a5a] font-bold uppercase tracking-widest">
-      Terminé
+      {t("statusEnded")}
     </span>
   );
 }
@@ -111,6 +113,7 @@ function EventModal({
   onSaved: (ev: Event) => void;
   editingEvent: Event | null;
 }) {
+  const t = useTranslations("AdminEventsPage");
   const overlayRef = useRef<HTMLDivElement>(null);
   const isEdit = !!editingEvent;
   const [form, setForm] = useState<EventFormData>(EMPTY_FORM);
@@ -145,11 +148,11 @@ function EventModal({
     e.preventDefault();
     setError("");
     if (!form.title || !form.startDate || !form.endDate) {
-      setError("Titre, date de début et date de fin sont obligatoires.");
+      setError(t("modal.requiredFields"));
       return;
     }
     if (new Date(form.startDate) >= new Date(form.endDate)) {
-      setError("La date de début doit être antérieure à la date de fin.");
+      setError(t("modal.startBeforeEnd"));
       return;
     }
     setLoading(true);
@@ -169,11 +172,11 @@ function EventModal({
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Erreur serveur");
+      if (!res.ok) throw new Error(data.error ?? t("errors.server"));
       onSaved(data);
       onClose();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      setError(err instanceof Error ? err.message : t("errors.unknown"));
     } finally {
       setLoading(false);
     }
@@ -209,11 +212,11 @@ function EventModal({
                     {isEdit ? <Pencil size={12} className="text-[#00E5FF]" /> : <Plus size={12} className="text-[#00E5FF]" strokeWidth={3} />}
                   </div>
                   <h2 className="text-base font-black text-white tracking-tight">
-                    {isEdit ? "Modifier l'événement" : "Nouvel événement"}
+                    {isEdit ? t("modal.editTitle") : t("modal.createTitle")}
                   </h2>
                 </div>
                 <p className="text-xs text-[#3a4a5a] ml-8">
-                  {isEdit ? `Slug : ${editingEvent?.slug}` : "Remplissez les informations ci-dessous"}
+                  {isEdit ? t("modal.editSubtitle", { slug: editingEvent?.slug ?? "" }) : t("modal.createSubtitle")}
                 </p>
               </div>
               <button
@@ -225,25 +228,25 @@ function EventModal({
             </div>
 
             <form onSubmit={handleSubmit} className="relative px-6 py-5 flex flex-col gap-4">
-              <Field label="Titre" required>
-                <input className={inputClass} value={form.title} onChange={(e) => set("title", e.target.value)} placeholder="Ex : DevConf Paris 2026" />
+              <Field label={t("modal.titleLabel")} required>
+                <input className={inputClass} value={form.title} onChange={(e) => set("title", e.target.value)} placeholder={t("modal.titlePlaceholder")} />
               </Field>
-              <Field label="Description">
-                <textarea className={`${inputClass} resize-none`} rows={3} value={form.description} onChange={(e) => set("description", e.target.value)} placeholder="Décrivez l'événement…" />
+              <Field label={t("modal.descriptionLabel")}>
+                <textarea className={`${inputClass} resize-none`} rows={3} value={form.description} onChange={(e) => set("description", e.target.value)} placeholder={t("modal.descriptionPlaceholder")} />
               </Field>
               <div className="grid grid-cols-2 gap-3">
-                <Field label="Début" required>
+                <Field label={t("modal.startLabel")} required>
                   <input className={inputClass} type="datetime-local" value={form.startDate} onChange={(e) => set("startDate", e.target.value)} />
                 </Field>
-                <Field label="Fin" required>
+                <Field label={t("modal.endLabel")} required>
                   <input className={inputClass} type="datetime-local" value={form.endDate} onChange={(e) => set("endDate", e.target.value)} />
                 </Field>
               </div>
-              <Field label="Lieu">
-                <input className={inputClass} value={form.location} onChange={(e) => set("location", e.target.value)} placeholder="Ex : Grande Halle, Paris" />
+              <Field label={t("modal.locationLabel")}>
+                <input className={inputClass} value={form.location} onChange={(e) => set("location", e.target.value)} placeholder={t("modal.locationPlaceholder")} />
               </Field>
-              <Field label="Image de couverture (URL)">
-                <input className={inputClass} type="url" value={form.coverImage} onChange={(e) => set("coverImage", e.target.value)} placeholder="https://…" />
+              <Field label={t("modal.coverLabel")}>
+                <input className={inputClass} type="url" value={form.coverImage} onChange={(e) => set("coverImage", e.target.value)} placeholder={t("modal.coverPlaceholder")} />
               </Field>
 
               <AnimatePresence>
@@ -262,7 +265,7 @@ function EventModal({
 
               <div className="flex gap-3 pt-1">
                 <button type="button" onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-[#1e2530] text-sm text-[#4a5568] hover:text-white hover:border-[#2e3a4a] transition-all duration-200 font-semibold">
-                  Annuler
+                  {t("modal.cancel")}
                 </button>
                 <button
                   type="submit"
@@ -270,7 +273,7 @@ function EventModal({
                   className="flex-1 py-2.5 rounded-xl bg-[#00E5FF] text-black text-sm font-black tracking-wide hover:bg-[#00cfea] active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ boxShadow: "0 0 20px #00E5FF30" }}
                 >
-                  {loading ? (isEdit ? "Sauvegarde…" : "Création…") : isEdit ? "Sauvegarder" : "Créer l'événement"}
+                  {loading ? (isEdit ? t("modal.saving") : t("modal.creating")) : isEdit ? t("modal.save") : t("modal.create")}
                 </button>
               </div>
             </form>
@@ -288,6 +291,7 @@ function DeleteModal({ event, onClose, onDeleted }: {
   onClose: () => void;
   onDeleted: (id: string) => void;
 }) {
+  const t = useTranslations("AdminEventsPage");
   const overlayRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -305,12 +309,12 @@ function DeleteModal({ event, onClose, onDeleted }: {
       const res = await fetch(`/api/events/${event.id}`, { method: "DELETE" });
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error ?? "Erreur lors de la suppression");
+        throw new Error(data.error ?? t("deleteModal.deleteError"));
       }
       onDeleted(event.id);
       onClose();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      setError(err instanceof Error ? err.message : t("errors.unknown"));
       setLoading(false);
     }
   };
@@ -340,9 +344,9 @@ function DeleteModal({ event, onClose, onDeleted }: {
               <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-900/40 flex items-center justify-center mb-4">
                 <Trash2 size={18} className="text-red-400" />
               </div>
-              <h2 className="text-base font-black text-white mb-1">Supprimer l'événement ?</h2>
+              <h2 className="text-base font-black text-white mb-1">{t("deleteModal.title")}</h2>
               <p className="text-sm text-[#4a5568] leading-relaxed">
-                <span className="text-[#ccc] font-semibold">{event.title}</span> et toutes ses sessions seront définitivement supprimés.
+                {t("deleteModal.body", { title: event.title })}
               </p>
               {error && (
                 <div className="mt-3 flex items-center gap-2 text-sm text-red-400 bg-red-500/10 border border-red-900/40 rounded-xl px-3 py-2">
@@ -353,14 +357,14 @@ function DeleteModal({ event, onClose, onDeleted }: {
             </div>
             <div className="flex gap-3 px-6 pb-6">
               <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-[#1e2530] text-sm text-[#4a5568] hover:text-white hover:border-[#2e3a4a] transition-all duration-200 font-semibold">
-                Annuler
+                {t("deleteModal.cancel")}
               </button>
               <button
                 onClick={handleDelete}
                 disabled={loading}
                 className="flex-1 py-2.5 rounded-xl bg-red-500/90 text-white text-sm font-black tracking-wide hover:bg-red-500 active:scale-95 transition-all duration-200 disabled:opacity-50"
               >
-                {loading ? "Suppression…" : "Supprimer"}
+                {loading ? t("deleteModal.deleting") : t("deleteModal.confirm")}
               </button>
             </div>
           </motion.div>
@@ -383,8 +387,10 @@ function AdminEventCard({
   onEdit: (ev: Event) => void;
   onDelete: (ev: Event) => void;
 }) {
+  const t = useTranslations("AdminEventsPage");
+  const locale = useLocale();
   const day = new Date(event.startDate).getDate();
-  const month = new Date(event.startDate).toLocaleDateString("fr-FR", { month: "short" });
+  const month = new Date(event.startDate).toLocaleDateString(locale, { month: "short" });
   const isMultiDay = event.startDate.slice(0, 10) !== event.endDate.slice(0, 10);
   const ongoing = isOngoing(event.startDate, event.endDate);
   const upcoming = isUpcoming(event.startDate);
@@ -455,24 +461,24 @@ function AdminEventCard({
 
         {/* Description */}
         <p className="text-[#4a5568] text-sm line-clamp-2 leading-relaxed flex-1">
-          {event.description ?? "Aucune description disponible."}
+          {event.description ?? t("noDescription")}
         </p>
 
         {/* Meta */}
         <div className="flex flex-col gap-1.5 text-xs text-[#3a4550]">
           <span className="flex items-center gap-2">
             <MapPin size={11} className="text-[#00E5FF55] shrink-0" />
-            <span className="truncate">{event.location ?? "Lieu non précisé"}</span>
+            <span className="truncate">{event.location ?? t("locationUnknown")}</span>
           </span>
           <span className="flex items-center gap-2">
             <Calendar size={11} className="text-[#00E5FF55] shrink-0" />
             {isMultiDay
-              ? `${formatDate(event.startDate)} → ${formatDate(event.endDate)}`
-              : formatDate(event.startDate)}
+              ? `${formatDate(event.startDate, locale)} → ${formatDate(event.endDate, locale)}`
+              : formatDate(event.startDate, locale)}
           </span>
           <span className="flex items-center gap-2">
             <Layers size={11} className="text-[#00E5FF55] shrink-0" />
-            {event._count.sessions} session{event._count.sessions !== 1 ? "s" : ""}
+            {t("sessionsCount", { count: event._count.sessions })}
           </span>
         </div>
 
@@ -488,7 +494,7 @@ function AdminEventCard({
             className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-[#00E5FF30] bg-[#00E5FF08] text-[#00E5FF] text-xs font-bold hover:bg-[#00E5FF18] hover:border-[#00E5FF55] transition-all duration-200"
           >
             <ExternalLink size={12} />
-            Voir le programme
+            {t("viewProgram")}
           </Link>
 
           {/* Gérer l'événement */}
@@ -497,7 +503,7 @@ function AdminEventCard({
             className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-[#1e2530] bg-[#ffffff05] text-[#aaa] text-xs font-bold hover:bg-[#ffffff0d] hover:border-[#2e3a4a] hover:text-white transition-all duration-200"
           >
             <Settings2 size={12} />
-            Gérer
+            {t("manage")}
           </Link>
         </div>
 
@@ -508,14 +514,14 @@ function AdminEventCard({
             className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg border border-[#1e2530] text-[#3a4a5a] text-[11px] font-semibold hover:text-white hover:border-[#2e3a4a] hover:bg-[#ffffff06] transition-all duration-200"
           >
             <Pencil size={11} />
-            Modifier
+            {t("edit")}
           </button>
           <button
             onClick={() => onDelete(event)}
             className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg border border-[#1e2530] text-[#3a4a5a] text-[11px] font-semibold hover:text-red-400 hover:border-red-900/50 hover:bg-red-500/05 transition-all duration-200"
           >
             <Trash2 size={11} />
-            Supprimer
+            {t("delete")}
           </button>
         </div>
       </div>
@@ -529,6 +535,7 @@ function AdminEventCard({
 // ─── Main Page ───
 
 export default function AdminEventsPage() {
+  const t = useTranslations("AdminEventsPage");
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -546,7 +553,7 @@ export default function AdminEventsPage() {
         const data = await res.json();
         setEvents(data.data ?? []);
       } catch {
-        setError("Erreur lors du chargement des événements.");
+        setError(t("loadError"));
       } finally {
         setLoading(false);
       }
@@ -595,9 +602,9 @@ export default function AdminEventsPage() {
       <main className="flex-1 px-8 py-12 max-w-6xl mx-auto w-full">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-[#4a5568] mb-8">
-          <Link href="/" className="hover:text-[#00E5FF] transition-colors">Home</Link>
+          <Link href="/" className="hover:text-[#00E5FF] transition-colors">{t("breadcrumbHome")}</Link>
           <ChevronRight size={13} />
-          <span className="text-white">Événements</span>
+          <span className="text-white">{t("breadcrumbEvents")}</span>
         </div>
 
         {/* Header */}
@@ -607,9 +614,9 @@ export default function AdminEventsPage() {
               <div className="w-8 h-8 rounded-xl mt-2 flex items-center justify-center">
                 <Calendar size={30} className="text-[#00E5FF]" />
               </div>
-              <h1 className="font-black text-5xl">Liste des événements</h1>
+              <h1 className="font-black text-5xl">{t("pageTitle")}</h1>
             </div>
-            <p className="text-lg text-[#4a5568] mt-1">Gérez, modifiez et planifiez tous vos événements.</p>
+            <p className="text-lg text-[#4a5568] mt-1">{t("pageDescription")}</p>
           </div>
 
           <button
@@ -618,7 +625,7 @@ export default function AdminEventsPage() {
             style={{ boxShadow: "0 0 24px #00E5FF30" }}
           >
             <Plus size={15} strokeWidth={3} />
-            Créer un événement
+            {t("createEvent")}
           </button>
         </div>
 
@@ -628,10 +635,10 @@ export default function AdminEventsPage() {
             {/* Filter tabs */}
             {(
               [
-                { key: "all", label: "Tous", count: events.length, dot: "#3a4a5a" },
-                { key: "live", label: "Live", count: liveCount, dot: "#00E5FF", pulse: true },
-                { key: "upcoming", label: "À venir", count: upcomingCount, dot: "#34d399" },
-                { key: "past", label: "Passés", count: pastCount, dot: "#2a3a4a" },
+                { key: "all", label: t("filterAll"), count: events.length, dot: "#3a4a5a" },
+                { key: "live", label: t("filterLive"), count: liveCount, dot: "#00E5FF", pulse: true },
+                { key: "upcoming", label: t("filterUpcoming"), count: upcomingCount, dot: "#34d399" },
+                { key: "past", label: t("filterPast"), count: pastCount, dot: "#2a3a4a" },
               ] as const
             ).map(({ key, label, count, dot, pulse }: { key: "all" | "live" | "upcoming" | "past"; label: string; count: number; dot: string; pulse?: boolean }) => {
               const active = filter === key;
@@ -675,7 +682,7 @@ export default function AdminEventsPage() {
               <Search size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#3a4a5a] pointer-events-none" />
               <input
                 type="text"
-                placeholder="Rechercher…"
+                placeholder={t("searchPlaceholder")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-52 pl-9 pr-4 py-2 rounded-xl bg-[#0d1117] border border-[#1e2530] text-sm text-[#ccc] placeholder-[#3a4a5a] focus:outline-none focus:border-[#00E5FF44] focus:ring-1 focus:ring-[#00E5FF22] transition-all"
@@ -705,13 +712,13 @@ export default function AdminEventsPage() {
             <div className="w-16 h-16 rounded-2xl bg-[#0d1117] border border-[#1e2530] flex items-center justify-center mx-auto mb-4">
               <Calendar size={28} className="text-[#1e2530]" />
             </div>
-            <p className="text-[#3a4a5a] italic text-sm mb-5">Aucun événement pour le moment.</p>
+            <p className="text-[#3a4a5a] italic text-sm mb-5">{t("emptyState")}</p>
             <button
               onClick={openCreate}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#00E5FF15] border border-[#00E5FF30] text-[#00E5FF] text-sm font-bold hover:bg-[#00E5FF20] transition-all"
             >
               <Plus size={13} />
-              Créer le premier événement
+              {t("createFirst")}
             </button>
           </div>
         )}
@@ -719,7 +726,7 @@ export default function AdminEventsPage() {
         {/* No search results */}
         {!loading && !error && events.length > 0 && filtered.length === 0 && (
           <div className="py-16 text-center">
-            <p className="text-[#3a4a5a] italic text-sm">Aucun résultat pour «&nbsp;{search}&nbsp;».</p>
+            <p className="text-[#3a4a5a] italic text-sm">{t("noSearchResults", { query: search })}</p>
           </div>
         )}
 

@@ -4,6 +4,7 @@ import { Mic, Plus, X, Pencil, Trash2, Layers, AlertTriangle, ChevronRight, Sear
 import { useEffect, useState, useRef, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { SpeakerLinks } from "@/types";
 import FileUpload from "@/components/FileUpload";
 import { SpeakerCard } from "@/components/SpeakerCard";
@@ -71,6 +72,7 @@ function SpeakerModal({
   onSaved: (speaker: Speaker) => void;
   editingSpeaker: Speaker | null;
 }) {
+  const t = useTranslations("AdminSpeakersPage");
   const overlayRef = useRef<HTMLDivElement>(null);
   const isEdit = !!editingSpeaker;
   const [form, setForm] = useState<SpeakerFormData>({
@@ -129,7 +131,7 @@ function SpeakerModal({
     setError("");
 
     if (!form.fullName.trim()) {
-      setError("Le nom complet est obligatoire.");
+      setError(t("modal.nameRequired"));
       return;
     }
 
@@ -156,11 +158,11 @@ function SpeakerModal({
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Erreur serveur");
+      if (!res.ok) throw new Error(data.error ?? t("errors.server"));
       onSaved({ _count: { sessions: 0 }, ...data });
       onClose();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      setError(err instanceof Error ? err.message : t("errors.unknown"));
     } finally {
       setLoading(false);
     }
@@ -205,10 +207,12 @@ function SpeakerModal({
                 </div>
                 <div>
                   <h2 className="text-base font-black text-white tracking-tight">
-                    {isEdit ? "Modifier l'intervenant" : "Nouvel intervenant"}
+                    {isEdit ? t("modal.editTitle") : t("modal.createTitle")}
                   </h2>
                   <p className="text-xs text-[#3a4a5a]">
-                    {isEdit ? `ID : ${editingSpeaker?.id.slice(0, 8)}…` : "Ajoutez un conférencier"}
+                    {isEdit
+                      ? t("modal.editSubtitle", { id: editingSpeaker?.id.slice(0, 8) ?? "" })
+                      : t("modal.createSubtitle")}
                   </p>
                 </div>
               </div>
@@ -226,7 +230,7 @@ function SpeakerModal({
               {/* Photo upload — avatar centré en haut */}
               <div className="flex flex-col items-center pt-1 pb-2 border-b border-[#1e2530]">
                 <label className="text-xs font-semibold uppercase tracking-widest text-[#3a4a5a] mb-3">
-                  Photo de profil
+                  {t("modal.photoLabel")}
                 </label>
                 <FileUpload
                   value={form.photo}
@@ -237,13 +241,13 @@ function SpeakerModal({
               {/* Full Name */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-semibold uppercase tracking-widest text-[#3a4a5a]">
-                  Nom complet <span className="text-[#00E5FF]">*</span>
+                  {t("modal.fullNameLabel")} <span className="text-[#00E5FF]">*</span>
                 </label>
                 <input
                   className={inputClass}
                   value={form.fullName}
                   onChange={(e) => set("fullName", e.target.value)}
-                  placeholder="Ex : Jean Dupont"
+                  placeholder={t("modal.fullNamePlaceholder")}
                   autoFocus
                 />
               </div>
@@ -251,21 +255,21 @@ function SpeakerModal({
               {/* Bio */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-semibold uppercase tracking-widest text-[#3a4a5a]">
-                  Biographie
+                  {t("modal.bioLabel")}
                 </label>
                 <textarea
                   className={`${inputClass} resize-none`}
                   rows={3}
                   value={form.bio}
                   onChange={(e) => set("bio", e.target.value)}
-                  placeholder="Décrivez l'intervenant…"
+                  placeholder={t("modal.bioPlaceholder")}
                 />
               </div>
 
               {/* Social Links */}
               <div className="border-t border-[#1e2530] pt-4 mt-2">
                 <p className="text-xs font-semibold uppercase tracking-widest text-[#3a4a5a] mb-3">
-                  Liens sociaux (optionnel)
+                  {t("modal.socialTitle")}
                 </p>
 
                 <div className="space-y-3">
@@ -329,7 +333,7 @@ function SpeakerModal({
                   onClick={onClose}
                   className="flex-1 py-2.5 rounded-xl border border-[#1e2530] text-sm text-[#4a5568] hover:text-white hover:border-[#2e3a4a] transition-all duration-200 font-semibold"
                 >
-                  Annuler
+                  {t("modal.cancel")}
                 </button>
                 <button
                   type="submit"
@@ -338,8 +342,12 @@ function SpeakerModal({
                   style={{ boxShadow: "0 0 20px #00E5FF30" }}
                 >
                   {loading
-                    ? isEdit ? "Sauvegarde…" : "Création…"
-                    : isEdit ? "Sauvegarder" : "Créer l'intervenant"}
+                    ? isEdit
+                      ? t("modal.saving")
+                      : t("modal.creating")
+                    : isEdit
+                      ? t("modal.save")
+                      : t("modal.create")}
                 </button>
               </div>
             </form>
@@ -361,6 +369,7 @@ function DeleteModal({
   onClose: () => void;
   onDeleted: (id: string) => void;
 }) {
+  const t = useTranslations("AdminSpeakersPage");
   const overlayRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -380,12 +389,12 @@ function DeleteModal({
       const res = await fetch(`/api/speakers/${speaker.id}`, { method: "DELETE" });
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error ?? "Erreur lors de la suppression");
+        throw new Error(data.error ?? t("deleteModal.deleteError"));
       }
       onDeleted(speaker.id);
       onClose();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      setError(err instanceof Error ? err.message : t("errors.unknown"));
       setLoading(false);
     }
   };
@@ -419,12 +428,12 @@ function DeleteModal({
               <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-900/40 flex items-center justify-center mb-4">
                 <Trash2 size={18} className="text-red-400" />
               </div>
-              <h2 className="text-base font-black text-white mb-1">Supprimer l&apos;intervenant ?</h2>
+              <h2 className="text-base font-black text-white mb-1">{t("deleteModal.title")}</h2>
               <p className="text-sm text-[#4a5568] leading-relaxed">
-                <span className="text-[#ccc] font-semibold">{speaker.fullName}</span> sera supprimé(e).
+                {t("deleteModal.body", { name: speaker.fullName })}
                 {speaker._count.sessions > 0 && (
                   <span className="text-amber-400 block mt-1.5">
-                    ⚠️ {speaker._count.sessions} session{speaker._count.sessions !== 1 ? "s" : ""} associée{speaker._count.sessions !== 1 ? "s" : ""} seront dissociées.
+                    {t("deleteModal.sessionsWarning", { count: speaker._count.sessions })}
                   </span>
                 )}
               </p>
@@ -441,14 +450,14 @@ function DeleteModal({
                 onClick={onClose}
                 className="flex-1 py-2.5 rounded-xl border border-[#1e2530] text-sm text-[#4a5568] hover:text-white hover:border-[#2e3a4a] transition-all duration-200 font-semibold"
               >
-                Annuler
+                {t("deleteModal.cancel")}
               </button>
               <button
                 onClick={handleDelete}
                 disabled={loading}
                 className="flex-1 py-2.5 rounded-xl bg-red-500/90 text-white text-sm font-black tracking-wide hover:bg-red-500 active:scale-95 transition-all duration-200 disabled:opacity-50"
               >
-                {loading ? "Suppression…" : "Supprimer"}
+                {loading ? t("deleteModal.deleting") : t("deleteModal.confirm")}
               </button>
             </div>
           </motion.div>
@@ -461,6 +470,7 @@ function DeleteModal({
 // ─── Main Page ───
 
 export default function AdminSpeakersPage() {
+  const t = useTranslations("AdminSpeakersPage");
   const [speakers, setSpeakers] = useState<Speaker[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -476,11 +486,11 @@ export default function AdminSpeakersPage() {
       const data = await res.json();
       setSpeakers(Array.isArray(data) ? data : []);
     } catch {
-      setError("Erreur lors du chargement des intervenants.");
+      setError(t("loadError"));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     (async () => {
@@ -535,10 +545,10 @@ export default function AdminSpeakersPage() {
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-[#4a5568] mb-8">
           <Link href="/" className="hover:text-[#00E5FF] transition-colors">
-            Home
+            {t("breadcrumbHome")}
           </Link>
           <ChevronRight size={13} />
-          <span className="text-white">Intervenants</span>
+          <span className="text-white">{t("breadcrumbSpeakers")}</span>
         </div>
 
         {/* Header */}
@@ -549,11 +559,11 @@ export default function AdminSpeakersPage() {
                 <Mic size={16} className="text-[#00E5FF]" />
               </div>
               <h1 className="text-3xl font-black text-white tracking-tight">
-                Intervenants
+                {t("pageTitle")}
               </h1>
             </div>
             <p className="text-sm text-[#4a5568] ml-11">
-              Gérez les conférenciers et leurs profils publics.
+              {t("pageDescription")}
             </p>
           </div>
 
@@ -563,7 +573,7 @@ export default function AdminSpeakersPage() {
             style={{ boxShadow: "0 0 24px #00E5FF30" }}
           >
             <Plus size={15} strokeWidth={3} />
-            Ajouter un intervenant
+            {t("addSpeaker")}
           </button>
         </div>
 
@@ -573,13 +583,13 @@ export default function AdminSpeakersPage() {
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#1e2530] bg-[#0d1117]">
               <Mic size={11} className="text-[#3a4a5a]" />
               <span className="text-xs text-[#3a4a5a] font-semibold">
-                {speakers.length} intervenant{speakers.length !== 1 ? "s" : ""}
+                {t("speakerCount", { count: speakers.length })}
               </span>
             </div>
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#1e2530] bg-[#0d1117]">
               <Layers size={11} className="text-[#3a4a5a]" />
               <span className="text-xs text-[#3a4a5a] font-semibold">
-                {totalSessions} session{totalSessions !== 1 ? "s" : ""} au total
+                {t("totalSessions", { count: totalSessions })}
               </span>
             </div>
 
@@ -590,7 +600,7 @@ export default function AdminSpeakersPage() {
               />
               <input
                 type="text"
-                placeholder="Rechercher…"
+                placeholder={t("searchPlaceholder")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-48 pl-9 pr-4 py-2 rounded-xl bg-[#0d1117] border border-[#1e2530] text-sm text-[#ccc] placeholder-[#3a4a5a] focus:outline-none focus:border-[#00E5FF44] focus:ring-1 focus:ring-[#00E5FF22] transition-all"
@@ -621,14 +631,14 @@ export default function AdminSpeakersPage() {
           <div className="py-20 text-center">
             <Mic size={28} className="mx-auto text-[#1e2530] mb-3" />
             <p className="text-[#3a4a5a] italic text-sm mb-4">
-              Aucun intervenant pour le moment.
+              {t("emptyState")}
             </p>
             <button
               onClick={openCreate}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#00E5FF15] border border-[#00E5FF30] text-[#00E5FF] text-sm font-bold hover:bg-[#00E5FF20] transition-all"
             >
               <Plus size={13} />
-              Créer le premier intervenant
+              {t("createFirst")}
             </button>
           </div>
         )}
@@ -637,7 +647,7 @@ export default function AdminSpeakersPage() {
         {!loading && !error && speakers.length > 0 && filtered.length === 0 && (
           <div className="py-12 text-center">
             <p className="text-[#3a4a5a] italic text-sm">
-              Aucun intervenant ne correspond à «&nbsp;{search}&nbsp;».
+              {t("noSearchResults", { query: search })}
             </p>
           </div>
         )}

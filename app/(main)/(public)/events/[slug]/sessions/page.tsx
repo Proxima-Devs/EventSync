@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 import { apiFetch } from "@/lib/api";
 import { useFavorites } from "@/hooks/useFavorites";
 import { Session, EventMeta } from "@/types";
@@ -207,6 +208,8 @@ function useInjectStyles(css: string) {
 }
 
 export default function SessionsPage() {
+    const t = useTranslations("EventSessionsPage");
+    const locale = useLocale();
     const { slug } = useParams<{ slug: string }>();
     const [event, setEvent] = useState<EventMeta | null>(null);
     const [sessions, setSessions] = useState<Session[]>([]);
@@ -251,7 +254,7 @@ export default function SessionsPage() {
             <div style={{ minHeight: "100vh", background: "#0a0e17", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
                     <div style={{ width: 28, height: 28, borderRadius: "50%", border: "2px solid #00E5FF", borderTopColor: "transparent" }} className="animate-spin" />
-                    <span style={{ color: "#4a5568", fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase" }}>Chargement</span>
+                    <span style={{ color: "#4a5568", fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase" }}>{t("loading")}</span>
                 </div>
             </div>
         );
@@ -284,7 +287,7 @@ export default function SessionsPage() {
                     color: "#4a5568", textDecoration: "none", marginBottom: 48,
                 }}>
                     <span className="arrow-icon" style={{ fontSize: 10 }}>←</span>
-                    {event?.title ?? "Retour"}
+                    {event?.title ?? t("back")}
                 </Link>
 
                 {/* ── Header ── */}
@@ -294,7 +297,7 @@ export default function SessionsPage() {
                         fontSize: "2.4rem", fontWeight: 900, lineHeight: 1.08,
                         letterSpacing: "-0.02em", marginBottom: 0,
                     }}>
-                        Sessions
+                        {t("pageTitle")}
                     </h1>
                 </header>
 
@@ -305,7 +308,7 @@ export default function SessionsPage() {
                             onClick={() => setActiveRoom("all")}
                             className={`filter-pill${activeRoom === "all" ? " active" : ""}`}
                         >
-                            Toutes
+                            {t("filterAll")}
                         </button>
                         {rooms.map((room, i) => (
                             <button
@@ -323,7 +326,7 @@ export default function SessionsPage() {
                 {/* ── Sessions heading ── */}
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
           <span style={{ fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: "#4a5568", fontWeight: 600, whiteSpace: "nowrap" }}>
-            Sessions
+            {t("pageTitle")}
           </span>
                     <span className="count-badge">{filtered.length}</span>
                     <div className="divider-line" />
@@ -350,13 +353,13 @@ export default function SessionsPage() {
                                             padding: "2px 8px", borderRadius: 999, fontWeight: 700,
                                         }}>
                       <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff" }} className="animate-pulse" />
-                      LIVE
+                      {t("live")}
                     </span>
                                     )}
                                     <span style={{ fontSize: 11, color: "#4a5568", fontVariantNumeric: "tabular-nums" }}>
-                    {new Date(session.startTime).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
+                    {new Date(session.startTime).toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" })}
                                         {" → "}
-                                        {new Date(session.endTime).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
+                                        {new Date(session.endTime).toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" })}
                   </span>
                                     {session.room && (
                                         <span className="room-badge">{session.room.name}</span>
@@ -378,7 +381,7 @@ export default function SessionsPage() {
                             <button
                                 onClick={() => handleToggleFav(session.id)}
                                 className={`star-btn${isFavorite(session.id) ? " active" : ""}${starPop === session.id ? " pop" : ""}`}
-                                title={isFavorite(session.id) ? "Retirer des favoris" : "Ajouter aux favoris"}
+                                title={isFavorite(session.id) ? t("removeFavorite") : t("addFavorite")}
                             >
                                 {isFavorite(session.id) ? "⭐" : "☆"}
                             </button>
