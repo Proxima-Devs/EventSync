@@ -387,7 +387,7 @@ export default function DashboardPage() {
   const t = useTranslations("AdminDashboardPage");
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [modalOpen, setModalOpen] = useState(false);
+  
 
   const fetchStats = useCallback(async () => {
     try {
@@ -484,14 +484,6 @@ export default function DashboardPage() {
 
   return (
     <>
-      <CreateEventModal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        onCreated={() => {
-          setLoading(true);
-          fetchStats().then(setStats);
-        }}
-      />
 
       <main className="flex-1 px-8 py-12 max-w-6xl mx-auto w-full">
         {/* Breadcrumb */}
@@ -514,13 +506,13 @@ export default function DashboardPage() {
             <p className="text-sm text-[#4a5568] ml-11">{t("pageDescription")}</p>
           </div>
 
-          <button
-            onClick={() => setModalOpen(true)}
+          <Link
+            href="/admin/react"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#00E5FF] text-black text-sm font-black tracking-wide hover:bg-[#00cfea] active:scale-95 transition-all duration-200 shadow-[0_0_24px_#00E5FF30]"
           >
             <Plus size={15} strokeWidth={3} />
-            {t("createEventButton")}
-          </button>
+            Admin
+          </Link>
         </div>
 
         {/* Stats Grid */}
