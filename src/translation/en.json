@@ -9,7 +9,7 @@
     "searchPlaceholder": "Search events by title or location...",
     "searchButton": "Search",
     "featuredEvents": "Featured Events",
-    "eventCount": "{count} event |||| {count} events",
+    "eventCount": "{count, plural, one {# event} other {# events}}",
     "allFilter": "All",
     "upcomingFilter": "Upcoming",
     "pastFilter": "Past",
@@ -115,8 +115,8 @@
     "live": "LIVE",
     "ended": "Ended",
     "upcoming": "Upcoming",
-    "sessionsCount": "{count} session |||| {count} sessions"
-    ,"createEventModal": {
+    "sessionsCount": "{count, plural, one {# session} other {# sessions}}",
+    "createEventModal": {
       "title": "Create an event",
       "description": "Fill in the details below",
       "titleLabel": "Title",
@@ -235,7 +235,7 @@
     "like": "Like",
     "reply": "Reply",
     "hideReplies": "Hide replies",
-    "viewReplies": "View {count} reply |||| View {count} replies",
+    "viewReplies": "{count, plural, one {View # reply} other {View # replies}}",
     "replyPlaceholder": "Write a reply...",
     "relativeJustNow": "just now",
     "relativeMinutes": "{count} min",
@@ -248,8 +248,8 @@
     "pageTitle": "Rooms",
     "pageDescription": "Manage spaces and auditoriums for your events.",
     "addRoom": "Add a room",
-    "roomCount": "{count} room |||| {count} rooms",
-    "totalSessions": "{count} session total |||| {count} sessions total",
+    "roomCount": "{count, plural, one {# room} other {# rooms}}",
+    "totalSessions": "{count, plural, one {# session total} other {# sessions total}}",
     "searchPlaceholder": "Search…",
     "tableRoom": "Room",
     "tableSessions": "Sessions",
@@ -257,7 +257,7 @@
     "emptyState": "No rooms yet.",
     "createFirst": "Create the first room",
     "noSearchResults": "No room matches “{query}”.",
-    "sessionsCount": "{count} session |||| {count} sessions",
+    "sessionsCount": "{count, plural, one {# session} other {# sessions}}",
     "editTitle": "Edit",
     "deleteTitle": "Delete",
     "modal": {
@@ -294,8 +294,8 @@
     "pageTitle": "Speakers",
     "pageDescription": "Manage speakers and their public profiles.",
     "addSpeaker": "Add a speaker",
-    "speakerCount": "{count} speaker |||| {count} speakers",
-    "totalSessions": "{count} session total |||| {count} sessions total",
+    "speakerCount": "{count, plural, one {# speaker} other {# speakers}}",
+    "totalSessions": "{count, plural, one {# session total} other {# sessions total}}",
     "searchPlaceholder": "Search…",
     "loadError": "Failed to load speakers.",
     "emptyState": "No speakers yet.",
@@ -305,7 +305,7 @@
       "noBio": "No biography",
       "edit": "Edit",
       "delete": "Delete",
-      "sessionsCount": "{count} session |||| {count} sessions"
+      "sessionsCount": "{count, plural, one {# session} other {# sessions}}"
     },
     "modal": {
       "editTitle": "Edit speaker",
@@ -437,7 +437,7 @@
       "noSpeakers": "No speakers.",
       "createSpeakerLink": "Create one",
       "createSpeakerFirst": " first.",
-      "speakersSelected": "{count} speaker selected |||| {count} speakers selected",
+      "speakersSelected": "{count, plural, one {# speaker selected} other {# speakers selected}}",
       "requiredFields": "Title, start, and end are required.",
       "startBeforeEnd": "Start must be before end.",
       "speakerRequired": "Select at least one speaker.",
