@@ -572,7 +572,7 @@ export default function EventDetailPage() {
   // ── Loading ──────────────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <main className="flex-1 min-h-screen bg-slate-950">
+      <main className="flex-1 min-h-screen">
         <div className="h-72 w-full bg-slate-800 animate-pulse" />
         <div className="px-6 py-8 max-w-5xl mx-auto w-full">
           <div className="h-4 w-24 bg-slate-800 rounded animate-pulse mb-8" />
@@ -590,7 +590,7 @@ export default function EventDetailPage() {
 
   if (pageError || !event) {
     return (
-      <main className="flex-1 min-h-screen bg-slate-950 px-6 py-8 max-w-5xl mx-auto w-full">
+      <main className="flex-1 min-h-screen px-6 py-8 max-w-5xl mx-auto w-full">
         <div className="flex items-center gap-2 text-rose-300 text-sm bg-rose-500/10 border border-rose-500/20 rounded-2xl px-4 py-3">
           <AlertTriangle size={15} />{pageError || t("notFound")}
         </div>
@@ -599,7 +599,7 @@ export default function EventDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
+    <div className="min-h-screen text-white">
       {/* Modals */}
       <EditEventModal open={editEventOpen} onClose={() => setEditEventOpen(false)} event={event} onSaved={setEvent} />
       <SessionModal open={sessionModalOpen} onClose={() => setSessionModalOpen(false)} onSaved={handleSessionSaved}
@@ -630,7 +630,7 @@ export default function EventDetailPage() {
         </div>
       </div>
 
-      <main className="px-6 pb-12 max-w-5xl mx-auto w-full -mt-6">
+      <main className="px-6 pb-12 max-w-5xl mx-auto w-full -mt-20">
 
         {/* ── Event header card ──────────────────────────────────────────────── */}
         <div className="rounded-3xl border border-slate-800 bg-slate-900/95 p-8 shadow-2xl shadow-black/30 backdrop-blur-xl mb-8">

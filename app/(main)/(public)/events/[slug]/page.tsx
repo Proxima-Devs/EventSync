@@ -85,12 +85,12 @@ function PlanningGrid({ sessions, selectedRoom, toggle, isFavorite, slug }: {
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[720px] border-collapse text-left">
+      <table className="w-full min-w-180 border-collapse text-left">
         <thead>
           <tr>
             <th className="py-3 px-4 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 border-b border-slate-800">{t("timeHeader")}</th>
             {visibleRooms.map((room) => (
-              <th key={room} className="py-3 px-4 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 border-b border-slate-800 bg-slate-900/60 border-l border-slate-800 text-center">
+              <th key={room} className="py-3 px-4 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 border-b border-slate-800 bg-slate-900/60 border-l text-center">
                 {room}
               </th>
             ))}
@@ -103,7 +103,7 @@ function PlanningGrid({ sessions, selectedRoom, toggle, isFavorite, slug }: {
               {visibleRooms.map((room) => {
                 const roomSessions = sessionsByTimeAndRoom[time]?.[room] ?? [];
                 return (
-                  <td key={room} className="py-4 px-3 border-l border-slate-800 align-top min-w-[220px]">
+                  <td key={room} className="py-4 px-3 border-l border-slate-800 align-top min-w-55">
                     {roomSessions.map((session) => (
                       <Link key={session.id} href={`/events/${slug}/sessions/${session.slug}`} className="group block rounded-2xl border border-slate-700 bg-slate-900/80 p-3 mb-2 hover:border-cyan-500/40 hover:bg-slate-800/90 transition-all">
                         <div className="flex items-start justify-between gap-3">
@@ -163,7 +163,7 @@ export default function EventDetailPage() {
 
   if (loading)
     return (
-      <main className="min-h-screen bg-slate-950 text-slate-100 px-6 py-10">
+      <main className="min-h-screen text-slate-100 px-6 py-10">
         <div className="mx-auto max-w-5xl space-y-8 animate-pulse">
           <div className="h-72 rounded-4xl bg-slate-800 shadow-inner" />
           <div className="space-y-3">
@@ -190,7 +190,7 @@ export default function EventDetailPage() {
 
   if (error || !event)
     return (
-      <main className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center px-6 py-10">
+      <main className="min-h-screen text-slate-100 flex items-center justify-center px-6 py-10">
         <div className="rounded-3xl border border-rose-500/20 bg-rose-500/10 px-8 py-6 text-rose-200">
           <p className="text-sm font-semibold">{error || t("eventNotFound")}</p>
         </div>
@@ -206,26 +206,25 @@ export default function EventDetailPage() {
   const planRooms = [...new Set(event.sessions.flatMap((session) => (session.room ? [session.room.name] : [])))];
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white">
+    <main className="min-h-screen text-white">
       <div className="relative">
         <div className="h-80 w-full overflow-hidden bg-slate-900">
-          <Image
-            src={event.coverImage ?? "/background.png"}
-            alt={event.title}
-            fill
-            className="w-screen h-screen object-cover"
-          />
+          <Image src={event.coverImage ?? "/background.png"} alt={event.title} fill className="w-screen h-screen object-cover" />
         </div>
         <div className="absolute inset-x-0 bottom-0 h-28 bg-linear-to-t from-slate-950 via-slate-950/70 to-transparent" />
+        <div className="absolute inset-x-0 top-0 h-20 bg-linear-to-b from-slate-950/60 to-transparent" />
+
+        <div className="absolute top-5 left-0 right-0 px-6 max-w-5xl mx-auto">
+          <Link href="/" className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.35em] text-slate-300 hover:text-cyan-300 transition">
+            <FontAwesomeIcon icon={faArrowLeft} className="text-[10px]" />
+            {t("backToEvents")}
+          </Link>
+        </div>
       </div>
 
-      <div className="mx-auto max-w-5xl px-6 py-10 lg:px-8">
-        <Link href="/" className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.35em] text-slate-500 transition hover:text-cyan-300">
-          <FontAwesomeIcon icon={faArrowLeft} className="text-[10px]" />
-          {t("backToEvents")}
-        </Link>
+      <div className="mx-auto max-w-5xl px-6 pb-10 lg:px-8 -mt-20">
 
-        <div className="mt-8 rounded-4xl border border-slate-800 bg-slate-900/95 p-8 shadow-2xl shadow-black/20 backdrop-blur-xl">
+        <div className="mt-0 rounded-4xl border border-slate-800 bg-slate-900/95 p-8 shadow-2xl shadow-black/20 backdrop-blur-xl">
           <div className="grid gap-10 lg:grid-cols-[1.55fr_0.9fr] lg:items-end">
             <div className="space-y-6">
               <div className="h-2.5 w-20 rounded-full bg-cyan-400/25" />
