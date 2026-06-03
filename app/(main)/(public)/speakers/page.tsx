@@ -146,7 +146,7 @@ export default function SpeakersPage() {
     const [search, setSearch] = useState("");
 
     useEffect(() => {
-        apiFetch<Speaker[]>"/api/speakers")
+        apiFetch<Speaker[]>("/api/speakers")
             .then(setSpeakers)
             .catch(() => setError(t("errorLoad")))
             .finally(() => setLoading(false));
