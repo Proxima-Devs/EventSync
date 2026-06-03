@@ -44,7 +44,7 @@ const raDataProvider: DataProvider = {
   getOne: async (resource, params) => {
     const url = `${apiUrl}/${resource}/${params.id}`;
     const res = await fetch(url);
-    if (res.status === 404) return { data: [], total: 0 };
+    if (res.status === 404) throw new Error("Not found");
     if (!res.ok) throw new Error(res.statusText);
     const json = await res.json();
     // Normalize payload to a single object
@@ -147,8 +147,8 @@ const raDataProvider: DataProvider = {
     const url = `${apiUrl}/${resource}/${params.id}`;
     const res = await fetch(url, { method: "DELETE" });
     if (!res.ok) throw new Error(res.statusText);
-    const json = await res.text();
-    return { data: params.previousData ?? { id: params.id } };
+    await res.text();
+    return { data: (params.previousData ?? { id: params.id }) as any };
   },
 
   deleteMany: async (resource, params) => {
