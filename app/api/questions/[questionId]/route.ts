@@ -4,6 +4,35 @@ import { requireAdmin } from "@/lib/auth-utils";
 
 type Params = { params: Promise<{ questionId: string }> };
 
+export async function GET(_req: NextRequest, { params }: Params) {
+  try {
+    const { questionId } = await params;
+
+    const question = await prisma.question.findUnique({
+      where: { id: questionId },
+      include: {
+        session: {
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+            event: { select: { id: true, title: true, slug: true } },
+          },
+        },
+      },
+    });
+
+    if (!question) {
+      return NextResponse.json({ error: "Question introuvable" }, { status: 404 });
+    }
+
+    return NextResponse.json(question);
+  } catch (error) {
+    console.error("[GET /api/questions/[questionId]]", error);
+    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
+  }
+}
+
 /**
  * DELETE /api/questions/[questionId]
  * ENDPOINT SUGGÉRÉ — suppression définitive par l'admin.
