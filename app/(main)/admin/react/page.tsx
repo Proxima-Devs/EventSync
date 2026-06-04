@@ -1,6 +1,6 @@
 "use client";
 
-import { Admin, Resource } from 'react-admin';
+import { Admin, Resource, AuthProvider } from 'react-admin';
 import dataProvider from '../dataProvider';
 import { darkCyanTheme } from '../adminTheme';
 import { EventList, EventCreate, EventEdit } from '../resources/events/page';
@@ -8,10 +8,20 @@ import { RoomList, RoomCreate, RoomEdit } from '../resources/rooms/page';
 import { SpeakerList, SpeakerCreate, SpeakerEdit } from '../resources/speakers/page';
 import DashboardPage from '../dashboard/page';
 
+
+const authProvider: AuthProvider = {
+  login: () => Promise.resolve(),
+  logout: () => Promise.resolve(),
+  checkAuth: () => Promise.resolve(),     
+  checkError: () => Promise.resolve(),
+  getPermissions: () => Promise.resolve(),
+};
+
 export default function ReactAdminPage() {
   return (
     <Admin
       dataProvider={dataProvider}
+      authProvider={authProvider}
       theme={darkCyanTheme}
       dashboard={DashboardPage}
       basename="/admin/react"
