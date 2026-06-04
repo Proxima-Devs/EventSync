@@ -4,13 +4,13 @@ const apiUrl = '/api';
 
 const dataProvider: DataProvider = {
   getList: async (resource, params) => {
-    const { page, perPage } = params.pagination;
+    const page = params.pagination?.page ?? 1;
+    const perPage = params.pagination?.perPage ?? 20;
     const url = `${apiUrl}/${resource}?page=${page}&perPage=${perPage}`;
-    const { json, headers } = await fetchUtils.fetchJson(url);
+    const { json } = await fetchUtils.fetchJson(url);
 
-    // Supporte { data: [], total: N } OU tableau direct
     const data = Array.isArray(json) ? json : (json.data ?? []);
-    const total = json.total ?? data.length;
+    const total = json.meta?.total ?? json.total ?? data.length;
 
     return { data, total };
   },
@@ -40,10 +40,9 @@ const dataProvider: DataProvider = {
     const { json } = await fetchUtils.fetchJson(`${apiUrl}/${resource}/${params.id}`, {
       method: 'DELETE',
     });
-    return { data: json };
+    return { data: json ?? { id: params.id } };
   },
 
-  // Méthodes requises mais non utilisées ici
   getMany: async (resource, params) => {
     const data = await Promise.all(
       params.ids.map(id =>
