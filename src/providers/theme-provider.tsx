@@ -1,14 +1,13 @@
 'use client';
 
 import React, { createContext, useCallback, useEffect, useState } from 'react';
-import { DEFAULT_THEME, ThemeConfig } from '@/types/theme';
-import { isValidHex } from '@/utils/color';
+import { DEFAULT_THEME, ThemeConfig, ThemeMode } from '@/types/theme';
 
 const STORAGE_KEY = 'eventsync_theme';
 
 interface ThemeContextType {
   theme: ThemeConfig;
-  setTheme: (newTheme: Partial<ThemeConfig>) => void;
+  setTheme: (mode: ThemeMode) => void;
   resetTheme: () => void;
 }
 
@@ -16,61 +15,62 @@ export const ThemeContext = createContext<ThemeContextType | undefined>(undefine
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<ThemeConfig>(DEFAULT_THEME);
-  const [mounted, setMounted] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
-        if (
-          isValidHex(parsed.primary) &&
-          isValidHex(parsed.secondary) &&
-          isValidHex(parsed.tertiary) &&
-          isValidHex(parsed.background) &&
-          isValidHex(parsed.backgroundDark)
-        ) {
+        if (parsed.mode && ['dark', 'light', 'system'].includes(parsed.mode)) {
           setThemeState(parsed);
         }
       } catch {
         localStorage.removeItem(STORAGE_KEY);
       }
     }
-    setMounted(true);
   }, []);
 
   const applyThemeToDom = useCallback((newTheme: ThemeConfig) => {
     const root = document.documentElement;
-    root.style.setProperty('--color-primary', newTheme.primary);
-    root.style.setProperty('--color-secondary', newTheme.secondary);
-    root.style.setProperty('--color-tertiary', newTheme.tertiary);
-    root.style.setProperty('--background', newTheme.background);
-    root.style.setProperty('--background-dark', newTheme.backgroundDark);
+    if (newTheme.mode === 'system') {
+      root.classList.toggle('dark', window.matchMedia('(prefers-color-scheme: dark)').matches);
+    } else {
+      root.classList.toggle('dark', newTheme.mode === 'dark');
+    }
   }, []);
 
   useEffect(() => {
-    if (mounted) {
+    if (isClient) {
       applyThemeToDom(theme);
     }
-  }, [theme, mounted, applyThemeToDom]);
+  }, [theme, isClient, applyThemeToDom]);
 
-  const setTheme = useCallback((newTheme: Partial<ThemeConfig>) => {
-    setThemeState((prev) => {
-      const updated = { ...prev, ...newTheme };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-      return updated;
-    });
-  }, []);
+  useEffect(() => {
+    if (!isClient) return;
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = () => {
+      if (theme.mode === 'system') {
+        applyThemeToDom(theme);
+      }
+    };
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, [theme, isClient, applyThemeToDom]);
+
+  const setTheme = useCallback((mode: ThemeMode) => {
+    const newTheme = { mode };
+    setThemeState(newTheme);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(newTheme));
+    applyThemeToDom(newTheme);
+  }, [applyThemeToDom]);
 
   const resetTheme = useCallback(() => {
     setThemeState(DEFAULT_THEME);
     localStorage.removeItem(STORAGE_KEY);
     applyThemeToDom(DEFAULT_THEME);
   }, [applyThemeToDom]);
-
-  if (!mounted) {
-    return <>{children}</>;
-  }
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme, resetTheme }}>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTheme } from '@/hooks/useTheme';
 import { Home, Heart, LayoutDashboard, Calendar, Users, Building2, LogOut, PanelLeft, Settings, LogIn, Trash2, X, AlertTriangle } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -7,7 +8,7 @@ import { useSidebar } from "./sidebar-context";
 import { authClient } from "@/lib/auth-client";
 import Image from "next/image";
 import Link from "next/link";
-import { ThemeCustomizer } from "./settings/ThemeCustomizer";
+import type { ThemeMode } from "@/types/theme";
 
 type NavItem = { href: string; icon: React.ElementType; label: string };
 
@@ -94,8 +95,8 @@ function SettingsModal({
     onClose: () => void;
 }) {
     const router = useRouter();
-    const [theme, setTheme] = useState<"dark" | "light" | "system">("dark");
-    const [tab, setTab] = useState<"profile" | "general" | "appearance">("profile");
+    const { theme, setTheme } = useTheme();
+    const [tab, setTab] = useState<"profile" | "general">("profile");
     const [lang, setLang] = useState<"fr" | "en">("fr");
     const overlayRef = useRef<HTMLDivElement>(null);
 
@@ -141,7 +142,7 @@ function SettingsModal({
                         <p className="px-3 pb-2 text-[10px] font-bold tracking-widest uppercase text-[#444]">
                             Compte
                         </p>
-                        {(["profile", "general", "appearance"] as const).map((t) => (
+                        {(["profile", "general"] as const).map((t) => (
                             <button
                                 key={t}
                                 onClick={() => setTab(t)}
@@ -151,7 +152,7 @@ function SettingsModal({
                                         : "text-[#666] hover:text-[#aaa] hover:bg-white/4"
                                     }`}
                             >
-                                {t === "profile" ? "Profil" : t === "general" ? "Général" : "Apparence"}
+                                {t === "profile" ? "Profil" : "Général"}
                             </button>
                         ))}
                     </div>
@@ -221,16 +222,16 @@ function SettingsModal({
                                     <div className="grid grid-cols-3 gap-2">
                                         {(
                                             [
-                                                { value: "dark", label: "Sombre", emoji: "🌑" },
-                                                { value: "light", label: "Clair", emoji: "☀️" },
-                                                { value: "system", label: "Système", emoji: "💻" },
+                                                { value: "dark" as ThemeMode, label: "Sombre", emoji: "🌑" },
+                                                { value: "light" as ThemeMode, label: "Clair", emoji: "☀️" },
+                                                { value: "system" as ThemeMode, label: "Système", emoji: "💻" },
                                             ] as const
                                         ).map((opt) => (
                                             <button
                                                 key={opt.value}
                                                 onClick={() => setTheme(opt.value)}
                                                 className={`cursor-pointer py-2.5 rounded-xl border text-xs font-bold transition-all
-                                                    ${theme === opt.value
+                                                    ${theme.mode === opt.value
                                                         ? "border-primary-light bg-primary-light text-primary"
                                                         : "border-[#1e2226] bg-[#111316] text-[#666] hover:text-[#aaa] hover:border-[#333]"
                                                     }`}
@@ -268,14 +269,6 @@ function SettingsModal({
                                         ))}
                                     </div>
                                 </div>
-                            </div>
-                        )}
-
-                        {tab === "appearance" && (
-                            <div>
-                                <h2 className="text-base font-bold text-[#eee] mb-6">Personnaliser l'apparence</h2>
-                                <p className="text-sm text-[#999] mb-6">Choisissez vos propres couleurs pour personnaliser votre interface.</p>
-                                <ThemeCustomizer />
                             </div>
                         )}
                     </div>
