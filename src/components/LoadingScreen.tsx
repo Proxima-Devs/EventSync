@@ -12,7 +12,7 @@ export default function LoadingScreen() {
         style={{ width: 300, height: 200 }}
       />
 
-      <p className="text-[#3a4550] text-xs mt-4 tracking-widest uppercase">
+      <p className="text-content-muted text-xs mt-4 tracking-widest uppercase">
         Loading...
       </p>
     </div>

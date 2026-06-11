@@ -44,23 +44,23 @@ function DeleteConfirmDialog({
 }) {
     return (
         <div className="fixed inset-0 z-300 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-            <div className="w-100 max-w-[90vw] bg-[#0e1114] border border-[#1e2226] rounded-2xl p-6 shadow-2xl shadow-black/60 animate-scale-in">
+            <div className="w-100 max-w-[90vw] bg-surface border border-[#1e2226] rounded-2xl p-6 shadow-2xl shadow-black/60 animate-scale-in">
                 <div className="flex items-center gap-3 mb-4">
                     <div className="w-9 h-9 rounded-xl bg-red-500/15 flex items-center justify-center shrink-0">
                         <AlertTriangle size={18} className="text-red-400" />
                     </div>
-                    <h3 className="text-base font-bold text-[#eee]">{t("deleteAccount")}</h3>
+                    <h3 className="text-base font-bold text-content-default">{t("deleteAccount")}</h3>
                 </div>
 
-                <p className="text-sm text-[#777] leading-relaxed mb-6">
-                    {t("deleteConfirmationIntro")} <span className="text-[#aaa] font-semibold">{t("deleteConfirmationIrreversible")}</span>. {t("deleteConfirmationOutro")}
+                <p className="text-sm text-content-secondary leading-relaxed mb-6">
+                    {t("deleteConfirmationIntro")} <span className="text-content-secondary font-semibold">{t("deleteConfirmationIrreversible")}</span>. {t("deleteConfirmationOutro")}
                 </p>
 
                 <div className="flex gap-2 justify-end">
                     <button
                         onClick={onCancel}
                         disabled={loading}
-                        className="cursor-pointer px-4 py-2 rounded-xl text-sm font-semibold text-[#777] hover:text-[#aaa] hover:bg-white/4 transition-colors disabled:opacity-50"
+                        className="cursor-pointer px-4 py-2 rounded-xl text-sm font-semibold text-content-secondary hover:text-content-secondary hover:bg-overlay-hover transition-colors disabled:opacity-50"
                     >
                         {t("cancel")}
                     </button>
@@ -97,8 +97,8 @@ function SettingsModal({
     const router = useRouter();
     const locale = useLocale() as "fr" | "en";
     const t = useTranslations("Sidebar");
-    const [theme, setTheme] = useState<"dark" | "light" | "system">("dark");
-    const [tab, setTab] = useState<"profile" | "general" | "appearance">("profile");
+    const { theme, setTheme } = useTheme();
+    const [tab, setTab] = useState<"profile" | "general">("profile");
     const [lang, setLang] = useState<"fr" | "en">(locale);
     const overlayRef = useRef<HTMLDivElement>(null);
 
@@ -141,30 +141,30 @@ function SettingsModal({
                 onClick={(e) => e.target === overlayRef.current && onClose()}
                 className="fixed inset-0 z-200 flex items-center justify-center bg-black/60 backdrop-blur-sm"
             >
-                <div className="relative flex w-160 max-w-[90vw] h-110 bg-[#0e1114] border border-[#1e2226] rounded-2xl overflow-hidden shadow-2xl shadow-black/60 animate-scale-in">
+                <div className="relative flex w-160 max-w-[90vw] h-110 bg-surface border border-[#1e2226] rounded-2xl overflow-hidden shadow-2xl shadow-black/60 animate-scale-in">
 
                     <button
                         onClick={onClose}
-                        className="cursor-pointer absolute top-4 right-4 z-10 w-7 h-7 flex items-center justify-center rounded-lg text-[#444] hover:text-[#aaa] hover:bg-white/5 transition-colors"
+                        className="cursor-pointer absolute top-4 right-4 z-10 w-7 h-7 flex items-center justify-center rounded-lg text-content-placeholder hover:text-content-secondary hover:bg-overlay-hover-strong transition-colors"
                     >
                         <X size={15} />
                     </button>
 
-                    <div className="w-44 shrink-0 bg-[#080a0c] border-r border-[#1a1a1a] flex flex-col px-2 py-5 gap-1">
-                        <p className="px-3 pb-2 text-[10px] font-bold tracking-widest uppercase text-[#444]">
+                    <div className="w-44 shrink-0 bg-surface-sidebar border-r border-[#1a1a1a] flex flex-col px-2 py-5 gap-1">
+                        <p className="px-3 pb-2 text-[10px] font-bold tracking-widest uppercase text-content-placeholder">
                             {t("account")}
                         </p>
-                        {(["profile", "general", "appearance"] as const).map((tabKey) => (
+                        {(["profile", "general"] as const).map((tabKey) => (
                             <button
                                 key={tabKey}
                                 onClick={() => setTab(tabKey)}
                                 className={`cursor-pointer w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors duration-150
                                     ${tab === tabKey
                                         ? "bg-primary-light text-primary"
-                                        : "text-[#666] hover:text-[#aaa] hover:bg-white/4"
+                                        : "text-content-muted hover:text-content-secondary hover:bg-overlay-hover"
                                     }`}
                             >
-                                {tabKey === "profile" ? t("profileTitle") : tabKey === "general" ? t("general") : t("appearance")}
+                                {tabKey === "profile" ? t("profileTitle") : t("general")}
                             </button>
                         ))}
                     </div>
@@ -172,23 +172,23 @@ function SettingsModal({
                     <div className="flex-1 overflow-y-auto p-7">
                         {tab === "profile" && (
                             <div>
-                                <h2 className="text-base font-bold text-[#eee] mb-6">{t("profileTitle")}</h2>
+                                <h2 className="text-base font-bold text-content-default mb-6">{t("profileTitle")}</h2>
 
                                 <div className="space-y-4">
                                     <div>
-                                        <p className="text-[10px] font-bold uppercase tracking-widest text-[#555] mb-1.5">
+                                        <p className="text-[10px] font-bold uppercase tracking-widest text-content-muted mb-1.5">
                                             {t("fullName")}
                                         </p>
-                                        <div className="bg-[#111316] border border-[#1e2226] rounded-xl px-4 py-2.5 text-sm text-[#ccc]">
+                                        <div className="bg-surface-elevated border border-[#1e2226] rounded-xl px-4 py-2.5 text-sm text-content-default">
                                             {user.name ?? t("noValue")}
                                         </div>
                                     </div>
 
                                     <div>
-                                        <p className="text-[10px] font-bold uppercase tracking-widest text-[#555] mb-1.5">
+                                        <p className="text-[10px] font-bold uppercase tracking-widest text-content-muted mb-1.5">
                                             {t("emailAddress")}
                                         </p>
-                                        <div className="bg-[#111316] border border-[#1e2226] rounded-xl px-4 py-2.5 text-sm text-[#ccc]">
+                                        <div className="bg-surface-elevated border border-[#1e2226] rounded-xl px-4 py-2.5 text-sm text-content-default">
                                             {user.email ?? t("noValue")}
                                         </div>
                                     </div>
@@ -197,8 +197,8 @@ function SettingsModal({
                                 <div className="mt-8 pt-5 border-t border-[#1a1a1a]">
                                     <div className="flex items-center justify-between gap-4">
                                         <div>
-                                            <p className="text-sm font-semibold text-[#666]">{t("deleteAccount")}</p>
-                                            <p className="text-xs text-[#444] mt-0.5">
+                                            <p className="text-sm font-semibold text-content-muted">{t("deleteAccount")}</p>
+                                            <p className="text-xs text-content-placeholder mt-0.5">
                                                 {t("deleteAccountDescription")}
                                             </p>
                                         </div>
@@ -225,10 +225,10 @@ function SettingsModal({
 
                         {tab === "general" && (
                             <div>
-                                <h2 className="text-base font-bold text-[#eee] mb-6">{t("general")}</h2>
+                                <h2 className="text-base font-bold text-content-default mb-6">{t("general")}</h2>
 
                                 <div className="mb-6">
-                                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#555] mb-3">
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-content-muted mb-3">
                                         {t("theme")}
                                     </p>
                                     <div className="grid grid-cols-3 gap-2">
@@ -245,7 +245,7 @@ function SettingsModal({
                                                 className={`cursor-pointer py-2.5 rounded-xl border text-xs font-bold transition-all
                                                     ${theme === opt.value
                                                         ? "border-primary-light bg-primary-light text-primary"
-                                                        : "border-[#1e2226] bg-[#111316] text-[#666] hover:text-[#aaa] hover:border-[#333]"
+                                                        : "border-[#1e2226] bg-surface-elevated text-content-muted hover:text-content-secondary hover:border-[#333]"
                                                     }`}
                                             >
                                                 <span className="mr-1.5">{opt.emoji}</span>
@@ -256,7 +256,7 @@ function SettingsModal({
                                 </div>
 
                                 <div>
-                                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#555] mb-3">
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-content-muted mb-3">
                                         {t("language")}
                                     </p>
                                     <div className="grid grid-cols-2 gap-2">
@@ -272,7 +272,7 @@ function SettingsModal({
                                                 className={`cursor-pointer py-2.5 rounded-xl border text-sm font-bold transition-all
                                                     ${lang === opt.value
                                                         ? "border-primary-light bg-primary-light text-primary"
-                                                        : "border-[#1e2226] bg-[#111316] text-[#666] hover:text-[#aaa] hover:border-[#333]"
+                                                        : "border-[#1e2226] bg-surface-elevated text-content-muted hover:text-content-secondary hover:border-[#333]"
                                                     }`}
                                             >
                                                 <span className="mr-2">{opt.flag}</span>
@@ -284,13 +284,7 @@ function SettingsModal({
                             </div>
                         )}
 
-                        {tab === "appearance" && (
-                            <div>
-                                <h2 className="text-base font-bold text-[#eee] mb-6">{t("appearanceTitle")}</h2>
-                                <p className="text-sm text-[#999] mb-6">{t("appearanceDescription")}</p>
-                                <ThemeCustomizer />
-                            </div>
-                        )}
+
                     </div>
                 </div>
             </div>
@@ -334,23 +328,23 @@ function UserPopup({
     return (
         <div
             ref={popupRef}
-            className="absolute bottom-[calc(100%+8px)] left-0 right-0 mx-2 bg-[#111316] border border-[#1e2024] rounded-2xl overflow-hidden shadow-xl shadow-black/60 z-100 animate-fade-up"
+            className="absolute bottom-[calc(100%+8px)] left-0 right-0 mx-2 bg-surface-elevated border border-[#1e2024] rounded-2xl overflow-hidden shadow-xl shadow-black/60 z-100 animate-fade-up"
         >
             <div className="px-4 py-3 border-b border-[#1a1a1a]">
-                <p className="text-[11px] text-[#555] truncate">{user.email ?? t("noValue")}</p>
+                <p className="text-[11px] text-content-muted truncate">{user.email ?? t("noValue")}</p>
             </div>
 
             <div className="p-1">
                 <button
                     onClick={onSettings}
-                    className="cursor-pointer flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-[#aaa] hover:text-[#eee] hover:bg-white/4 transition-colors"
+                    className="cursor-pointer flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-content-secondary hover:text-content-default hover:bg-overlay-hover transition-colors"
                 >
                     <Settings size={15} className="shrink-0" />
                     {t("auth.settings")}
                 </button>
                 <button
                     onClick={onLogout}
-                    className="cursor-pointer flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-[#aaa] hover:text-red-400 hover:bg-red-400/[0.07] transition-colors"
+                    className="cursor-pointer flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-content-secondary hover:text-red-400 hover:bg-red-400/[0.07] transition-colors"
                 >
                     <LogOut size={15} className="shrink-0" />
                     {t("auth.logout")}
@@ -395,7 +389,7 @@ export default function Sidebar() {
         <>
             <aside
                 className={`
-                    fixed left-0 top-0 h-screen bg-[#080a0c] border-r border-[#1a1a1a]
+                    fixed left-0 top-0 h-screen bg-surface-sidebar border-r border-[#1a1a1a]
                     flex flex-col z-50 overflow-visible
                     transition-[width] duration-300 ease-in-out
                     ${expanded ? "w-55" : "w-15"}
@@ -414,7 +408,7 @@ export default function Sidebar() {
                     </span>
                     <button
                         onClick={() => setExpanded(!expanded)}
-                        className="w-8 h-8 flex items-center justify-center rounded-lg shrink-0 text-[#444] hover:text-primary hover:bg-primary-light transition-colors duration-200 cursor-pointer ml-auto"
+                        className="w-8 h-8 flex items-center justify-center rounded-lg shrink-0 text-content-placeholder hover:text-primary hover:bg-primary-light transition-colors duration-200 cursor-pointer ml-auto"
                     >
                         <PanelLeft size={18} className={`transition-transform duration-300 ${expanded ? "" : "rotate-180"}`} />
                     </button>
@@ -430,7 +424,7 @@ export default function Sidebar() {
                                 href={item.href}
                                 className={`
                                     group relative flex items-center rounded-xl px-2.5 py-2.5 transition-colors duration-200
-                                    ${active ? "bg-primary-lighter text-primary" : "text-[#505050] hover:text-primary hover:bg-primary-light"}
+                                    ${active ? "bg-primary-lighter text-primary" : "text-content-placeholder hover:text-primary hover:bg-primary-light"}
                                 `}
                             >
                                 <Icon size={19} className="shrink-0" />
@@ -461,7 +455,7 @@ export default function Sidebar() {
                     {isLoggedIn ? (
                         <button
                             onClick={() => setPopupOpen((v) => !v)}
-                            className="group relative flex items-center w-full rounded-xl px-2.5 py-2 gap-2.5 text-[#888] hover:text-[#ccc] hover:bg-white/4 transition-colors duration-200 cursor-pointer"
+                            className="group relative flex items-center w-full rounded-xl px-2.5 py-2 gap-2.5 text-content-muted hover:text-content-default hover:bg-overlay-hover transition-colors duration-200 cursor-pointer"
                         >
                             {user.image ? (
                                 <Image src={user.image} alt={user.name} width={32} height={32} className="rounded-full object-cover shrink-0 ring-1 ring-white/10" />
@@ -486,7 +480,7 @@ export default function Sidebar() {
                     ) : (
                         <Link
                             href="/auth/login"
-                            className="group relative flex items-center rounded-xl px-2.5 py-2.5 w-full text-[#505050] hover:text-primary hover:bg-primary-light transition-colors duration-200"
+                            className="group relative flex items-center rounded-xl px-2.5 py-2.5 w-full text-content-placeholder hover:text-primary hover:bg-primary-light transition-colors duration-200"
                         >
                             <LogIn size={19} className="shrink-0" />
                             <span className={`text-sm font-semibold whitespace-nowrap overflow-hidden transition-all duration-300 ease-in-out ${expanded ? "max-w-40 opacity-100 pl-3" : "max-w-0 opacity-0 pl-0"}`}>

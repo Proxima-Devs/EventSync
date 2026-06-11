@@ -46,7 +46,7 @@ function duration(start: string, end: string) {
 // ─── Shared input style ───────────────────────────────────────────────────────
 
 const inputCls =
-  "w-full px-3 py-2 rounded-lg border border-slate-700 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all bg-slate-900";
+  "w-full px-3 py-2 rounded-lg border border-slate-700 text-sm text-content-default placeholder-content-muted focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all bg-surface-elevated";
 
 function Field({ label, required, hint, children }: {
   label: string; required?: boolean; hint?: string; children: React.ReactNode;
@@ -54,10 +54,10 @@ function Field({ label, required, hint, children }: {
   return (
     <div className="flex flex-col gap-1">
       <div className="flex items-center gap-1">
-        <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
+        <label className="text-xs font-semibold text-content-secondary uppercase tracking-wide">
           {label}{required && <span className="text-cyan-400 ml-0.5">*</span>}
         </label>
-        {hint && <span className="text-[10px] text-slate-500">{hint}</span>}
+        {hint && <span className="text-[10px] text-content-muted">{hint}</span>}
       </div>
       {children}
     </div>
@@ -143,10 +143,10 @@ function SessionModal({ open, onClose, onSaved, editingSession, allSpeakers, all
           className="fixed inset-0 z-50 flex items-center justify-center px-4 py-8 bg-black/60 backdrop-blur-sm">
           <motion.div initial={{ opacity: 0, y: 16, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.98 }} transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="relative w-full max-w-lg rounded-3xl border border-slate-700 bg-slate-900 shadow-2xl shadow-black/40 overflow-hidden max-h-[90vh] flex flex-col">
+            className="relative w-full max-w-lg rounded-3xl border border-slate-700 bg-surface-elevated shadow-2xl shadow-black/40 overflow-hidden max-h-[90vh] flex flex-col">
             <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-slate-800">
-              <h2 className="text-base font-bold text-white">{isEdit ? t("sessionModal.editTitle") : t("sessionModal.createTitle")}</h2>
-              <button onClick={onClose} className="w-8 h-8 rounded-lg border border-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition-colors">
+              <h2 className="text-base font-bold text-content-default">{isEdit ? t("sessionModal.editTitle") : t("sessionModal.createTitle")}</h2>
+              <button onClick={onClose} className="w-8 h-8 rounded-lg border border-slate-700 flex items-center justify-center text-content-secondary hover:text-content-default transition-colors">
                 <X size={14} />
               </button>
             </div>
@@ -184,12 +184,12 @@ function SessionModal({ open, onClose, onSaved, editingSession, allSpeakers, all
                         const checked = form.speakerIds.includes(sp.id);
                         return (
                           <button key={sp.id} type="button" onClick={() => toggleSpeaker(sp.id)}
-                            className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${checked ? "bg-cyan-500/10" : "hover:bg-slate-800"}`}>
-                            <div className="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center text-[10px] font-bold text-slate-300 shrink-0 overflow-hidden">
+                            className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${checked ? "bg-cyan-500/10" : "hover:bg-surface-skeleton"}`}>
+                            <div className="w-7 h-7 rounded-full bg-surface-skeleton flex items-center justify-center text-[10px] font-bold text-content-default shrink-0 overflow-hidden">
                               <img src={sp.photo ?? `https://api.dicebear.com/7.x/adventurer/svg?seed=${sp.fullName}&flip=true&radius=50`} alt={sp.fullName} className="w-full h-full object-cover" />
                             </div>
-                            <span className={`flex-1 text-sm font-medium ${checked ? "text-cyan-300" : "text-slate-300"}`}>{sp.fullName}</span>
-                            {checked ? <CheckSquare size={15} className="text-cyan-400" /> : <Square size={15} className="text-slate-600" />}
+                            <span className={`flex-1 text-sm font-medium ${checked ? "text-cyan-300" : "text-content-default"}`}>{sp.fullName}</span>
+                            {checked ? <CheckSquare size={15} className="text-cyan-400" /> : <Square size={15} className="text-content-muted" />}
                           </button>
                         );
                       })}
@@ -209,7 +209,7 @@ function SessionModal({ open, onClose, onSaved, editingSession, allSpeakers, all
                 </AnimatePresence>
               </div>
               <div className="px-6 pb-6 pt-4 border-t border-slate-800 flex gap-3">
-                <button type="button" onClick={onClose} className="flex-1 py-2.5 rounded-2xl border border-slate-700 text-sm text-slate-400 hover:text-white transition-colors font-semibold">{t("sessionModal.cancel")}</button>
+                <button type="button" onClick={onClose} className="flex-1 py-2.5 rounded-2xl border border-slate-700 text-sm text-content-secondary hover:text-content-default transition-colors font-semibold">{t("sessionModal.cancel")}</button>
                 <button type="submit" disabled={loading} className="flex-1 py-2.5 rounded-2xl bg-cyan-500 text-slate-950 text-sm font-bold hover:bg-cyan-400 active:scale-[0.98] transition-all disabled:opacity-50">
                   {loading ? (isEdit ? t("sessionModal.saving") : t("sessionModal.creating")) : (isEdit ? t("sessionModal.save") : t("sessionModal.add"))}
                 </button>
@@ -274,7 +274,7 @@ function DeleteSessionModal({ session, onClose, onDeleted }: {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 8 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="relative w-full max-w-sm rounded-2xl border border-red-900/40 bg-[#0a0e14] overflow-hidden"
+            className="relative w-full max-w-sm rounded-2xl border border-red-900/40 bg-surface-card-alt overflow-hidden"
             style={{ boxShadow: "0 0 0 1px #ff444418, 0 0 40px #ff444412, 0 32px 64px rgba(0,0,0,0.6)" }}
           >
             <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-red-500/50 to-transparent" />
@@ -282,8 +282,8 @@ function DeleteSessionModal({ session, onClose, onDeleted }: {
               <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-900/40 flex items-center justify-center mb-4">
                 <Trash2 size={18} className="text-red-400" />
               </div>
-              <h2 className="text-base font-black text-white mb-1">{t("deleteSessionModal.title")}</h2>
-              <p className="text-sm text-[#4a5568] leading-relaxed">
+              <h2 className="text-base font-black text-content-default mb-1">{t("deleteSessionModal.title")}</h2>
+              <p className="text-sm text-content-secondary leading-relaxed">
                 {t("deleteSessionModal.body", { title: session.title })}
               </p>
               {error && (
@@ -296,7 +296,7 @@ function DeleteSessionModal({ session, onClose, onDeleted }: {
             <div className="flex gap-3 px-6 pb-6">
               <button
                 onClick={onClose}
-                className="flex-1 py-2.5 rounded-xl border border-[#1e2530] text-sm text-[#4a5568] hover:text-white hover:border-[#2e3a4a] transition-all duration-200 font-semibold"
+                className="flex-1 py-2.5 rounded-xl border border-[#1e2530] text-sm text-content-secondary hover:text-content-default hover:border-[#2e3a4a] transition-all duration-200 font-semibold"
               >
                 {t("deleteSessionModal.cancel")}
               </button>
@@ -364,10 +364,10 @@ function EditEventModal({ open, onClose, event, onSaved }: {
           className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/60 backdrop-blur-sm">
           <motion.div initial={{ opacity: 0, y: 16, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.98 }} transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="w-full max-w-lg rounded-3xl border border-slate-700 bg-slate-900 shadow-2xl shadow-black/40 overflow-hidden">
+            className="w-full max-w-lg rounded-3xl border border-slate-700 bg-surface-elevated shadow-2xl shadow-black/40 overflow-hidden">
             <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-slate-800">
-              <h2 className="text-base font-bold text-white">{t("editEventModal.title")}</h2>
-              <button onClick={onClose} className="w-8 h-8 rounded-lg border border-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition-colors"><X size={14} /></button>
+              <h2 className="text-base font-bold text-content-default">{t("editEventModal.title")}</h2>
+              <button onClick={onClose} className="w-8 h-8 rounded-lg border border-slate-700 flex items-center justify-center text-content-secondary hover:text-content-default transition-colors"><X size={14} /></button>
             </div>
             <form onSubmit={handleSubmit} className="px-6 py-5 flex flex-col gap-4">
               <Field label={t("editEventModal.titleLabel")} required><input className={inputCls} value={form.title} onChange={(e) => set("title", e.target.value)} placeholder={t("editEventModal.titlePlaceholder")} /></Field>
@@ -387,7 +387,7 @@ function EditEventModal({ open, onClose, event, onSaved }: {
                 )}
               </AnimatePresence>
               <div className="flex gap-3 pt-1">
-                <button type="button" onClick={onClose} className="flex-1 py-2.5 rounded-2xl border border-slate-700 text-sm text-slate-400 hover:text-white font-semibold transition-colors">{t("editEventModal.cancel")}</button>
+                <button type="button" onClick={onClose} className="flex-1 py-2.5 rounded-2xl border border-slate-700 text-sm text-content-secondary hover:text-content-default font-semibold transition-colors">{t("editEventModal.cancel")}</button>
                 <button type="submit" disabled={loading} className="flex-1 py-2.5 rounded-2xl bg-cyan-500 text-slate-950 text-sm font-bold hover:bg-cyan-400 active:scale-[0.98] transition-all disabled:opacity-50">
                   {loading ? t("editEventModal.saving") : t("editEventModal.save")}
                 </button>
@@ -429,7 +429,7 @@ function PlanningGrid({ sessions, selectedRoom, toggle, isFavorite, slug }: {
 
   if (timeSlots.length === 0) {
     return (
-      <div className="text-center py-20 text-slate-500 text-sm">
+      <div className="text-center py-20 text-content-muted text-sm">
         {t("noSessionsForRoom")}
       </div>
     );
@@ -440,11 +440,11 @@ function PlanningGrid({ sessions, selectedRoom, toggle, isFavorite, slug }: {
       <table className="w-full border-collapse">
         <thead>
           <tr>
-            <th className="w-20 py-3 px-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-800">
+            <th className="w-20 py-3 px-4 text-left text-xs font-bold text-content-muted uppercase tracking-wider border-b border-slate-800">
               {t("timeHeader")}
             </th>
             {visibleRooms.map((room) => (
-              <th key={room} className="py-3 px-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-800 bg-slate-900/50 border-l">
+              <th key={room} className="py-3 px-4 text-center text-xs font-bold text-content-muted uppercase tracking-wider border-b border-slate-800 bg-surface-elevated/50 border-l">
                 {room}
               </th>
             ))}
@@ -453,7 +453,7 @@ function PlanningGrid({ sessions, selectedRoom, toggle, isFavorite, slug }: {
         <tbody>
           {timeSlots.map((time) => (
             <tr key={time} className="border-b border-slate-800/60 align-top">
-              <td className="py-4 px-4 text-sm font-semibold text-slate-400 whitespace-nowrap w-20">
+              <td className="py-4 px-4 text-sm font-semibold text-content-secondary whitespace-nowrap w-20">
                 {time}
               </td>
               {visibleRooms.map((room) => {
@@ -462,11 +462,11 @@ function PlanningGrid({ sessions, selectedRoom, toggle, isFavorite, slug }: {
                   <td key={room} className="py-3 px-3 border-l border-slate-800 min-w-50">
                     {roomSessions.map((s) => (
                       <Link key={s.id} href={`/events/${slug}/sessions/${s.slug}`}
-                        className="block rounded-2xl border border-slate-700 bg-slate-900/80 p-3 mb-2 hover:border-cyan-500/40 hover:bg-slate-800/80 transition-all group">
+                        className="block rounded-2xl border border-slate-700 bg-surface-elevated/80 p-3 mb-2 hover:border-cyan-500/40 hover:bg-surface-skeleton/80 transition-all group">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1 min-w-0">
-                            <p className="text-base font-semibold text-slate-200 leading-snug group-hover:text-cyan-300 transition-colors">{s.title}</p>
-                            <p className="text-xs text-slate-500 mt-0.5">
+                            <p className="text-base font-semibold text-content-default leading-snug group-hover:text-cyan-300 transition-colors">{s.title}</p>
+                            <p className="text-xs text-content-muted mt-0.5">
                               {formatTime(s.startTime, locale)}–{formatTime(s.endTime, locale)}
                             </p>
                             {s.speakers.length > 0 && (
@@ -477,7 +477,7 @@ function PlanningGrid({ sessions, selectedRoom, toggle, isFavorite, slug }: {
                           </div>
                           <button
                             onClick={(e) => { e.preventDefault(); toggle(s.id); }}
-                            className="shrink-0 mt-0.5 text-slate-600 hover:text-rose-400 transition-colors"
+                            className="shrink-0 mt-0.5 text-content-muted hover:text-rose-400 transition-colors"
                             aria-label={t("favoriteAria")}>
                             <Heart size={15} className={isFavorite(s.id) ? "fill-rose-400 text-rose-400" : ""} />
                           </button>
@@ -573,14 +573,14 @@ export default function EventDetailPage() {
   if (loading) {
     return (
       <main className="flex-1 min-h-screen">
-        <div className="h-72 w-full bg-slate-800 animate-pulse" />
+        <div className="h-72 w-full bg-surface-skeleton animate-pulse" />
         <div className="px-6 py-8 max-w-5xl mx-auto w-full">
-          <div className="h-4 w-24 bg-slate-800 rounded animate-pulse mb-8" />
-          <div className="h-8 w-64 bg-slate-800 rounded animate-pulse mb-3" />
-          <div className="h-4 w-48 bg-slate-800 rounded animate-pulse mb-8" />
+          <div className="h-4 w-24 bg-surface-skeleton rounded animate-pulse mb-8" />
+          <div className="h-8 w-64 bg-surface-skeleton rounded animate-pulse mb-3" />
+          <div className="h-4 w-48 bg-surface-skeleton rounded animate-pulse mb-8" />
           <div className="flex gap-4 mt-8">
             {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="h-28 flex-1 bg-slate-800/50 rounded-2xl border border-slate-800 animate-pulse" />
+              <div key={i} className="h-28 flex-1 bg-surface-skeleton/50 rounded-2xl border border-slate-800 animate-pulse" />
             ))}
           </div>
         </div>
@@ -599,7 +599,7 @@ export default function EventDetailPage() {
   }
 
   return (
-    <div className="min-h-screen text-white">
+    <div className="min-h-screen text-content-default">
       {/* Modals */}
       <EditEventModal open={editEventOpen} onClose={() => setEditEventOpen(false)} event={event} onSaved={setEvent} />
       <SessionModal open={sessionModalOpen} onClose={() => setSessionModalOpen(false)} onSaved={handleSessionSaved}
@@ -608,7 +608,7 @@ export default function EventDetailPage() {
 
       {/* ── Cover Image ─────────────────────────────────────────────────────── */}
       <div className="relative">
-        <div className="h-72 w-full overflow-hidden bg-slate-900">
+        <div className="h-72 w-full overflow-hidden bg-surface-elevated">
           <Image
             src={event.coverImage ?? "/background.png"}
             alt={event.title}
@@ -617,14 +617,14 @@ export default function EventDetailPage() {
           />
         </div>
         {/* gradient overlay bottom */}
-        <div className="absolute inset-x-0 bottom-0 h-32 bg-linear-to-t from-slate-950 via-slate-950/70 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-32 bg-linear-to-t from-surface-card-alt via-surface-card-alt/70 to-transparent" />
         {/* gradient overlay top (for back link readability) */}
-        <div className="absolute inset-x-0 top-0 h-20 bg-linear-to-b from-slate-950/60 to-transparent" />
+        <div className="absolute inset-x-0 top-0 h-20 bg-linear-to-b from-surface-card-alt/60 to-transparent" />
 
         {/* Back link floating on image */}
         <div className="absolute top-5 left-0 right-0 px-6 max-w-5xl mx-auto">
           <Link href="/admin/events"
-            className="inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.3em] text-slate-300 hover:text-cyan-300 transition-colors">
+            className="inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.3em] text-content-default hover:text-cyan-300 transition-colors">
             <ArrowLeft size={12} /> {t("backToEvents")}
           </Link>
         </div>
@@ -633,37 +633,37 @@ export default function EventDetailPage() {
       <main className="px-6 pb-12 max-w-5xl mx-auto w-full -mt-20">
 
         {/* ── Event header card ──────────────────────────────────────────────── */}
-        <div className="rounded-3xl border border-slate-800 bg-slate-900/95 p-8 shadow-2xl shadow-black/30 backdrop-blur-xl mb-8">
+        <div className="rounded-3xl border border-slate-800 bg-surface-elevated/95 p-8 shadow-2xl shadow-black/30 backdrop-blur-xl mb-8">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
               {/* accent bar */}
               <div className="h-2 w-16 rounded-full bg-cyan-400/30 mb-5" />
-              <h1 className="text-3xl font-black text-white tracking-tight">{event.title}</h1>
+              <h1 className="text-3xl font-black text-content-default tracking-tight">{event.title}</h1>
               <div className="flex items-center gap-4 mt-3 flex-wrap">
-                <span className="flex items-center gap-1.5 text-sm text-slate-400">
+                <span className="flex items-center gap-1.5 text-sm text-content-secondary">
                   <Calendar size={13} className="text-cyan-400" />
                   {formatDate(event.startDate, locale)}
                 </span>
                 {event.location && (
-                  <span className="flex items-center gap-1.5 text-sm text-slate-400">
+                  <span className="flex items-center gap-1.5 text-sm text-content-secondary">
                     <MapPin size={13} className="text-cyan-400" />
                     {event.location}
                   </span>
                 )}
               </div>
               {event.description && (
-                <p className="mt-4 text-slate-400 leading-7 text-sm max-w-2xl">{event.description}</p>
+                <p className="mt-4 text-content-secondary leading-7 text-sm max-w-2xl">{event.description}</p>
               )}
             </div>
 
             {/* Action buttons */}
             <div className="flex items-center gap-2 shrink-0">
               <Link href={`/events/${event.slug}`} target="_blank"
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl border border-slate-700 text-sm text-slate-300 hover:text-white hover:border-slate-500 transition-all font-medium">
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl border border-slate-700 text-sm text-content-default hover:text-content-default hover:border-slate-500 transition-all font-medium">
                 <Eye size={14} /> {t("view")}
               </Link>
               <button onClick={() => setEditEventOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-slate-800 border border-slate-700 text-sm text-slate-300 hover:text-white hover:border-slate-500 transition-all font-medium">
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-surface-skeleton border border-slate-700 text-sm text-content-default hover:text-content-default hover:border-slate-500 transition-all font-medium">
                 <Pencil size={14} /> {t("edit")}
               </button>
             </div>
@@ -678,11 +678,11 @@ export default function EventDetailPage() {
               className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-t-lg border-b-2 transition-all -mb-px ${
                 view === "liste"
                   ? "border-cyan-400 text-cyan-300"
-                  : "border-transparent text-slate-500 hover:text-slate-300"
+                  : "border-transparent text-content-muted hover:text-content-default"
               }`}>
               <List size={15} />
               {t("sessionsTab")}
-              <span className={`text-xs rounded-full px-1.5 py-0.5 font-bold ${view === "liste" ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30" : "bg-slate-800 text-slate-400"}`}>
+              <span className={`text-xs rounded-full px-1.5 py-0.5 font-bold ${view === "liste" ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30" : "bg-surface-skeleton text-content-secondary"}`}>
                 {event.sessions.length}
               </span>
             </button>
@@ -691,7 +691,7 @@ export default function EventDetailPage() {
               className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-t-lg border-b-2 transition-all -mb-px ${
                 view === "planning"
                   ? "border-cyan-400 text-cyan-300"
-                  : "border-transparent text-slate-500 hover:text-slate-300"
+                  : "border-transparent text-content-muted hover:text-content-default"
               }`}>
               <LayoutGrid size={15} />
               {t("planningTab")}
@@ -704,7 +704,7 @@ export default function EventDetailPage() {
           {view === "liste" && (
             <motion.div key="liste" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.18 }}>
               <div className="flex items-center justify-between mb-5">
-                <h2 className="text-lg font-bold text-white">{t("sessionsTab")}</h2>
+                <h2 className="text-lg font-bold text-content-default">{t("sessionsTab")}</h2>
                 <button
                   onClick={() => { setEditingSession(null); setSessionModalOpen(true); }}
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-cyan-500 text-slate-950 text-sm font-bold hover:bg-cyan-400 active:scale-[0.98] transition-all shadow-sm shadow-cyan-500/20">
@@ -713,11 +713,11 @@ export default function EventDetailPage() {
               </div>
 
               {sortedSessions.length === 0 ? (
-                <div className="rounded-3xl border border-dashed border-slate-700 bg-slate-900/50 py-16 text-center">
-                  <p className="text-slate-500 text-sm mb-4">{t("emptySessions")}</p>
+                <div className="rounded-3xl border border-dashed border-slate-700 bg-surface-elevated/50 py-16 text-center">
+                  <p className="text-content-muted text-sm mb-4">{t("emptySessions")}</p>
                   <button
                     onClick={() => { setEditingSession(null); setSessionModalOpen(true); }}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl border border-slate-700 text-sm text-slate-400 hover:text-white font-semibold transition-colors">
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl border border-slate-700 text-sm text-content-secondary hover:text-content-default font-semibold transition-colors">
                     <Plus size={13} /> {t("createFirstSession")}
                   </button>
                 </div>
@@ -726,30 +726,30 @@ export default function EventDetailPage() {
                   <AnimatePresence initial={false}>
                     {sortedSessions.map((s) => (
                       <motion.div key={s.id} layout initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.98 }} transition={{ duration: 0.18 }}
-                        className="flex items-center justify-between gap-4 rounded-2xl border border-slate-800 bg-slate-900/80 px-5 py-4 hover:border-slate-700 hover:bg-slate-900 transition-all group">
+                        className="flex items-center justify-between gap-4 rounded-2xl border border-slate-800 bg-surface-elevated/80 px-5 py-4 hover:border-slate-700 hover:bg-surface-elevated transition-all group">
                         <div className="flex-1 min-w-0">
                           <Link href={`/events/${event.slug}/sessions/${s.slug}`}
                             className="text-lg font-semibold text-cyan-400 hover:text-cyan-300 transition-colors truncate block">
                             {s.title}
                           </Link>
                           <div className="flex items-center gap-3 mt-1.5 flex-wrap">
-                            <span className="text-xs text-slate-500 flex items-center gap-1">
-                              <Clock size={10} className="text-slate-600" />
+                            <span className="text-xs text-content-muted flex items-center gap-1">
+                              <Clock size={10} className="text-content-muted" />
                               {formatTime(s.startTime, locale)}–{formatTime(s.endTime, locale)}
-                              <span className="text-slate-700 ml-0.5">· {duration(s.startTime, s.endTime)}</span>
+                              <span className="text-content-muted ml-0.5">· {duration(s.startTime, s.endTime)}</span>
                             </span>
                             {s.room && (
-                              <span className="text-xs text-slate-500 flex items-center gap-1">
-                                <Building2 size={10} className="text-slate-600" /> {s.room.name}
+                              <span className="text-xs text-content-muted flex items-center gap-1">
+                                <Building2 size={10} className="text-content-muted" /> {s.room.name}
                               </span>
                             )}
                             {s.capacity && (
-                              <span className="text-xs text-slate-500 flex items-center gap-1">
-                                <Users size={10} className="text-slate-600" /> {t("places", { count: s.capacity })}
+                              <span className="text-xs text-content-muted flex items-center gap-1">
+                                <Users size={10} className="text-content-muted" /> {t("places", { count: s.capacity })}
                               </span>
                             )}
                             {s.speakers.length > 0 && (
-                              <span className="text-xs text-slate-500">
+                              <span className="text-xs text-content-muted">
                                 {s.speakers.map((sp) => sp.fullName).join(", ")}
                               </span>
                             )}
@@ -763,13 +763,13 @@ export default function EventDetailPage() {
                           )}
                           <button
                             onClick={() => { setEditingSession(s); setSessionModalOpen(true); }}
-                            className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-600 hover:text-cyan-400 hover:bg-cyan-500/10 transition-all"
+                            className="w-8 h-8 rounded-lg flex items-center justify-center text-content-muted hover:text-cyan-400 hover:bg-cyan-500/10 transition-all"
                             aria-label={t("editSessionAria")}>
                             <Pencil size={14} />
                           </button>
                           <button
                             onClick={() => setDeletingSession(s)}
-                            className="flex-1 flex items-center justify-center gap-1.5 p-2 rounded-lg border border-[#1e2530] text-[#3a4a5a] text-[11px] font-semibold hover:text-red-400 hover:border-red-900/50 hover:bg-red-500/05 transition-all duration-200"
+                            className="flex-1 flex items-center justify-center gap-1.5 p-2 rounded-lg border border-[#1e2530] text-content-muted text-[11px] font-semibold hover:text-red-400 hover:border-red-900/50 hover:bg-red-500/5 transition-all duration-200"
                           >
                             <Trash2 size={11} />
                             {t("deleteSession")}
@@ -789,13 +789,13 @@ export default function EventDetailPage() {
               <div className="flex items-center justify-end gap-2 mb-6 flex-wrap">
                 <button
                   onClick={() => setSelectedRoom(null)}
-                  className={`px-4 py-2 rounded-2xl text-sm font-semibold transition-all ${selectedRoom === null ? "bg-cyan-500 text-slate-950 shadow-sm shadow-cyan-500/20" : "border border-slate-700 text-slate-400 hover:text-white hover:border-slate-500"}`}>
+                  className={`px-4 py-2 rounded-2xl text-sm font-semibold transition-all ${selectedRoom === null ? "bg-cyan-500 text-slate-950 shadow-sm shadow-cyan-500/20" : "border border-slate-700 text-content-secondary hover:text-content-default hover:border-slate-500"}`}>
                   {t("allRooms")}
                 </button>
                 {planRooms.map((r) => (
                   <button key={r}
                     onClick={() => setSelectedRoom(r)}
-                    className={`px-4 py-2 rounded-2xl text-sm font-semibold transition-all ${selectedRoom === r ? "bg-cyan-500 text-slate-950 shadow-sm shadow-cyan-500/20" : "border border-slate-700 text-slate-400 hover:text-white hover:border-slate-500"}`}>
+                    className={`px-4 py-2 rounded-2xl text-sm font-semibold transition-all ${selectedRoom === r ? "bg-cyan-500 text-slate-950 shadow-sm shadow-cyan-500/20" : "border border-slate-700 text-content-secondary hover:text-content-default hover:border-slate-500"}`}>
                     {r}
                   </button>
                 ))}
@@ -806,7 +806,7 @@ export default function EventDetailPage() {
                   <div className="w-8 h-8 border-2 border-slate-700 border-t-cyan-400 rounded-full animate-spin" />
                 </div>
               ) : (
-                <div className="rounded-3xl border border-slate-800 bg-slate-900/80 overflow-hidden">
+                <div className="rounded-3xl border border-slate-800 bg-surface-elevated/80 overflow-hidden">
                   <PlanningGrid
                     sessions={planSessions}
                     selectedRoom={selectedRoom}

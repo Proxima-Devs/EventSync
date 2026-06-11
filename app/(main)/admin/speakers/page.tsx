@@ -34,26 +34,26 @@ interface SpeakerFormData {
 // ─── Style ───
 
 const inputClass =
-  "w-full px-4 py-2.5 rounded-xl bg-[#060a0f] border border-[#1e2530] text-sm text-[#ccc] placeholder-[#2a3a4a] focus:outline-none focus:border-[#00E5FF44] focus:ring-1 focus:ring-[#00E5FF22] transition-all duration-200";
+  "w-full px-4 py-2.5 rounded-xl bg-surface-input border border-[#1e2530] text-sm text-content-default placeholder-content-placeholder focus:outline-none focus:border-[#00E5FF44] focus:ring-1 focus:ring-[#00E5FF22] transition-all duration-200";
 
 // ─── Skeleton ───
 
 function SpeakerCardSkeleton() {
   return (
-    <div className="animate-pulse flex flex-col rounded-2xl border border-[#1e2530] bg-[#0d1117] overflow-hidden">
+    <div className="animate-pulse flex flex-col rounded-2xl border border-[#1e2530] bg-surface-secondary overflow-hidden">
       <div className="flex flex-col items-center pt-7 pb-5 px-5 flex-1">
-        <div className="w-20 h-20 rounded-full bg-[#1e2530] mb-4" />
-        <div className="h-3.5 w-2/3 bg-[#1e2530] rounded-lg mb-2" />
-        <div className="h-2.5 w-1/3 bg-[#1e2530] rounded-lg mb-4" />
+        <div className="w-20 h-20 rounded-full bg-surface-skeleton mb-4" />
+        <div className="h-3.5 w-2/3 bg-surface-skeleton rounded-lg mb-2" />
+        <div className="h-2.5 w-1/3 bg-surface-skeleton rounded-lg mb-4" />
         <div className="space-y-1.5 w-full">
-          <div className="h-2 bg-[#1e2530] rounded-lg w-full" />
-          <div className="h-2 bg-[#1e2530] rounded-lg w-4/5 mx-auto" />
-          <div className="h-2 bg-[#1e2530] rounded-lg w-3/5 mx-auto" />
+          <div className="h-2 bg-surface-skeleton rounded-lg w-full" />
+          <div className="h-2 bg-surface-skeleton rounded-lg w-4/5 mx-auto" />
+          <div className="h-2 bg-surface-skeleton rounded-lg w-3/5 mx-auto" />
         </div>
       </div>
-      <div className="flex gap-2 px-4 py-3 border-t border-[#1e2530] bg-[#060a0f]">
-        <div className="flex-1 h-8 bg-[#1e2530] rounded-xl" />
-        <div className="flex-1 h-8 bg-[#1e2530] rounded-xl" />
+      <div className="flex gap-2 px-4 py-3 border-t border-[#1e2530] bg-surface-input">
+        <div className="flex-1 h-8 bg-surface-skeleton rounded-xl" />
+        <div className="flex-1 h-8 bg-surface-skeleton rounded-xl" />
       </div>
     </div>
   );
@@ -185,7 +185,7 @@ function SpeakerModal({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.97 }}
             transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-            className="relative w-full max-w-md rounded-2xl border border-[#1e2530] bg-[#0a0e14] overflow-hidden my-auto"
+            className="relative w-full max-w-md rounded-2xl border border-[#1e2530] bg-surface-card-alt overflow-hidden my-auto"
             style={{
               boxShadow:
                 "0 0 0 1px #00E5FF18, 0 0 40px #00E5FF18, 0 0 80px #00E5FF08, 0 32px 64px rgba(0,0,0,0.6)",
@@ -206,10 +206,10 @@ function SpeakerModal({
                   )}
                 </div>
                 <div>
-                  <h2 className="text-base font-black text-white tracking-tight">
+                  <h2 className="text-base font-black text-content-default tracking-tight">
                     {isEdit ? t("modal.editTitle") : t("modal.createTitle")}
                   </h2>
-                  <p className="text-xs text-[#3a4a5a]">
+                  <p className="text-xs text-content-muted">
                     {isEdit
                       ? t("modal.editSubtitle", { id: editingSpeaker?.id.slice(0, 8) ?? "" })
                       : t("modal.createSubtitle")}
@@ -218,7 +218,7 @@ function SpeakerModal({
               </div>
               <button
                 onClick={onClose}
-                className="w-8 h-8 rounded-xl border border-[#1e2530] flex items-center justify-center text-[#3a4a5a] hover:text-white hover:border-[#2e3a4a] transition-all duration-200"
+                className="w-8 h-8 rounded-xl border border-[#1e2530] flex items-center justify-center text-content-muted hover:text-content-default hover:border-[#2e3a4a] transition-all duration-200"
               >
                 <X size={14} />
               </button>
@@ -229,7 +229,7 @@ function SpeakerModal({
 
               {/* Photo upload — avatar centré en haut */}
               <div className="flex flex-col items-center pt-1 pb-2 border-b border-[#1e2530]">
-                <label className="text-xs font-semibold uppercase tracking-widest text-[#3a4a5a] mb-3">
+                <label className="text-xs font-semibold uppercase tracking-widest text-content-muted mb-3">
                   {t("modal.photoLabel")}
                 </label>
                 <FileUpload
@@ -240,7 +240,7 @@ function SpeakerModal({
 
               {/* Full Name */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold uppercase tracking-widest text-[#3a4a5a]">
+                <label className="text-xs font-semibold uppercase tracking-widest text-content-muted">
                   {t("modal.fullNameLabel")} <span className="text-[#00E5FF]">*</span>
                 </label>
                 <input
@@ -254,7 +254,7 @@ function SpeakerModal({
 
               {/* Bio */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold uppercase tracking-widest text-[#3a4a5a]">
+                <label className="text-xs font-semibold uppercase tracking-widest text-content-muted">
                   {t("modal.bioLabel")}
                 </label>
                 <textarea
@@ -268,13 +268,13 @@ function SpeakerModal({
 
               {/* Social Links */}
               <div className="border-t border-[#1e2530] pt-4 mt-2">
-                <p className="text-xs font-semibold uppercase tracking-widest text-[#3a4a5a] mb-3">
+                <p className="text-xs font-semibold uppercase tracking-widest text-content-muted mb-3">
                   {t("modal.socialTitle")}
                 </p>
 
                 <div className="space-y-3">
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs text-[#2a3a4a]">Twitter</label>
+                    <label className="text-xs text-content-placeholder">Twitter</label>
                     <input
                       className={inputClass}
                       value={form.twitter}
@@ -283,7 +283,7 @@ function SpeakerModal({
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs text-[#2a3a4a]">LinkedIn</label>
+                    <label className="text-xs text-content-placeholder">LinkedIn</label>
                     <input
                       className={inputClass}
                       value={form.linkedin}
@@ -292,7 +292,7 @@ function SpeakerModal({
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs text-[#2a3a4a]">Website</label>
+                    <label className="text-xs text-content-placeholder">Website</label>
                     <input
                       className={inputClass}
                       type="url"
@@ -302,7 +302,7 @@ function SpeakerModal({
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs text-[#2a3a4a]">GitHub</label>
+                    <label className="text-xs text-content-placeholder">GitHub</label>
                     <input
                       className={inputClass}
                       value={form.github}
@@ -331,7 +331,7 @@ function SpeakerModal({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="flex-1 py-2.5 rounded-xl border border-[#1e2530] text-sm text-[#4a5568] hover:text-white hover:border-[#2e3a4a] transition-all duration-200 font-semibold"
+                  className="flex-1 py-2.5 rounded-xl border border-[#1e2530] text-sm text-content-secondary hover:text-content-default hover:border-[#2e3a4a] transition-all duration-200 font-semibold"
                 >
                   {t("modal.cancel")}
                 </button>
@@ -416,7 +416,7 @@ function DeleteModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 8 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="relative w-full max-w-sm rounded-2xl border border-red-900/40 bg-[#0a0e14] overflow-hidden"
+            className="relative w-full max-w-sm rounded-2xl border border-red-900/40 bg-surface-card-alt overflow-hidden"
             style={{
               boxShadow:
                 "0 0 0 1px #ff444418, 0 0 40px #ff444412, 0 32px 64px rgba(0,0,0,0.6)",
@@ -428,8 +428,8 @@ function DeleteModal({
               <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-900/40 flex items-center justify-center mb-4">
                 <Trash2 size={18} className="text-red-400" />
               </div>
-              <h2 className="text-base font-black text-white mb-1">{t("deleteModal.title")}</h2>
-              <p className="text-sm text-[#4a5568] leading-relaxed">
+              <h2 className="text-base font-black text-content-default mb-1">{t("deleteModal.title")}</h2>
+              <p className="text-sm text-content-secondary leading-relaxed">
                 {t("deleteModal.body", { name: speaker.fullName })}
                 {speaker._count.sessions > 0 && (
                   <span className="text-amber-400 block mt-1.5">
@@ -448,7 +448,7 @@ function DeleteModal({
             <div className="flex gap-3 px-6 pb-6">
               <button
                 onClick={onClose}
-                className="flex-1 py-2.5 rounded-xl border border-[#1e2530] text-sm text-[#4a5568] hover:text-white hover:border-[#2e3a4a] transition-all duration-200 font-semibold"
+                className="flex-1 py-2.5 rounded-xl border border-[#1e2530] text-sm text-content-secondary hover:text-content-default hover:border-[#2e3a4a] transition-all duration-200 font-semibold"
               >
                 {t("deleteModal.cancel")}
               </button>
@@ -543,12 +543,12 @@ export default function AdminSpeakersPage() {
 
       <main className="flex-1 px-8 py-12 max-w-7xl mx-auto w-full">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-[#4a5568] mb-8">
+        <div className="flex items-center gap-2 text-sm text-content-secondary mb-8">
           <Link href="/" className="hover:text-[#00E5FF] transition-colors">
             {t("breadcrumbHome")}
           </Link>
           <ChevronRight size={13} />
-          <span className="text-white">{t("breadcrumbSpeakers")}</span>
+          <span className="text-content-default">{t("breadcrumbSpeakers")}</span>
         </div>
 
         {/* Header */}
@@ -558,11 +558,11 @@ export default function AdminSpeakersPage() {
               <div className="w-8 h-8 rounded-xl bg-[#00E5FF15] border border-[#00E5FF30] flex items-center justify-center">
                 <Mic size={16} className="text-[#00E5FF]" />
               </div>
-              <h1 className="text-3xl font-black text-white tracking-tight">
+              <h1 className="text-3xl font-black text-content-default tracking-tight">
                 {t("pageTitle")}
               </h1>
             </div>
-            <p className="text-sm text-[#4a5568] ml-11">
+            <p className="text-sm text-content-secondary ml-11">
               {t("pageDescription")}
             </p>
           </div>
@@ -580,15 +580,15 @@ export default function AdminSpeakersPage() {
         {/* Mini stats + search */}
         {!loading && speakers.length > 0 && (
           <div className="flex items-center gap-4 mb-8 flex-wrap">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#1e2530] bg-[#0d1117]">
-              <Mic size={11} className="text-[#3a4a5a]" />
-              <span className="text-xs text-[#3a4a5a] font-semibold">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#1e2530] bg-surface-secondary">
+              <Mic size={11} className="text-content-muted" />
+              <span className="text-xs text-content-muted font-semibold">
                 {t("speakerCount", { count: speakers.length })}
               </span>
             </div>
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#1e2530] bg-[#0d1117]">
-              <Layers size={11} className="text-[#3a4a5a]" />
-              <span className="text-xs text-[#3a4a5a] font-semibold">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#1e2530] bg-surface-secondary">
+              <Layers size={11} className="text-content-muted" />
+              <span className="text-xs text-content-muted font-semibold">
                 {t("totalSessions", { count: totalSessions })}
               </span>
             </div>
@@ -596,14 +596,14 @@ export default function AdminSpeakersPage() {
             <div className="relative ml-auto">
               <Search
                 size={13}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#3a4a5a] pointer-events-none"
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-content-muted pointer-events-none"
               />
               <input
                 type="text"
                 placeholder={t("searchPlaceholder")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-48 pl-9 pr-4 py-2 rounded-xl bg-[#0d1117] border border-[#1e2530] text-sm text-[#ccc] placeholder-[#3a4a5a] focus:outline-none focus:border-[#00E5FF44] focus:ring-1 focus:ring-[#00E5FF22] transition-all"
+                className="w-48 pl-9 pr-4 py-2 rounded-xl bg-surface-secondary border border-[#1e2530] text-sm text-content-default placeholder-content-muted focus:outline-none focus:border-[#00E5FF44] focus:ring-1 focus:ring-[#00E5FF22] transition-all"
               />
             </div>
           </div>
@@ -629,8 +629,8 @@ export default function AdminSpeakersPage() {
         {/* Empty state */}
         {!loading && !error && speakers.length === 0 && (
           <div className="py-20 text-center">
-            <Mic size={28} className="mx-auto text-[#1e2530] mb-3" />
-            <p className="text-[#3a4a5a] italic text-sm mb-4">
+            <Mic size={28} className="mx-auto text-content-muted mb-3" />
+            <p className="text-content-muted italic text-sm mb-4">
               {t("emptyState")}
             </p>
             <button
@@ -646,7 +646,7 @@ export default function AdminSpeakersPage() {
         {/* No search results */}
         {!loading && !error && speakers.length > 0 && filtered.length === 0 && (
           <div className="py-12 text-center">
-            <p className="text-[#3a4a5a] italic text-sm">
+            <p className="text-content-muted italic text-sm">
               {t("noSearchResults", { query: search })}
             </p>
           </div>

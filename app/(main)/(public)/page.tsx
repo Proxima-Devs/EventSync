@@ -110,11 +110,11 @@ export default function HomePage() {
           </span>
         </h1>
 
-        <p className="text-[#4a5568] max-w-xl mx-auto text-base mb-10 leading-relaxed">
+        <p className="text-content-secondary max-w-xl mx-auto text-base mb-10 leading-relaxed">
           {t("description")}
         </p>
 
-        <div className="w-full max-w-xl flex rounded-full overflow-hidden border border-[#1e2530] bg-[#0d1117] shadow-xl shadow-[#00E5FF08]">
+        <div className="w-full max-w-xl flex rounded-full overflow-hidden border border-[#1e2530] bg-surface-secondary shadow-xl shadow-[#00E5FF08]">
           <span className="flex items-center pl-5"><Search /></span>
           <input
             type="text"
@@ -122,7 +122,7 @@ export default function HomePage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && setSubmitted(search)}
-            className="flex-1 bg-transparent px-4 py-4 text-sm text-white placeholder-[#444] focus:outline-none"
+            className="flex-1 bg-transparent px-4 py-4 text-sm text-content-default placeholder-content-placeholder focus:outline-none"
           />
           <button
             onClick={() => setSubmitted(search)}
@@ -139,7 +139,7 @@ export default function HomePage() {
             <h2 className="text-2xl font-black">{t("featuredEvents")}</h2>
             <div className="h-0.75w-10 bg-[#00E5FF] rounded-full" />
           </div>
-          <span className="text-[#4a5568] text-sm">
+          <span className="text-content-secondary text-sm">
             {!loading && t("eventCount", { count: filtered.length })}
           </span>
         </div>
@@ -151,7 +151,7 @@ export default function HomePage() {
               onClick={() => setActiveFilter(filter.value)}
               className={`cursor-pointer px-4 py-1.5 rounded-full text-sm font-semibold border transition-all duration-200 ${activeFilter === filter.value
                   ? "bg-[#00E5FF] border-[#00E5FF] text-black shadow-lg shadow-[#00E5FF33]"
-                  : "bg-transparent border-[#1e2530] text-[#4a5568] hover:text-white hover:border-[#00E5FF44]"
+                  : "bg-transparent border-[#1e2530] text-content-secondary hover:text-content-default hover:border-[#00E5FF44]"
                 }`}
             >
               {filter.label}
@@ -170,7 +170,7 @@ export default function HomePage() {
             {error}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] py-20 text-center text-[#3a4550] italic text-sm">
+          <div className="rounded-2xl border border-[#1e2530] bg-surface-secondary py-20 text-center text-content-muted italic text-sm">
             {t("noEventsFound")}
           </div>
         ) : (

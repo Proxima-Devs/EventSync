@@ -83,7 +83,7 @@ export default function FileUpload({ value, onChange }: Props) {
               : value
               ? "#00E5FF44"
               : "#1e2530",
-            background: value ? "transparent" : "#060a0f",
+            background: value ? "transparent" : "var(--surface-input)",
             boxShadow: dragOver
               ? "0 0 0 4px #00E5FF22, 0 0 20px #00E5FF30"
               : value
@@ -125,8 +125,8 @@ export default function FileUpload({ value, onChange }: Props) {
             >
               {!value && (
                 <>
-                  <Camera size={22} className="text-[#2a3a4a]" />
-                  <span className="text-[9px] font-bold uppercase tracking-widest text-[#2a3a4a]">
+                  <Camera size={22} className="text-content-placeholder" />
+                  <span className="text-[9px] font-bold uppercase tracking-widest text-content-placeholder">
                     Photo
                   </span>
                 </>
@@ -150,7 +150,7 @@ export default function FileUpload({ value, onChange }: Props) {
           <button
             type="button"
             onClick={handleRemove}
-            className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[#0a0e14] border border-[#1e2530] flex items-center justify-center text-[#4a5568] hover:text-red-400 hover:border-red-900/50 transition-all duration-200"
+            className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-surface-card-alt border border-[#1e2530] flex items-center justify-center text-content-secondary hover:text-red-400 hover:border-red-900/50 transition-all duration-200"
             title="Supprimer la photo"
           >
             <X size={10} />
@@ -168,10 +168,10 @@ export default function FileUpload({ value, onChange }: Props) {
 
       {/* Click / drag hint */}
       {!uploading && (
-        <p className="text-[10px] text-[#2a3a4a] text-center leading-relaxed">
+        <p className="text-[10px] text-content-placeholder text-center leading-relaxed">
           {value ? "Cliquez pour changer · Glissez une image" : "Cliquez pour choisir · Glissez une image"}
           <br />
-          <span className="text-[#1e2838]">JPG, PNG, WebP · max 2 Mo</span>
+          <span className="text-content-placeholder">JPG, PNG, WebP · max 2 Mo</span>
         </p>
       )}
 

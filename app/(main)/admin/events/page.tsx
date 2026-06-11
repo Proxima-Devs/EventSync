@@ -60,7 +60,7 @@ function StatusBadge({ start, end }: { start: string; end: string }) {
     );
   }
   return (
-    <span className="inline-flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full border border-[#1e2530] bg-[#ffffff05] text-[#3a4a5a] font-bold uppercase tracking-widest">
+    <span className="inline-flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full border border-[#1e2530] bg-overlay-hover text-content-muted font-bold uppercase tracking-widest">
       {t("statusEnded")}
     </span>
   );
@@ -70,16 +70,16 @@ function StatusBadge({ start, end }: { start: string; end: string }) {
 
 function CardSkeleton() {
   return (
-    <div className="animate-pulse rounded-2xl border border-[#1e2530] bg-[#0d1117] overflow-hidden">
-      <div className="h-44 w-full bg-[#1e2530]" />
+    <div className="animate-pulse rounded-2xl border border-[#1e2530] bg-surface-secondary overflow-hidden">
+      <div className="h-44 w-full bg-surface-skeleton" />
       <div className="p-5 space-y-3">
-        <div className="h-4 w-2/3 bg-[#1e2530] rounded-lg" />
-        <div className="h-3 w-full bg-[#1e2530] rounded-lg" />
-        <div className="h-3 w-1/2 bg-[#1e2530] rounded-lg" />
-        <div className="h-px w-full bg-[#1e2530] rounded" />
+        <div className="h-4 w-2/3 bg-surface-skeleton rounded-lg" />
+        <div className="h-3 w-full bg-surface-skeleton rounded-lg" />
+        <div className="h-3 w-1/2 bg-surface-skeleton rounded-lg" />
+        <div className="h-px w-full bg-surface-skeleton rounded" />
         <div className="flex gap-2 pt-1">
-          <div className="h-8 flex-1 bg-[#1e2530] rounded-xl" />
-          <div className="h-8 flex-1 bg-[#1e2530] rounded-xl" />
+          <div className="h-8 flex-1 bg-surface-skeleton rounded-xl" />
+          <div className="h-8 flex-1 bg-surface-skeleton rounded-xl" />
         </div>
       </div>
     </div>
@@ -91,7 +91,7 @@ function CardSkeleton() {
 function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-xs font-semibold uppercase tracking-widest text-[#3a4a5a]">
+      <label className="text-xs font-semibold uppercase tracking-widest text-content-muted">
         {label}
         {required && <span className="text-[#00E5FF] ml-1">*</span>}
       </label>
@@ -101,7 +101,7 @@ function Field({ label, required, children }: { label: string; required?: boolea
 }
 
 const inputClass =
-  "w-full px-4 py-2.5 rounded-xl bg-[#060a0f] border border-[#1e2530] text-sm text-[#ccc] placeholder-[#2a3a4a] focus:outline-none focus:border-[#00E5FF44] focus:ring-1 focus:ring-[#00E5FF22] transition-all duration-200";
+  "w-full px-4 py-2.5 rounded-xl bg-surface-input border border-[#1e2530] text-sm text-content-default placeholder-content-placeholder focus:outline-none focus:border-[#00E5FF44] focus:ring-1 focus:ring-[#00E5FF22] transition-all duration-200";
 
 // ─── Event Form Modal ───
 
@@ -199,7 +199,7 @@ function EventModal({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.97 }}
             transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-            className="relative w-full max-w-lg rounded-2xl border border-[#1e2530] bg-[#0a0e14] overflow-hidden"
+            className="relative w-full max-w-lg rounded-2xl border border-[#1e2530] bg-surface-card-alt overflow-hidden"
             style={{ boxShadow: "0 0 0 1px #00E5FF18, 0 0 40px #00E5FF18, 0 0 80px #00E5FF08, 0 32px 64px rgba(0,0,0,0.6)" }}
           >
             <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-[#00E5FF60] to-transparent" />
@@ -211,17 +211,17 @@ function EventModal({
                   <div className="w-6 h-6 rounded-lg bg-[#00E5FF15] border border-[#00E5FF30] flex items-center justify-center">
                     {isEdit ? <Pencil size={12} className="text-[#00E5FF]" /> : <Plus size={12} className="text-[#00E5FF]" strokeWidth={3} />}
                   </div>
-                  <h2 className="text-base font-black text-white tracking-tight">
+                  <h2 className="text-base font-black text-content-default tracking-tight">
                     {isEdit ? t("modal.editTitle") : t("modal.createTitle")}
                   </h2>
                 </div>
-                <p className="text-xs text-[#3a4a5a] ml-8">
+                <p className="text-xs text-content-muted ml-8">
                   {isEdit ? t("modal.editSubtitle", { slug: editingEvent?.slug ?? "" }) : t("modal.createSubtitle")}
                 </p>
               </div>
               <button
                 onClick={onClose}
-                className="w-8 h-8 rounded-xl border border-[#1e2530] flex items-center justify-center text-[#3a4a5a] hover:text-white hover:border-[#00E5FF33] transition-all duration-200"
+                className="w-8 h-8 rounded-xl border border-[#1e2530] flex items-center justify-center text-content-muted hover:text-content-default hover:border-[#00E5FF33] transition-all duration-200"
               >
                 <X size={14} />
               </button>
@@ -264,7 +264,7 @@ function EventModal({
               </AnimatePresence>
 
               <div className="flex gap-3 pt-1">
-                <button type="button" onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-[#1e2530] text-sm text-[#4a5568] hover:text-white hover:border-[#2e3a4a] transition-all duration-200 font-semibold">
+                <button type="button" onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-[#1e2530] text-sm text-content-secondary hover:text-content-default hover:border-[#2e3a4a] transition-all duration-200 font-semibold">
                   {t("modal.cancel")}
                 </button>
                 <button
@@ -336,7 +336,7 @@ function DeleteModal({ event, onClose, onDeleted }: {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 8 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="relative w-full max-w-sm rounded-2xl border border-red-900/40 bg-[#0a0e14] overflow-hidden"
+            className="relative w-full max-w-sm rounded-2xl border border-red-900/40 bg-surface-card-alt overflow-hidden"
             style={{ boxShadow: "0 0 0 1px #ff444418, 0 0 40px #ff444412, 0 32px 64px rgba(0,0,0,0.6)" }}
           >
             <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-red-500/50 to-transparent" />
@@ -344,8 +344,8 @@ function DeleteModal({ event, onClose, onDeleted }: {
               <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-900/40 flex items-center justify-center mb-4">
                 <Trash2 size={18} className="text-red-400" />
               </div>
-              <h2 className="text-base font-black text-white mb-1">{t("deleteModal.title")}</h2>
-              <p className="text-sm text-[#4a5568] leading-relaxed">
+              <h2 className="text-base font-black text-content-default mb-1">{t("deleteModal.title")}</h2>
+              <p className="text-sm text-content-secondary leading-relaxed">
                 {t("deleteModal.body", { title: event.title })}
               </p>
               {error && (
@@ -356,7 +356,7 @@ function DeleteModal({ event, onClose, onDeleted }: {
               )}
             </div>
             <div className="flex gap-3 px-6 pb-6">
-              <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-[#1e2530] text-sm text-[#4a5568] hover:text-white hover:border-[#2e3a4a] transition-all duration-200 font-semibold">
+              <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-[#1e2530] text-sm text-content-secondary hover:text-content-default hover:border-[#2e3a4a] transition-all duration-200 font-semibold">
                 {t("deleteModal.cancel")}
               </button>
               <button
@@ -402,10 +402,10 @@ function AdminEventCard({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.96 }}
       transition={{ duration: 0.35, delay: index * 0.05, ease: [0.22, 1, 0.36, 1] }}
-      className="group relative rounded-2xl border border-[#1e2530] bg-[#0b0f18] overflow-hidden shadow-lg shadow-black/30 flex flex-col"
+      className="group relative rounded-2xl border border-[#1e2530] bg-surface-event-card overflow-hidden shadow-lg shadow-black/30 flex flex-col"
     >
       {/* ── Cover Image ── */}
-      <div className="relative h-44 w-full overflow-hidden bg-[#0d1117] shrink-0">
+      <div className="relative h-44 w-full overflow-hidden bg-surface-secondary shrink-0">
         {event.coverImage ? (
           <Image
             src={event.coverImage}
@@ -417,7 +417,7 @@ function AdminEventCard({
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-linear-to-br from-[#00E5FF08] via-[#0d1117] to-[#001a1e]" />
+            <div className="absolute inset-0 bg-linear-to-br from-[#00E5FF08] via-surface-secondary to-surface-card-alt" />
             <svg className="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
               <defs>
                 <pattern id={`grid-admin-${event.id}`} width="32" height="32" patternUnits="userSpaceOnUse">
@@ -433,10 +433,10 @@ function AdminEventCard({
         )}
 
         {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-linear-to-t from-[#0b0f18] via-[#0b0f1850] to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-surface-event-card via-surface-event-card/31 to-transparent" />
 
         {/* Date badge */}
-        <div className="absolute top-3 left-3 flex flex-col items-center justify-center w-12 h-12 rounded-xl bg-[#0b0f18cc] border border-[#00E5FF33] backdrop-blur-sm">
+        <div className="absolute top-3 left-3 flex flex-col items-center justify-center w-12 h-12 rounded-xl bg-surface-event-card/80 border border-[#00E5FF33] backdrop-blur-sm">
           <span className="text-lg font-black text-[#00E5FF] leading-none">{day}</span>
           <span className="text-[9px] text-[#00E5FF88] uppercase tracking-widest">{month}</span>
         </div>
@@ -453,19 +453,19 @@ function AdminEventCard({
       <div className="flex flex-col flex-1 p-4 gap-3">
         {/* Title */}
         <div>
-          <h3 className="text-white font-bold text-lg leading-snug line-clamp-1">
+          <h3 className="text-content-default font-bold text-lg leading-snug line-clamp-1">
             {event.title}
           </h3>
-          <p className="text-[#3a4a5a] text-xs font-mono mt-0.5">{event.slug}</p>
+          <p className="text-content-muted text-xs font-mono mt-0.5">{event.slug}</p>
         </div>
 
         {/* Description */}
-        <p className="text-[#4a5568] text-sm line-clamp-2 leading-relaxed flex-1">
+        <p className="text-content-secondary text-sm line-clamp-2 leading-relaxed flex-1">
           {event.description ?? t("noDescription")}
         </p>
 
         {/* Meta */}
-        <div className="flex flex-col gap-1.5 text-xs text-[#3a4550]">
+        <div className="flex flex-col gap-1.5 text-xs text-content-muted">
           <span className="flex items-center gap-2">
             <MapPin size={11} className="text-[#00E5FF55] shrink-0" />
             <span className="truncate">{event.location ?? t("locationUnknown")}</span>
@@ -500,7 +500,7 @@ function AdminEventCard({
           {/* Gérer l'événement */}
           <Link
             href={`/admin/events/${event.slug}`}
-            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-[#1e2530] bg-[#ffffff05] text-[#aaa] text-xs font-bold hover:bg-[#ffffff0d] hover:border-[#2e3a4a] hover:text-white transition-all duration-200"
+            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-[#1e2530] bg-overlay-hover text-content-secondary text-xs font-bold hover:bg-overlay-hover-strong hover:border-[#2e3a4a] hover:text-content-default transition-all duration-200"
           >
             <Settings2 size={12} />
             {t("manage")}
@@ -511,14 +511,14 @@ function AdminEventCard({
         <div className="flex items-center gap-2">
           <button
             onClick={() => onEdit(event)}
-            className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg border border-[#1e2530] text-[#3a4a5a] text-[11px] font-semibold hover:text-white hover:border-[#2e3a4a] hover:bg-[#ffffff06] transition-all duration-200"
+            className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg border border-[#1e2530] text-content-muted text-[11px] font-semibold hover:text-content-default hover:border-[#2e3a4a] hover:bg-overlay-hover transition-all duration-200"
           >
             <Pencil size={11} />
             {t("edit")}
           </button>
           <button
             onClick={() => onDelete(event)}
-            className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg border border-[#1e2530] text-[#3a4a5a] text-[11px] font-semibold hover:text-red-400 hover:border-red-900/50 hover:bg-red-500/05 transition-all duration-200"
+            className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg border border-[#1e2530] text-content-muted text-[11px] font-semibold hover:text-red-400 hover:border-red-900/50 hover:bg-red-500/05 transition-all duration-200"
           >
             <Trash2 size={11} />
             {t("delete")}
@@ -601,10 +601,10 @@ export default function AdminEventsPage() {
 
       <main className="flex-1 px-8 py-12 max-w-6xl mx-auto w-full">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-[#4a5568] mb-8">
+        <div className="flex items-center gap-2 text-sm text-content-secondary mb-8">
           <Link href="/" className="hover:text-[#00E5FF] transition-colors">{t("breadcrumbHome")}</Link>
           <ChevronRight size={13} />
-          <span className="text-white">{t("breadcrumbEvents")}</span>
+          <span className="text-content-default">{t("breadcrumbEvents")}</span>
         </div>
 
         {/* Header */}
@@ -616,7 +616,7 @@ export default function AdminEventsPage() {
               </div>
               <h1 className="font-black text-5xl">{t("pageTitle")}</h1>
             </div>
-            <p className="text-lg text-[#4a5568] mt-1">{t("pageDescription")}</p>
+            <p className="text-lg text-content-secondary mt-1">{t("pageDescription")}</p>
           </div>
 
           <button
@@ -649,8 +649,8 @@ export default function AdminEventsPage() {
                   className={[
                     "relative flex items-center gap-2 px-4 py-2 rounded-xl border text-xs font-bold transition-all duration-200",
                     active
-                      ? "border-[#00E5FF44] bg-[#00E5FF12] text-white"
-                      : "border-[#1e2530] bg-[#0d1117] text-[#3a4a5a] hover:border-[#2e3a4a] hover:text-[#8a9aaa]",
+                      ? "border-[#00E5FF44] bg-[#00E5FF12] text-content-default"
+                      : "border-[#1e2530] bg-surface-secondary text-content-muted hover:border-[#2e3a4a] hover:text-content-muted",
                   ].join(" ")}
                 >
                   <span
@@ -661,7 +661,7 @@ export default function AdminEventsPage() {
                   <span
                     className={[
                       "ml-0.5 text-[10px] font-black tabular-nums",
-                      active ? "text-[#00E5FF]" : "text-[#2a3a4a]",
+                      active ? "text-[#00E5FF]" : "text-content-placeholder",
                     ].join(" ")}
                   >
                     {count}
@@ -679,13 +679,13 @@ export default function AdminEventsPage() {
 
             {/* Search */}
             <div className="relative ml-auto">
-              <Search size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#3a4a5a] pointer-events-none" />
+              <Search size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-content-muted pointer-events-none" />
               <input
                 type="text"
                 placeholder={t("searchPlaceholder")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-52 pl-9 pr-4 py-2 rounded-xl bg-[#0d1117] border border-[#1e2530] text-sm text-[#ccc] placeholder-[#3a4a5a] focus:outline-none focus:border-[#00E5FF44] focus:ring-1 focus:ring-[#00E5FF22] transition-all"
+                className="w-52 pl-9 pr-4 py-2 rounded-xl bg-surface-secondary border border-[#1e2530] text-sm text-content-default placeholder-content-muted focus:outline-none focus:border-[#00E5FF44] focus:ring-1 focus:ring-[#00E5FF22] transition-all"
               />
             </div>
           </div>
@@ -709,10 +709,10 @@ export default function AdminEventsPage() {
         {/* Empty state */}
         {!loading && !error && events.length === 0 && (
           <div className="py-24 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-[#0d1117] border border-[#1e2530] flex items-center justify-center mx-auto mb-4">
-              <Calendar size={28} className="text-[#1e2530]" />
+            <div className="w-16 h-16 rounded-2xl bg-surface-secondary border border-[#1e2530] flex items-center justify-center mx-auto mb-4">
+              <Calendar size={28} className="text-content-muted" />
             </div>
-            <p className="text-[#3a4a5a] italic text-sm mb-5">{t("emptyState")}</p>
+            <p className="text-content-muted italic text-sm mb-5">{t("emptyState")}</p>
             <button
               onClick={openCreate}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#00E5FF15] border border-[#00E5FF30] text-[#00E5FF] text-sm font-bold hover:bg-[#00E5FF20] transition-all"
@@ -726,7 +726,7 @@ export default function AdminEventsPage() {
         {/* No search results */}
         {!loading && !error && events.length > 0 && filtered.length === 0 && (
           <div className="py-16 text-center">
-            <p className="text-[#3a4a5a] italic text-sm">{t("noSearchResults", { query: search })}</p>
+            <p className="text-content-muted italic text-sm">{t("noSearchResults", { query: search })}</p>
           </div>
         )}
 
