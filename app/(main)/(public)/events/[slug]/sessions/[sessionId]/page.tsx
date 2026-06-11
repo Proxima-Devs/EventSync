@@ -4,37 +4,42 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { useLocale, useTranslations } from "next-intl";
 import { apiFetch } from "@/lib/api";
 import { useFavorites } from "@/hooks/useFavorites";
 import QuestionSection from "@/components/QuestionSection";
 import { Session } from "@/types";
 
-function formatTime(iso: string) {
-  return new Date(iso).toLocaleTimeString("fr-FR", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
 export default function SessionDetailPage() {
+  const t = useTranslations("SessionDetailPage");
+  const locale = useLocale();
   const { slug, sessionId } = useParams<{ slug: string; sessionId: string }>();
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const { toggle, isFavorite } = useFavorites();
 
+  const formatTime = (iso: string) =>
+    new Date(iso).toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
+
   useEffect(() => {
     apiFetch<Session>(`/api/sessions/${sessionId}`)
       .then((data) => {
         if (!data) {
-          setError("Session introuvable");
+          setError(t("notFound"));
         } else {
           setSession(data);
         }
       })
-      .catch(() => setError("Session introuvable"))
+      .catch(() => setError(t("notFound")))
       .finally(() => setLoading(false));
-  }, [sessionId]);
+  }, [sessionId, t]);
+
+  useEffect(() => {
+  if (session?.title) {
+    document.title = session.title;
+  }
+}, [session]);
 
   if (loading)
     return (
@@ -51,7 +56,7 @@ export default function SessionDetailPage() {
     return (
       <main className="flex-1 px-8 py-12 max-w-3xl mx-auto w-full">
         <div className="rounded-2xl border border-red-900 bg-red-500/10 py-12 text-center text-red-400 text-sm">
-          {error || "Session introuvable"}
+          {error || t("notFound")}
         </div>
       </main>
     );
@@ -60,24 +65,23 @@ export default function SessionDetailPage() {
 
   return (
     <main className="flex-1 px-8 py-12 max-w-3xl mx-auto w-full">
-      {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-[#4a5568] mb-8 flex-wrap">
         <Link href="/" className="hover:text-[#00E5FF] transition-colors">
-          Accueil
+          {t("breadcrumbHome")}
         </Link>
         <span>/</span>
         <Link
           href={`/events/${slug}`}
           className="hover:text-[#00E5FF] transition-colors"
         >
-          Événement
+          {t("breadcrumbEvent")}
         </Link>
         <span>/</span>
         <Link
           href={`/events/${slug}/sessions`}
           className="hover:text-[#00E5FF] transition-colors"
         >
-          Sessions
+          {t("breadcrumbSessions")}
         </Link>
         <span>/</span>
         <span className="text-white truncate max-w-45">{session.title}</span>
@@ -89,7 +93,7 @@ export default function SessionDetailPage() {
             {session.isLive && (
               <span className="inline-flex items-center gap-1.5 text-xs bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1 rounded-full font-bold animate-pulse">
                 <span className="w-1.5 h-1.5 rounded-full bg-red-400 inline-block" />
-                LIVE
+                {t("live")}
               </span>
             )}
             {session.room && (
@@ -106,7 +110,7 @@ export default function SessionDetailPage() {
                 : "bg-transparent border-[#1e2530] text-[#4a5568] hover:text-white hover:border-[#00E5FF44]"
             }`}
           >
-            {fav ? "⭐ Favori" : "☆ Ajouter"}
+            {fav ? t("favorite") : t("addFavorite")}
           </button>
         </div>
 
@@ -117,7 +121,7 @@ export default function SessionDetailPage() {
             🕐 {formatTime(session.startTime)} → {formatTime(session.endTime)}
           </span>
           {session.capacity && (
-            <span>👥 Capacité : {session.capacity} places</span>
+            <span>{t("capacity", { count: session.capacity })}</span>
           )}
         </div>
 
@@ -126,10 +130,9 @@ export default function SessionDetailPage() {
         )}
       </div>
 
-      {/* Intervenants */}
       {session.speakers.length > 0 && (
         <div className="mb-6">
-          <h2 className="text-xl font-black mb-4 pl-7 text-white">Intervenants</h2>
+          <h2 className="text-xl font-black mb-4 pl-7 text-white">{t("speakersTitle")}</h2>
           <div className="grid gap-3 md:grid-cols-2">
             {session.speakers.map((speaker) => (
               <Link
@@ -137,20 +140,14 @@ export default function SessionDetailPage() {
                 href={`/speakers/${speaker.slug}`}
                 className="flex items-center gap-4 rounded-2xl px-4 py-3 mx-4 hover:border-[#00E5FF44] transition-all duration-200 group hover:border "
               >
-                {speaker.photo ? (
-                  <Image
-                    src={speaker.photo}
-                    alt={speaker.fullName}
-                    width={56}
-                    height={56}
-                    unoptimized
-                    className="rounded-full object-cover shrink-0 ring-2 ring-[#1e2530] group-hover:ring-[#00E5FF33] transition-all"
-                  />
-                ) : (
-                  <div className="w-14 h-14 rounded-full bg-[#1e2530] flex items-center justify-center text-[#00E5FF] font-black text-xl shrink-0 group-hover:bg-[#00E5FF15] transition-colors">
-                    {speaker.fullName[0]}
-                  </div>
-                )}
+                <Image
+                  src={speaker.photo ?? `https://api.dicebear.com/7.x/adventurer/svg?seed=${speaker.fullName}&flip=true&radius=50`}
+                  alt={speaker.fullName}
+                  width={56}
+                  height={56}
+                  unoptimized
+                  className="rounded-full object-cover shrink-0 ring-2 ring-[#1e2530] group-hover:ring-[#00E5FF33] transition-all"
+                />
                 <div className="min-w-0">
                   <p className="font-bold group-hover:text-[#00E5FF] text-white transition-colors">
                     {speaker.fullName}
@@ -161,7 +158,7 @@ export default function SessionDetailPage() {
                     </p>
                   )}
                   <span className="text-xs text-[#00E5FF] opacity-0 group-hover:opacity-100 transition-opacity mt-1 inline-block">
-                    Voir le profil →
+                    {t("viewProfile")}
                   </span>
                 </div>
               </Link>

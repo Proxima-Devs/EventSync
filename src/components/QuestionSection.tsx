@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { ThumbsUp } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { authClient } from "@/lib/auth-client";
 
 interface QuestionReply {
@@ -41,19 +42,23 @@ function refreshQuestions(
     .catch(() => {});
 }
 
-function formatRelativeTime(timestamp: string) {
+function formatRelativeTime(
+  timestamp: string,
+  t: ReturnType<typeof useTranslations<"QuestionSection">>
+) {
   const diffMs = Date.now() - new Date(timestamp).getTime();
   const seconds = Math.max(Math.floor(diffMs / 1000), 0);
-  if (seconds < 60) return "à l'instant";
+  if (seconds < 60) return t("relativeJustNow");
   const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes} min`;
+  if (minutes < 60) return t("relativeMinutes", { count: minutes });
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h`;
+  if (hours < 24) return t("relativeHours", { count: hours });
   const days = Math.floor(hours / 24);
-  return `${days}j`;
+  return t("relativeDays", { count: days });
 }
 
 export default function QuestionSection({ sessionId, isLive }: Props) {
+  const t = useTranslations("QuestionSection");
   const { data: session } = authClient.useSession();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [content, setContent] = useState("");
@@ -135,15 +140,15 @@ export default function QuestionSection({ sessionId, isLive }: Props) {
       });
       if (!res.ok) {
         const data = await res.json();
-        setError(data.error ?? "Erreur lors de l'envoi");
+        setError(data.error ?? t("submitError"));
         return;
       }
       setContent("");
-      setSuccess("Question envoyée !");
+      setSuccess(t("questionSent"));
       refreshQuestions(sessionId, setQuestions, setUpvoted);
       setTimeout(() => setSuccess(""), 3000);
     } catch {
-      setError("Erreur réseau");
+      setError(t("networkError"));
     } finally {
       setPosting(false);
     }
@@ -165,7 +170,7 @@ export default function QuestionSection({ sessionId, isLive }: Props) {
   async function handleReplySubmit(questionId: string, e: React.FormEvent) {
     e.preventDefault();
     if (!replyContent.trim()) {
-      setReplyError("La réponse est vide.");
+      setReplyError(t("replyEmpty"));
       return;
     }
     setReplyPosting(true);
@@ -182,16 +187,16 @@ export default function QuestionSection({ sessionId, isLive }: Props) {
       });
       const data = await res.json();
       if (!res.ok) {
-        setReplyError(data.error ?? "Erreur lors de l'envoi");
+        setReplyError(data.error ?? t("submitError"));
         return;
       }
       setReplyContent("");
       setReplyAuthorName("");
-      setReplySuccess("Réponse envoyée !");
+      setReplySuccess(t("replySent"));
       refreshQuestions(sessionId, setQuestions, setUpvoted);
       setTimeout(() => setReplySuccess(""), 3000);
     } catch {
-      setReplyError("Erreur réseau");
+      setReplyError(t("networkError"));
     } finally {
       setReplyPosting(false);
     }
@@ -231,11 +236,11 @@ export default function QuestionSection({ sessionId, isLive }: Props) {
       }
       if (!res.ok) {
         const data = await res.json();
-        setVoteError(data.error ?? "Erreur de vote");
+        setVoteError(data.error ?? t("voteError"));
         refreshQuestions(sessionId, setQuestions, setUpvoted);
       }
     } catch {
-      setVoteError("Impossible d'enregistrer le vote. Réessayez.");
+      setVoteError(t("voteSaveError"));
       refreshQuestions(sessionId, setQuestions, setUpvoted);
     }
   }
@@ -244,7 +249,7 @@ export default function QuestionSection({ sessionId, isLive }: Props) {
     <div className="font-sans text-[#e4e6eb] max-w-170">
       {/* Title */}
       <h2 className="text-base font-bold text-[#e4e6eb] mb-4">
-        {isLive ? "💬 Questions en direct" : "💬 Questions"}
+        {isLive ? t("titleLive") : t("title")}
       </h2>
  
       {/* Vote error */}
@@ -273,7 +278,7 @@ export default function QuestionSection({ sessionId, isLive }: Props) {
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                placeholder="Posez votre question..."
+                placeholder={t("askPlaceholder")}
                 maxLength={500}
                 required
                 rows={1}
@@ -292,7 +297,7 @@ export default function QuestionSection({ sessionId, isLive }: Props) {
               type="text"
               value={authorName}
               onChange={(e) => setAuthorName(e.target.value)}
-              placeholder="Votre nom (optionnel)"
+              placeholder={t("namePlaceholder")}
               className="flex-1 bg-[#1E2836] border-none rounded-[20px] px-3.5 py-2 text-[#e4e6eb] text-sm font-[inherit] outline-none placeholder-[#b0b3b8]"
             />
             <button
@@ -300,7 +305,7 @@ export default function QuestionSection({ sessionId, isLive }: Props) {
               disabled={posting || !content.trim()}
               className="bg-[#2374e1] text-white border-none rounded-md px-3.5 py-1.75 text-sm font-semibold font-[inherit] cursor-pointer whitespace-nowrap transition-colors duration-150 hover:bg-[#1a6cd4] disabled:opacity-45 disabled:cursor-not-allowed"
             >
-              {posting ? "Envoi…" : "Publier"}
+              {posting ? t("posting") : t("publish")}
             </button>
           </div>
         </div>
@@ -318,9 +323,7 @@ export default function QuestionSection({ sessionId, isLive }: Props) {
         </div>
       ) : questions.length === 0 ? (
         <p className="text-[#b0b3b8] text-sm italic text-center py-6">
-          {isLive
-            ? "Aucune question pour l'instant. Soyez le premier !"
-            : "Aucune question n'a été posée durant cette session."}
+          {isLive ? t("emptyLive") : t("emptyPast")}
         </p>
       ) : (
         <div className="flex flex-col gap-1">
@@ -339,7 +342,7 @@ export default function QuestionSection({ sessionId, isLive }: Props) {
                       {/* Bubble */}
                       <div className="inline-block bg-[#1E2836] rounded-[18px] px-3.5 py-2 max-w-full">
                         <span className="block text-[0.8125rem] font-bold text-[#e4e6eb] mb-0.5">
-                          {q.authorName ?? "Anonyme"}
+                          {q.authorName ?? t("anonymous")}
                         </span>
                         <p className="text-[0.9375rem] text-[#e4e6eb] leading-[1.4] m-0 whitespace-pre-wrap wrap-break-word">
                           {q.content}
@@ -365,18 +368,18 @@ export default function QuestionSection({ sessionId, isLive }: Props) {
                           }`}
                         >
                           <ThumbsUp size={14} />
-                          J&apos;aime
+                          {t("like")}
                         </button>
                         <span className="text-[#4e4f50] text-xs">·</span>
                         <button
                           onClick={() => handleReplyToggle(q.id)}
                           className="inline-flex items-center gap-1 bg-transparent border-none cursor-pointer text-[0.8125rem] font-bold text-[#b0b3b8] font-[inherit] px-1 py-0.5 rounded transition-colors duration-150 hover:text-[#e4e6eb] hover:bg-white/5"
                         >
-                          Répondre
+                          {t("reply")}
                         </button>
                         <span className="text-[#4e4f50] text-xs">·</span>
                         <span className="text-xs text-[#b0b3b8] px-1 py-0.5">
-                          {formatRelativeTime(q.createdAt)}
+                          {formatRelativeTime(q.createdAt, t)}
                         </span>
                       </div>
                     </div>
@@ -390,8 +393,8 @@ export default function QuestionSection({ sessionId, isLive }: Props) {
                         className="bg-transparent border-none cursor-pointer text-[0.8125rem] font-bold text-[#b0b3b8] font-[inherit] px-1.5 py-1 rounded flex items-center gap-1.5 transition-colors duration-150 hover:text-[#e4e6eb] before:content-[''] before:inline-block before:w-5 before:h-[1.5px] before:bg-[#b0b3b8] before:rounded"
                       >
                         {repliesOpen
-                          ? "Masquer les réponses"
-                          : `Voir ${q.replies.length} réponse${q.replies.length > 1 ? "s" : ""}`}
+                          ? t("hideReplies")
+                          : t("viewReplies", { count: q.replies.length })}
                       </button>
  
                       {repliesOpen && (
@@ -401,7 +404,7 @@ export default function QuestionSection({ sessionId, isLive }: Props) {
                               <div className="flex-1 min-w-0">
                                 <div className="inline-block bg-[#1E2836] rounded-[18px] px-3.5 py-2 max-w-full">
                                   <span className="block text-[0.8125rem] font-bold text-[#e4e6eb] mb-0.5">
-                                    {reply.authorName ?? "Anonyme"}
+                                    {reply.authorName ?? t("anonymous")}
                                   </span>
                                   <p className="text-[0.9375rem] text-[#e4e6eb] leading-[1.4] m-0 whitespace-pre-wrap wrap-break-word">
                                     {reply.content}
@@ -409,7 +412,7 @@ export default function QuestionSection({ sessionId, isLive }: Props) {
                                 </div>
                                 <div className="flex items-center gap-1 px-1.5 pt-0.75">
                                   <span className="text-xs text-[#b0b3b8] px-1 py-0.5">
-                                    {formatRelativeTime(reply.createdAt)}
+                                    {formatRelativeTime(reply.createdAt, t)}
                                   </span>
                                 </div>
                               </div>
@@ -439,7 +442,7 @@ export default function QuestionSection({ sessionId, isLive }: Props) {
                           <textarea
                             value={replyContent}
                             onChange={(e) => setReplyContent(e.target.value)}
-                            placeholder="Écrire une réponse..."
+                            placeholder={t("replyPlaceholder")}
                             maxLength={500}
                             rows={1}
                             onInput={(e) => {
@@ -457,7 +460,7 @@ export default function QuestionSection({ sessionId, isLive }: Props) {
                           type="text"
                           value={replyAuthorName}
                           onChange={(e) => setReplyAuthorName(e.target.value)}
-                          placeholder="Votre nom (optionnel)"
+                          placeholder={t("namePlaceholder")}
                           className="flex-1 bg-[#1E2836] border-none rounded-[20px] px-3.5 py-2 text-[#e4e6eb] text-sm font-[inherit] outline-none placeholder-[#b0b3b8]"
                         />
                         <button
@@ -465,7 +468,7 @@ export default function QuestionSection({ sessionId, isLive }: Props) {
                           disabled={replyPosting || !replyContent.trim()}
                           className="bg-[#2374e1] text-white border-none rounded-md px-3.5 py-1.75 text-sm font-semibold font-[inherit] cursor-pointer whitespace-nowrap transition-colors duration-150 hover:bg-[#1a6cd4] disabled:opacity-45 disabled:cursor-not-allowed"
                         >
-                          {replyPosting ? "Envoi…" : "Répondre"}
+                          {replyPosting ? t("posting") : t("reply")}
                         </button>
                       </div>
                     </div>

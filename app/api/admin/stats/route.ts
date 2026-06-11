@@ -18,6 +18,7 @@ export async function GET() {
       liveSessionsCount,
       upcomingEventsCount,
       recentQuestions,
+      recentEventsRaw,
     ] = await prisma.$transaction([
       prisma.event.count(),
       prisma.eventSession.count(),
@@ -51,7 +52,19 @@ export async function GET() {
           },
         },
       }),
+      prisma.event.findMany({
+        take: 5,
+        orderBy: { startDate: "desc" },
+        include: {
+          _count: { select: { sessions: true } },
+        },
+      }),
     ]);
+
+    const recentEvents = recentEventsRaw.map((event) => ({
+      ...event,
+      location: event.location ?? undefined,
+    }));
 
     return NextResponse.json({
       totals: {
@@ -68,6 +81,7 @@ export async function GET() {
         events: upcomingEventsCount,
       },
       recentQuestions,
+      recentEvents,
     });
   } catch (error) {
     console.error("[GET /api/admin/stats]", error);

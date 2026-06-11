@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { apiFetch } from "@/lib/api";
 import EventSkeleton from "@/components/EventSkeleton";
 import EventCard from "@/components/EventCard";
@@ -13,12 +14,17 @@ type ApiResponse = {
   meta: { total: number; page: number; perPage: number };
 };
 
-const FILTERS = ["All", "Upcoming", "Past"];
-
 export default function HomePage() {
+  const t = useTranslations("HomePage");
+  const FILTERS = [
+    { value: "all", label: t("allFilter") },
+    { value: "upcoming", label: t("upcomingFilter") },
+    { value: "past", label: t("pastFilter") },
+  ];
+
   const [search, setSearch] = useState("");
   const [submitted, setSubmitted] = useState("");
-  const [activeFilter, setActiveFilter] = useState("All");
+  const [activeFilter, setActiveFilter] = useState("all");
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -30,13 +36,13 @@ export default function HomePage() {
         const res = await apiFetch<ApiResponse>("/api/events");
         setEvents(res.data);
       } catch {
-        setError("Failed to load events");
+        setError(t("errorLoad"));
       } finally {
         setLoading(false);
       }
     };
     fetchEvents();
-  }, []);
+  }, [t]);
 
   const filtered = events.filter((e) => {
     const matchSearch =
@@ -47,8 +53,8 @@ export default function HomePage() {
     const now = new Date();
     const start = new Date(e.startDate);
 
-    if (activeFilter === "Upcoming") return matchSearch && start >= now;
-    if (activeFilter === "Past") return matchSearch && start < now;
+    if (activeFilter === "upcoming") return matchSearch && start >= now;
+    if (activeFilter === "past") return matchSearch && start < now;
     return matchSearch;
   });
 
@@ -85,35 +91,34 @@ export default function HomePage() {
         </div>
 
         <div className="mb-6 inline-flex items-center gap-2 border border-[#00E5FF33] bg-[#00E5FF0a] text-[#00E5FF] text-xs font-bold tracking-widest uppercase px-4 py-2 rounded-full">
-          <span>✦</span> MadaTechEvent
+          <span>✦</span> {t("heroBadge")}
         </div>
 
         <h1 className="text-5xl md:text-6xl font-black leading-tight mb-4">
           <span className="inline-block" style={{ animation: "slideInLeft 0.6s ease forwards", opacity: 0 }}>
-            Synchronize
+            {t("titlePart1")}
           </span>{" "}
           <span className="inline-block" style={{ animation: "slideInLeft 0.6s ease 0.2s forwards", opacity: 0 }}>
-            Your
+            {t("titlePart2")}
           </span>
           <br />
           <span className="text-[#00E5FF] inline-block" style={{ animation: "blurIn 0.8s ease 0.4s forwards", opacity: 0 }}>
-            Event
+            {t("titleEvent")}
           </span>{" "}
           <span className="text-[#00E5FF] inline-block" style={{ animation: "blurIn 0.8s ease 0.6s forwards", opacity: 0 }}>
-            Experience
+            {t("titleExperience")}
           </span>
         </h1>
 
         <p className="text-[#4a5568] max-w-xl mx-auto text-base mb-10 leading-relaxed">
-          Discover the most exciting tech conferences, workshops, and meetups in
-          Madagascar. Manage your schedule, connect with speakers, and never miss a beat.
+          {t("description")}
         </p>
 
         <div className="w-full max-w-xl flex rounded-full overflow-hidden border border-[#1e2530] bg-[#0d1117] shadow-xl shadow-[#00E5FF08]">
           <span className="flex items-center pl-5"><Search /></span>
           <input
             type="text"
-            placeholder="Search events by title or location..."
+            placeholder={t("searchPlaceholder")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && setSubmitted(search)}
@@ -123,7 +128,7 @@ export default function HomePage() {
             onClick={() => setSubmitted(search)}
             className="cursor-pointer px-6 py-4 bg-[#00E5FF] text-black font-bold text-sm hover:bg-[#00ffff] transition-colors"
           >
-            Search
+            {t("searchButton")}
           </button>
         </div>
       </section>
@@ -131,25 +136,25 @@ export default function HomePage() {
       <section className="px-8 pb-16">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <h2 className="text-2xl font-black">Featured Events</h2>
+            <h2 className="text-2xl font-black">{t("featuredEvents")}</h2>
             <div className="h-0.75w-10 bg-[#00E5FF] rounded-full" />
           </div>
           <span className="text-[#4a5568] text-sm">
-            {!loading && `${filtered.length} event${filtered.length !== 1 ? "s" : ""}`}
+            {!loading && t("eventCount", { count: filtered.length })}
           </span>
         </div>
 
         <div className="flex gap-2 mb-6">
           {FILTERS.map((filter) => (
             <button
-              key={filter}
-              onClick={() => setActiveFilter(filter)}
-              className={`cursor-pointer px-4 py-1.5 rounded-full text-sm font-semibold border transition-all duration-200 ${activeFilter === filter
+              key={filter.value}
+              onClick={() => setActiveFilter(filter.value)}
+              className={`cursor-pointer px-4 py-1.5 rounded-full text-sm font-semibold border transition-all duration-200 ${activeFilter === filter.value
                   ? "bg-[#00E5FF] border-[#00E5FF] text-black shadow-lg shadow-[#00E5FF33]"
                   : "bg-transparent border-[#1e2530] text-[#4a5568] hover:text-white hover:border-[#00E5FF44]"
                 }`}
             >
-              {filter}
+              {filter.label}
             </button>
           ))}
         </div>
@@ -166,7 +171,7 @@ export default function HomePage() {
           </div>
         ) : filtered.length === 0 ? (
           <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] py-20 text-center text-[#3a4550] italic text-sm">
-            No events found.
+            {t("noEventsFound")}
           </div>
         ) : (
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
