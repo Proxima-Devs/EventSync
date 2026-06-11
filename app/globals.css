@@ -2,9 +2,6 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --background-dark: #0a0a0a;
   --color-primary: #00E5FF;
   --color-secondary: #7b61ff;
   --color-tertiary: #00ffc8;
@@ -12,24 +9,85 @@
   --scrollbar-thumb-hover: #00e5ff;
   --scrollbar-track: #0f172a8c;
   --scrollbar-track-light: #f0f8ff1f;
+
+  --_surface: #f7f7f5;
+  --_surface-secondary: #f3f4f6;
+  --_surface-sidebar: #f0f0f0;
+  --_surface-elevated: #ffffff;
+  --_surface-card-alt: #f9fafb;
+  --_surface-input: #f5f5f5;
+  --_surface-skeleton: #d1d5db;
+  --_surface-event-card: #f9fafb;
+
+  --_content-default: #111111;
+  --_content-secondary: #374151;
+  --_content-muted: #6b7280;
+  --_content-placeholder: #9ca3af;
+
+  --_border-default: #d1d5db;
+  --_border-secondary: #e5e7eb;
+
+  --_overlay-hover: rgba(0,0,0,0.04);
+  --_overlay-hover-strong: rgba(0,0,0,0.05);
+
+  --background: var(--_surface);
+  --foreground: var(--_content-default);
+}
+
+.dark {
+  --_surface: #0e1114;
+  --_surface-secondary: #0d1117;
+  --_surface-sidebar: #080a0c;
+  --_surface-elevated: #111316;
+  --_surface-card-alt: #0a0e14;
+  --_surface-input: #060a0f;
+  --_surface-skeleton: #1e2530;
+  --_surface-event-card: #0b0f18;
+
+  --_content-default: #eee;
+  --_content-secondary: #4a5568;
+  --_content-muted: #3a4a5a;
+  --_content-placeholder: #2a3a4a;
+
+  --_border-default: #1e2530;
+  --_border-secondary: #1a1a1a;
+
+  --_overlay-hover: rgba(255,255,255,0.04);
+  --_overlay-hover-strong: rgba(255,255,255,0.05);
+
+  --background: var(--_surface);
+  --foreground: var(--_content-default);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-surface: var(--_surface);
+  --color-surface-secondary: var(--_surface-secondary);
+  --color-surface-sidebar: var(--_surface-sidebar);
+  --color-surface-elevated: var(--_surface-elevated);
+  --color-surface-card-alt: var(--_surface-card-alt);
+  --color-surface-input: var(--_surface-input);
+  --color-surface-skeleton: var(--_surface-skeleton);
+  --color-surface-event-card: var(--_surface-event-card);
+
+  --color-content-default: var(--_content-default);
+  --color-content-secondary: var(--_content-secondary);
+  --color-content-muted: var(--_content-muted);
+  --color-content-placeholder: var(--_content-placeholder);
+
+  --color-border-default: var(--_border-default);
+  --color-border-secondary: var(--_border-secondary);
+
+  --color-overlay-hover: var(--_overlay-hover);
+  --color-overlay-hover-strong: var(--_overlay-hover-strong);
+
+  --color-background: var(--_surface);
+  --color-foreground: var(--_content-default);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --scrollbar-thumb: rgba(0, 229, 255, 0.9);
   --scrollbar-thumb-hover: rgba(0, 229, 255, 1);
   --scrollbar-track: rgba(15, 23, 42, 0.55);
   --scrollbar-track-light: rgba(240, 248, 255, 0.12);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: var(--background-dark);
-    --foreground: #ededed;
-  }
 }
 
 @font-face {
@@ -167,11 +225,10 @@ body {
   from { opacity: 0; transform: scale(0.96); }
   to   { opacity: 1; transform: scale(1); }
 }
- 
+
 .animate-fade-up  { animation: fade-up  0.15s ease forwards; }
 .animate-scale-in { animation: scale-in 0.18s ease forwards; }
 
-/* Primary color utility classes with CSS variables */
 .text-primary { color: var(--color-primary); }
 .bg-primary-light { background-color: color-mix(in srgb, var(--color-primary) 5%); }
 .bg-primary-lighter { background-color: color-mix(in srgb, var(--color-primary) 8%); }

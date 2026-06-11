@@ -53,17 +53,17 @@ const SOCIAL_ICONS: Record<string, { icon: React.ReactNode }> = {
 
 function SpeakerCardSkeleton() {
     return (
-        <div className="animate-pulse rounded-2xl border border-[#1e2530] bg-[#0d1117] p-6">
+        <div className="animate-pulse rounded-2xl border border-[#1e2530] bg-surface-secondary p-6">
             <div className="flex items-start gap-4">
-                <div className="w-14 h-14 rounded-full bg-[#1e2530] shrink-0" />
+                <div className="w-14 h-14 rounded-full bg-surface-skeleton shrink-0" />
                 <div className="flex-1 space-y-2 pt-1">
-                    <div className="h-4 w-2/3 bg-[#1e2530] rounded-lg" />
-                    <div className="h-3 w-1/3 bg-[#1e2530] rounded-lg" />
+                    <div className="h-4 w-2/3 bg-surface-skeleton rounded-lg" />
+                    <div className="h-3 w-1/3 bg-surface-skeleton rounded-lg" />
                 </div>
             </div>
             <div className="mt-4 space-y-2">
-                <div className="h-3 w-full bg-[#1e2530] rounded-lg" />
-                <div className="h-3 w-4/5 bg-[#1e2530] rounded-lg" />
+                <div className="h-3 w-full bg-surface-skeleton rounded-lg" />
+                <div className="h-3 w-4/5 bg-surface-skeleton rounded-lg" />
             </div>
         </div>
     );
@@ -77,7 +77,7 @@ function SpeakerCard({ speaker }: { speaker: Speaker }) {
     return (
         <Link
             href={`/speakers/${speaker.slug}`}
-            className="group relative flex flex-col rounded-2xl border border-[#1e2530] bg-[#0d1117] p-6 hover:border-[#00E5FF33] hover:bg-[#0d1117] transition-all duration-300"
+            className="group relative flex flex-col rounded-2xl border border-[#1e2530] bg-surface-secondary p-6 hover:border-[#00E5FF33] hover:bg-surface-secondary transition-all duration-300"
         >
             <div className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-[radial-gradient(ellipse_at_top_left,#00E5FF08_0%,transparent_60%)]" />
 
@@ -92,10 +92,10 @@ function SpeakerCard({ speaker }: { speaker: Speaker }) {
                 />
 
                 <div className="flex-1 min-w-0 pt-0.5">
-                    <h2 className="font-bold text-[#eee] truncate group-hover:text-white transition-colors leading-tight">
+                    <h2 className="font-bold text-content-default truncate group-hover:text-content-default transition-colors leading-tight">
                         {speaker.fullName}
                     </h2>
-                    <p className="text-xs text-[#3a4a5a] mt-1 flex items-center gap-1.5">
+                    <p className="text-xs text-content-muted mt-1 flex items-center gap-1.5">
                         <Mic size={11} className="shrink-0" />
                         {speaker._count.sessions === 0
                             ? t("sessionsZero")
@@ -107,7 +107,7 @@ function SpeakerCard({ speaker }: { speaker: Speaker }) {
             </div>
 
             {speaker.bio && (
-                <p className="text-sm text-[#4a5568] leading-relaxed mt-4 line-clamp-2">
+                <p className="text-sm text-content-secondary leading-relaxed mt-4 line-clamp-2">
                     {speaker.bio}
                 </p>
             )}
@@ -120,7 +120,7 @@ function SpeakerCard({ speaker }: { speaker: Speaker }) {
                         return (
                             <span
                                 key={key}
-                                className="inline-flex items-center text-[10px] px-2 py-1 rounded-full border border-[#1e2530] text-[#3a4a5a] font-semibold"
+                                className="inline-flex items-center text-[10px] px-2 py-1 rounded-full border border-[#1e2530] text-content-muted font-semibold"
                             >
                                 {meta?.icon ?? (
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3.5 h-3.5">
@@ -164,26 +164,26 @@ export default function SpeakersPage() {
 
     return (
         <main className="flex-1 px-8 py-12 max-w-5xl mx-auto w-full">
-            <div className="flex items-center gap-2 text-sm text-[#4a5568] mb-8">
+            <div className="flex items-center gap-2 text-sm text-content-secondary mb-8">
                 <Link href="/" className="hover:text-[#00E5FF] transition-colors">
                     {t("breadcrumbHome")}
                 </Link>
                 <span>/</span>
-                <span className="text-white">{t("pageTitle")}</span>
+                <span className="text-content-default">{t("pageTitle")}</span>
             </div>
 
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-end gap-4 mb-8">
                 <div className="flex-1">
-                    <h1 className="text-3xl font-black text-white">
+                    <h1 className="text-3xl font-black text-content-default">
                         {t("pageTitle")}
                         {!loading && speakers.length > 0 && (
-                            <span className="ml-3 text-base font-normal text-[#3a4a5a]">
+                            <span className="ml-3 text-base font-normal text-content-muted">
                                 {speakers.length}
                             </span>
                         )}
                     </h1>
-                    <p className="text-sm text-[#4a5568] mt-1">
+                    <p className="text-sm text-content-secondary mt-1">
                         {t("description")}
                     </p>
                 </div>
@@ -192,14 +192,14 @@ export default function SpeakersPage() {
                     <div className="relative">
                         <Search
                             size={14}
-                            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#3a4a5a] pointer-events-none"
+                            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-content-muted pointer-events-none"
                         />
                         <input
                             type="text"
                             placeholder={t("searchPlaceholder")}
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-56 pl-9 pr-4 py-2.5 rounded-xl bg-[#0d1117] border border-[#1e2530] text-sm text-[#ccc] placeholder-[#3a4a5a] focus:outline-none focus:border-[#00E5FF44] focus:ring-1 focus:ring-[#00E5FF22] transition-all"
+                            className="w-56 pl-9 pr-4 py-2.5 rounded-xl bg-surface-secondary border border-[#1e2530] text-sm text-content-default placeholder-[#3a4a5a] focus:outline-none focus:border-[#00E5FF44] focus:ring-1 focus:ring-[#00E5FF22] transition-all"
                         />
                     </div>
                 )}
@@ -220,17 +220,17 @@ export default function SpeakersPage() {
             )}
 
             {!loading && !error && speakers.length === 0 && (
-                <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] py-20 text-center">
-                    <Mic size={28} className="mx-auto text-[#1e2530] mb-3" />
-                    <p className="text-[#3a4a5a] italic text-sm">
+                <div className="rounded-2xl border border-[#1e2530] bg-surface-secondary py-20 text-center">
+                    <Mic size={28} className="mx-auto text-content-muted mb-3" />
+                    <p className="text-content-muted italic text-sm">
                         {t("noSpeakers")}
                     </p>
                 </div>
             )}
 
             {!loading && !error && speakers.length > 0 && filtered.length === 0 && (
-                <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] py-16 text-center">
-                    <p className="text-[#3a4a5a] italic text-sm">
+                <div className="rounded-2xl border border-[#1e2530] bg-surface-secondary py-16 text-center">
+                    <p className="text-content-muted italic text-sm">
                         {t("noResults", { query: search })}
                     </p>
                 </div>

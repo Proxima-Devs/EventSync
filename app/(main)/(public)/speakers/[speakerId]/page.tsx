@@ -96,15 +96,15 @@ export default function SpeakerPage() {
         return (
             <main className="flex-1 px-8 py-12 max-w-3xl mx-auto w-full">
                 <div className="animate-pulse space-y-4">
-                    <div className="h-4 w-32 bg-[#1e2530] rounded-full" />
+                    <div className="h-4 w-32 bg-surface-skeleton rounded-full" />
                     <div className="flex items-center gap-6">
-                        <div className="w-24 h-24 rounded-full bg-[#1e2530]" />
+                        <div className="w-24 h-24 rounded-full bg-surface-skeleton" />
                         <div className="space-y-2 flex-1">
-                            <div className="h-6 w-1/2 bg-[#1e2530] rounded-xl" />
-                            <div className="h-4 w-1/3 bg-[#1e2530] rounded-xl" />
+                            <div className="h-6 w-1/2 bg-surface-skeleton rounded-xl" />
+                            <div className="h-4 w-1/3 bg-surface-skeleton rounded-xl" />
                         </div>
                     </div>
-                    <div className="h-32 bg-[#1e2530] rounded-2xl" />
+                    <div className="h-32 bg-surface-skeleton rounded-2xl" />
                 </div>
             </main>
         );
@@ -123,7 +123,7 @@ export default function SpeakerPage() {
 
     return (
         <main className="flex-1 px-8 py-12 max-w-3xl mx-auto w-full">
-            <div className="flex items-center gap-2 text-sm text-[#4a5568] mb-8">
+            <div className="flex items-center gap-2 text-sm text-content-secondary mb-8">
                 <Link href="/" className="hover:text-[#00E5FF] transition-colors">
                     {t("breadcrumbHome")}
                 </Link>
@@ -132,10 +132,10 @@ export default function SpeakerPage() {
                     {t("breadcrumbSpeakers")}
                 </Link>
                 <span>/</span>
-                <span className="text-white">{speaker.fullName}</span>
+                <span className="text-content-default">{speaker.fullName}</span>
             </div>
 
-            <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] p-8 mb-6">
+            <div className="rounded-2xl border border-[#1e2530] bg-surface-secondary p-8 mb-6">
                 <div className="flex items-start gap-6">
                     <Image
                         src={speaker.photo ?? `https://api.dicebear.com/7.x/adventurer/svg?seed=${speaker.fullName}&flip=true&radius=50`}
@@ -159,7 +159,7 @@ export default function SpeakerPage() {
                                             href={url}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border border-[#1e2530] text-[#4a5568] hover:text-[#00E5FF] hover:border-[#00E5FF44] transition-all"
+                                            className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border border-[#1e2530] text-content-secondary hover:text-[#00E5FF] hover:border-[#00E5FF44] transition-all"
                                         >
                                             {meta?.icon ?? (
                                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3.5 h-3.5">
@@ -177,7 +177,7 @@ export default function SpeakerPage() {
                 </div>
 
                 {speaker.bio && (
-                    <p className="text-[#6b7280] leading-relaxed mt-6 border-t border-[#1e2530] pt-6">
+                    <p className="text-content-muted leading-relaxed mt-6 border-t border-[#1e2530] pt-6">
                         {speaker.bio}
                     </p>
                 )}
@@ -185,13 +185,13 @@ export default function SpeakerPage() {
 
             <h2 className="text-xl font-black mb-4">
                 {t("sessionsTitle")} {" "}
-                <span className="text-[#4a5568] font-normal text-base">
+                <span className="text-content-secondary font-normal text-base">
                     ({sessions.length})
                 </span>
             </h2>
 
             {sessions.length === 0 ? (
-                <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] py-16 text-center text-[#3a4550] italic text-sm">
+                <div className="rounded-2xl border border-[#1e2530] bg-surface-secondary py-16 text-center text-content-muted italic text-sm">
                     {t("noSessions")}
                 </div>
             ) : (
@@ -200,7 +200,7 @@ export default function SpeakerPage() {
                         <Link
                             key={session.id}
                             href={`/events/${session.event.slug}/sessions/${session.slug}`}
-                            className="block rounded-2xl border border-[#1e2530] bg-[#0d1117] p-5 hover:border-[#00E5FF44] transition-all duration-200"
+                            className="block rounded-2xl border border-[#1e2530] bg-surface-secondary p-5 hover:border-[#00E5FF44] transition-all duration-200"
                         >
                             <p className="text-xs text-[#00E5FF] mb-2 font-semibold">
                                 {session.event.title}
@@ -213,7 +213,7 @@ export default function SpeakerPage() {
                                         LIVE
                                     </span>
                                 )}
-                                <span className="text-xs text-[#4a5568]">
+                                <span className="text-xs text-content-secondary">
                                     {formatTime(session.startTime)} → {formatTime(session.endTime)}
                                 </span>
                                 {session.room && (

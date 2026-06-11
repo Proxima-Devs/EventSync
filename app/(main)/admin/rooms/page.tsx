@@ -17,21 +17,21 @@ interface Room {
 // ─── Input style ───
 
 const inputClass =
-  "w-full px-4 py-2.5 rounded-xl bg-[#060a0f] border border-[#1e2530] text-sm text-[#ccc] placeholder-[#2a3a4a] focus:outline-none focus:border-[#00E5FF44] focus:ring-1 focus:ring-[#00E5FF22] transition-all duration-200";
+  "w-full px-4 py-2.5 rounded-xl bg-surface-input border border-[#1e2530] text-sm text-content-default placeholder-content-placeholder focus:outline-none focus:border-[#00E5FF44] focus:ring-1 focus:ring-[#00E5FF22] transition-all duration-200";
 
 // ─── Skeleton ───
 
 function RoomRowSkeleton() {
   return (
     <div className="animate-pulse flex items-center gap-4 px-6 py-5 border-b border-[#1e2530]">
-      <div className="w-10 h-10 rounded-xl bg-[#1e2530] shrink-0" />
+      <div className="w-10 h-10 rounded-xl bg-surface-skeleton shrink-0" />
       <div className="flex-1 space-y-2">
-        <div className="h-3.5 w-1/3 bg-[#1e2530] rounded-lg" />
-        <div className="h-2.5 w-1/5 bg-[#1e2530] rounded-lg" />
+        <div className="h-3.5 w-1/3 bg-surface-skeleton rounded-lg" />
+        <div className="h-2.5 w-1/5 bg-surface-skeleton rounded-lg" />
       </div>
       <div className="flex gap-2 ml-auto">
-        <div className="w-8 h-8 bg-[#1e2530] rounded-xl" />
-        <div className="w-8 h-8 bg-[#1e2530] rounded-xl" />
+        <div className="w-8 h-8 bg-surface-skeleton rounded-xl" />
+        <div className="w-8 h-8 bg-surface-skeleton rounded-xl" />
       </div>
     </div>
   );
@@ -123,7 +123,7 @@ function RoomModal({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.97 }}
             transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-            className="relative w-full max-w-md rounded-2xl border border-[#1e2530] bg-[#0a0e14] overflow-hidden"
+            className="relative w-full max-w-md rounded-2xl border border-[#1e2530] bg-surface-card-alt overflow-hidden"
             style={{
               boxShadow:
                 "0 0 0 1px #00E5FF18, 0 0 40px #00E5FF18, 0 0 80px #00E5FF08, 0 32px 64px rgba(0,0,0,0.6)",
@@ -145,17 +145,17 @@ function RoomModal({
                   )}
                 </div>
                 <div>
-                  <h2 className="text-base font-black text-white tracking-tight">
+                  <h2 className="text-base font-black text-content-default tracking-tight">
                     {isEdit ? t("modal.editTitle") : t("modal.createTitle")}
                   </h2>
-                  <p className="text-xs text-[#3a4a5a]">
+                  <p className="text-xs text-content-muted">
                     {isEdit ? t("modal.editSubtitle", { id: editingRoom?.id.slice(0, 8) ?? "" }) : t("modal.createSubtitle")}
                   </p>
                 </div>
               </div>
               <button
                 onClick={onClose}
-                className="w-8 h-8 rounded-xl border border-[#1e2530] flex items-center justify-center text-[#3a4a5a] hover:text-white hover:border-[#2e3a4a] transition-all duration-200"
+                className="w-8 h-8 rounded-xl border border-[#1e2530] flex items-center justify-center text-content-muted hover:text-content-default hover:border-[#2e3a4a] transition-all duration-200"
               >
                 <X size={14} />
               </button>
@@ -167,7 +167,7 @@ function RoomModal({
               className="relative px-6 py-5 flex flex-col gap-4"
             >
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold uppercase tracking-widest text-[#3a4a5a]">
+                <label className="text-xs font-semibold uppercase tracking-widest text-content-muted">
                   {t("modal.nameLabel")} <span className="text-[#00E5FF]">*</span>
                 </label>
                 <input
@@ -199,7 +199,7 @@ function RoomModal({
                   onClick={() => {
                     onClose();
                   }}
-                  className="flex-1 py-2.5 rounded-xl border border-[#1e2530] text-sm text-[#4a5568] hover:text-white hover:border-[#2e3a4a] transition-all duration-200 font-semibold"
+                  className="flex-1 py-2.5 rounded-xl border border-[#1e2530] text-sm text-content-secondary hover:text-content-default hover:border-[#2e3a4a] transition-all duration-200 font-semibold"
                 >
                   {t("modal.cancel")}
                 </button>
@@ -280,7 +280,7 @@ function DeleteModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 8 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="relative w-full max-w-sm rounded-2xl border border-red-900/40 bg-[#0a0e14] overflow-hidden"
+            className="relative w-full max-w-sm rounded-2xl border border-red-900/40 bg-surface-card-alt overflow-hidden"
             style={{
               boxShadow:
                 "0 0 0 1px #ff444418, 0 0 40px #ff444412, 0 32px 64px rgba(0,0,0,0.6)",
@@ -292,8 +292,8 @@ function DeleteModal({
               <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-900/40 flex items-center justify-center mb-4">
                 <Trash2 size={18} className="text-red-400" />
               </div>
-              <h2 className="text-base font-black text-white mb-1">{t("deleteModal.title")}</h2>
-              <p className="text-sm text-[#4a5568] leading-relaxed">
+              <h2 className="text-base font-black text-content-default mb-1">{t("deleteModal.title")}</h2>
+              <p className="text-sm text-content-secondary leading-relaxed">
                 {t("deleteModal.body", { name: room.name })}
                 {room._count.sessions > 0 && (
                   <span className="text-amber-400 block mt-1.5">
@@ -312,7 +312,7 @@ function DeleteModal({
             <div className="flex gap-3 px-6 pb-6">
               <button
                 onClick={onClose}
-                className="flex-1 py-2.5 rounded-xl border border-[#1e2530] text-sm text-[#4a5568] hover:text-white hover:border-[#2e3a4a] transition-all duration-200 font-semibold"
+                className="flex-1 py-2.5 rounded-xl border border-[#1e2530] text-sm text-content-secondary hover:text-content-default hover:border-[#2e3a4a] transition-all duration-200 font-semibold"
               >
                 {t("deleteModal.cancel")}
               </button>
@@ -350,28 +350,28 @@ function RoomRow({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, x: -16 }}
       transition={{ duration: 0.2 }}
-      className="group flex items-center gap-4 px-6 py-4 border-b border-[#1e2530] hover:bg-[#ffffff03] transition-colors"
+      className="group flex items-center gap-4 px-6 py-4 border-b border-[#1e2530] hover:bg-overlay-hover transition-colors"
     >
       {/* Icon */}
-      <div className="w-10 h-10 rounded-xl bg-[#ffffff06] border border-[#1e2530] flex items-center justify-center shrink-0 group-hover:border-[#00E5FF22] transition-colors">
-        <Building2 size={16} className="text-[#3a4a5a] group-hover:text-[#00E5FF] transition-colors" />
+      <div className="w-10 h-10 rounded-xl bg-overlay-hover border border-[#1e2530] flex items-center justify-center shrink-0 group-hover:border-[#00E5FF22] transition-colors">
+        <Building2 size={16} className="text-content-muted group-hover:text-[#00E5FF] transition-colors" />
       </div>
 
       {/* Info */}
       <div className="flex-1 min-w-0">
-        <span className="font-bold text-[#eee] text-sm truncate block">{room.name}</span>
+        <span className="font-bold text-content-default text-sm truncate block">{room.name}</span>
         <div className="flex items-center gap-1.5 mt-0.5">
-          <Layers size={10} className="text-[#3a4a5a]" />
-          <span className="text-[11px] text-[#3a4a5a]">
+          <Layers size={10} className="text-content-muted" />
+          <span className="text-[11px] text-content-muted">
             {t("sessionsCount", { count: room._count.sessions })}
           </span>
         </div>
       </div>
 
       {room._count.sessions > 0 && (
-        <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#1e2530] bg-[#ffffff04]">
-          <Layers size={11} className="text-[#3a4a5a]" />
-          <span className="text-xs text-[#3a4a5a] font-semibold">
+        <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#1e2530] bg-overlay-hover">
+          <Layers size={11} className="text-content-muted" />
+          <span className="text-xs text-content-muted font-semibold">
             {t("sessionsCount", { count: room._count.sessions })}
           </span>
         </div>
@@ -380,14 +380,14 @@ function RoomRow({
       <div className="flex items-center gap-2 shrink-0">
         <button
           onClick={() => onEdit(room)}
-          className="w-8 h-8 rounded-xl border border-[#1e2530] flex items-center justify-center text-[#3a4a5a] hover:text-white hover:border-[#2e3a4a] transition-all duration-200"
+          className="w-8 h-8 rounded-xl border border-[#1e2530] flex items-center justify-center text-content-muted hover:text-content-default hover:border-[#2e3a4a] transition-all duration-200"
           title={t("editTitle")}
         >
           <Pencil size={13} />
         </button>
         <button
           onClick={() => onDelete(room)}
-          className="w-8 h-8 rounded-xl border border-[#1e2530] flex items-center justify-center text-[#3a4a5a] hover:text-red-400 hover:border-red-900/50 transition-all duration-200"
+          className="w-8 h-8 rounded-xl border border-[#1e2530] flex items-center justify-center text-content-muted hover:text-red-400 hover:border-red-900/50 transition-all duration-200"
           title={t("deleteTitle")}
         >
           <Trash2 size={13} />
@@ -473,12 +473,12 @@ export default function AdminRoomsPage() {
 
       <main className="flex-1 px-8 py-12 max-w-4xl mx-auto w-full">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-[#4a5568] mb-8">
+        <div className="flex items-center gap-2 text-sm text-content-secondary mb-8">
           <Link href="/" className="hover:text-[#00E5FF] transition-colors">
             {t("breadcrumbHome")}
           </Link>
           <ChevronRight size={13} />
-          <span className="text-white">{t("breadcrumbRooms")}</span>
+          <span className="text-content-default">{t("breadcrumbRooms")}</span>
         </div>
 
         {/* Header */}
@@ -488,11 +488,11 @@ export default function AdminRoomsPage() {
               <div className="w-8 h-8 rounded-xl bg-[#00E5FF15] border border-[#00E5FF30] flex items-center justify-center">
                 <Building2 size={16} className="text-[#00E5FF]" />
               </div>
-              <h1 className="text-3xl font-black text-white tracking-tight">
+              <h1 className="text-3xl font-black text-content-default tracking-tight">
                 {t("pageTitle")}
               </h1>
             </div>
-            <p className="text-sm text-[#4a5568] ml-11">
+            <p className="text-sm text-content-secondary ml-11">
               {t("pageDescription")}
             </p>
           </div>
@@ -510,15 +510,15 @@ export default function AdminRoomsPage() {
         {/* Mini stats + search */}
         {!loading && rooms.length > 0 && (
           <div className="flex items-center gap-4 mb-6 flex-wrap">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#1e2530] bg-[#0d1117]">
-              <Building2 size={11} className="text-[#3a4a5a]" />
-              <span className="text-xs text-[#3a4a5a] font-semibold">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#1e2530] bg-surface-secondary">
+              <Building2 size={11} className="text-content-muted" />
+              <span className="text-xs text-content-muted font-semibold">
                 {t("roomCount", { count: rooms.length })}
               </span>
             </div>
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#1e2530] bg-[#0d1117]">
-              <Layers size={11} className="text-[#3a4a5a]" />
-              <span className="text-xs text-[#3a4a5a] font-semibold">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#1e2530] bg-surface-secondary">
+              <Layers size={11} className="text-content-muted" />
+              <span className="text-xs text-content-muted font-semibold">
                 {t("totalSessions", { count: totalSessions })}
               </span>
             </div>
@@ -526,28 +526,28 @@ export default function AdminRoomsPage() {
             <div className="relative ml-auto">
               <Search
                 size={13}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#3a4a5a] pointer-events-none"
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-content-muted pointer-events-none"
               />
               <input
                 type="text"
                 placeholder={t("searchPlaceholder")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-48 pl-9 pr-4 py-2 rounded-xl bg-[#0d1117] border border-[#1e2530] text-sm text-[#ccc] placeholder-[#3a4a5a] focus:outline-none focus:border-[#00E5FF44] focus:ring-1 focus:ring-[#00E5FF22] transition-all"
+                className="w-48 pl-9 pr-4 py-2 rounded-xl bg-surface-secondary border border-[#1e2530] text-sm text-content-default placeholder-content-muted focus:outline-none focus:border-[#00E5FF44] focus:ring-1 focus:ring-[#00E5FF22] transition-all"
               />
             </div>
           </div>
         )}
 
         {/* Table */}
-        <div className="rounded-2xl border border-[#1e2530] bg-[#0d1117] overflow-hidden">
+        <div className="rounded-2xl border border-[#1e2530] bg-surface-secondary overflow-hidden">
           {/* Header */}
-          <div className="flex items-center gap-4 px-6 py-3 border-b border-[#1e2530] bg-[#060a0f]">
+          <div className="flex items-center gap-4 px-6 py-3 border-b border-[#1e2530] bg-surface-input">
             <div className="w-10 shrink-0" />
-            <span className="flex-1 text-[10px] font-bold uppercase tracking-widest text-[#2a3a4a]">
+            <span className="flex-1 text-[10px] font-bold uppercase tracking-widest text-content-placeholder">
               {t("tableRoom")}
             </span>
-            <span className="hidden sm:block text-[10px] font-bold uppercase tracking-widest text-[#2a3a4a]">
+            <span className="hidden sm:block text-[10px] font-bold uppercase tracking-widest text-content-placeholder">
               {t("tableSessions")}
             </span>
             <span className="w-20 shrink-0" />
@@ -568,8 +568,8 @@ export default function AdminRoomsPage() {
           {/* Empty state */}
           {!loading && !error && rooms.length === 0 && (
             <div className="py-20 text-center">
-              <Building2 size={28} className="mx-auto text-[#1e2530] mb-3" />
-              <p className="text-[#3a4a5a] italic text-sm mb-4">
+              <Building2 size={28} className="mx-auto text-content-muted mb-3" />
+              <p className="text-content-muted italic text-sm mb-4">
                 {t("emptyState")}
               </p>
               <button
@@ -585,7 +585,7 @@ export default function AdminRoomsPage() {
           {/* No search results */}
           {!loading && !error && rooms.length > 0 && filtered.length === 0 && (
             <div className="py-12 text-center">
-              <p className="text-[#3a4a5a] italic text-sm">
+              <p className="text-content-muted italic text-sm">
                 {t("noSearchResults", { query: search })}
               </p>
             </div>
