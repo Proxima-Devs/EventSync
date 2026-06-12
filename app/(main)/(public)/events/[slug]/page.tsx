@@ -9,7 +9,7 @@ import { Event } from "@/types";
 import { useFavorites } from "@/hooks/useFavorites";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClock, faArrowLeft, faMapPin, faChevronRight, faList, faThLarge, faHeart } from "@fortawesome/free-solid-svg-icons";
-import Image from "next/image";
+
 function TimeProgress({ start, end }: { start: string; end: string }) {
   const [pct, setPct] = useState(0);
   useEffect(() => {
@@ -209,7 +209,7 @@ export default function EventDetailPage() {
     <main className="min-h-screen text-white">
       <div className="relative">
         <div className="h-80 w-full overflow-hidden bg-slate-900">
-          <Image src={event.coverImage ?? "/background.png"} alt={event.title} fill className="w-screen h-screen object-cover" />
+          <img src={event.coverImage ?? "/background.png"} alt={event.title} className="w-full h-full object-cover" />
         </div>
         <div className="absolute inset-x-0 bottom-0 h-28 bg-linear-to-t from-slate-950 via-slate-950/70 to-transparent" />
         <div className="absolute inset-x-0 top-0 h-20 bg-linear-to-b from-slate-950/60 to-transparent" />

@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
-import Image from "next/image";
+
 import { SpeakerLinks } from "@/types";
 
 type Session = {
@@ -137,12 +137,11 @@ export default function SpeakerPage() {
 
             <div className="rounded-2xl border border-[#1e2530] bg-surface-secondary p-8 mb-6">
                 <div className="flex items-start gap-6">
-                    <Image
+                    <img
                         src={speaker.photo ?? `https://api.dicebear.com/7.x/adventurer/svg?seed=${speaker.fullName}&flip=true&radius=50`}
                         alt={speaker.fullName}
                         width={96}
                         height={96}
-                        unoptimized
                         className="w-24 h-24 rounded-full object-cover shrink-0 ring-2 ring-[#00E5FF33]"
                     />
                     <div className="flex-1 min-w-0">

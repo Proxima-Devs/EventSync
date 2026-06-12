@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
-import Image from "next/image";
+
 import { useLocale, useTranslations } from "next-intl";
 import { Calendar, MapPin, Layers, Pencil, Trash2, Plus, X, ExternalLink, Search, AlertTriangle, ChevronRight, Settings2 } from "lucide-react";
 import { Event, EventFormData } from "@/types";
@@ -407,12 +407,9 @@ function AdminEventCard({
       {/* ── Cover Image ── */}
       <div className="relative h-44 w-full overflow-hidden bg-surface-secondary shrink-0">
         {event.coverImage ? (
-          <Image
+          <img
             src={event.coverImage}
             alt={event.title}
-            fill
-            unoptimized
-            sizes="(max-width: 768px) 100vw, 50vw"
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (

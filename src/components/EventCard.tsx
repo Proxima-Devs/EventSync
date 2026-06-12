@@ -3,7 +3,7 @@
 import { MapPin, Calendar } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import Image from "next/image";
+
 
 type Event = {
   id: string;
@@ -48,13 +48,9 @@ export default function EventCard({ event, index = 0 }: { event: Event; index?: 
             className="relative h-44 w-full overflow-hidden bg-surface-secondary"
           >
             {event.coverImage ? (
-              <Image
+              <img
                 src={event.coverImage}
                 alt={event.title}
-                fill
-                loading="eager"
-                unoptimized
-                sizes="(max-width: 768px) 100vw, 33vw"
                 className="w-full h-full object-cover transition-transform duration-500"
               />
             ) : (

@@ -6,7 +6,6 @@ import { useLocale, useTranslations } from "next-intl";
 import { AnimatePresence, motion } from "framer-motion";
 import { useFavorites } from "@/hooks/useFavorites";
 import Link from "next/link";
-import Image from "next/image";
 import {
   ArrowLeft, Eye, Pencil, Trash2, Plus, X, AlertTriangle,
   Clock, Building2, Users, CheckSquare, Square,
@@ -609,10 +608,9 @@ export default function EventDetailPage() {
       {/* ── Cover Image ─────────────────────────────────────────────────────── */}
       <div className="relative">
         <div className="h-72 w-full overflow-hidden bg-surface-elevated">
-          <Image
+          <img
             src={event.coverImage ?? "/background.png"}
             alt={event.title}
-            fill
             className="w-full h-full object-cover opacity-70"
           />
         </div>

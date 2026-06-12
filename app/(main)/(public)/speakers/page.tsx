@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import Image from "next/image";
+
 import { apiFetch } from "@/lib/api";
 import { Search, Mic } from "lucide-react";
 import { SpeakerLinks } from "@/types";
@@ -82,12 +82,11 @@ function SpeakerCard({ speaker }: { speaker: Speaker }) {
             <div className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-[radial-gradient(ellipse_at_top_left,#00E5FF08_0%,transparent_60%)]" />
 
             <div className="flex items-start gap-4">
-                <Image
+                <img
                     src={speaker.photo ?? `https://api.dicebear.com/7.x/adventurer/svg?seed=${speaker.fullName}&flip=true&radius=50`}
                     alt={speaker.fullName}
                     width={56}
                     height={56}
-                    unoptimized
                     className="w-14 h-14 rounded-full object-cover shrink-0 ring-2 ring-[#1e2530] group-hover:ring-[#00E5FF33] transition-all duration-300"
                 />
 

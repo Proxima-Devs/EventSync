@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
+
 import { useLocale, useTranslations } from "next-intl";
 import { apiFetch } from "@/lib/api";
 import { useFavorites } from "@/hooks/useFavorites";
@@ -140,12 +140,11 @@ export default function SessionDetailPage() {
                 href={`/speakers/${speaker.slug}`}
                 className="flex items-center gap-4 rounded-2xl px-4 py-3 mx-4 hover:border-[#00E5FF44] transition-all duration-200 group hover:border "
               >
-                <Image
+                <img
                   src={speaker.photo ?? `https://api.dicebear.com/7.x/adventurer/svg?seed=${speaker.fullName}&flip=true&radius=50`}
                   alt={speaker.fullName}
                   width={56}
                   height={56}
-                  unoptimized
                   className="rounded-full object-cover shrink-0 ring-2 ring-default group-hover:ring-[#00E5FF33] transition-all"
                 />
                 <div className="min-w-0">
