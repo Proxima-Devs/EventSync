@@ -13,17 +13,15 @@ export async function GET(request: NextRequest) {
     const perPage = parseInt(searchParams.get("perPage") ?? "20");
     const skip = (page - 1) * perPage;
 
-    const [events, total] = await prisma.$transaction([
-      prisma.event.findMany({
-        orderBy: { startDate: "desc" },
-        skip,
-        take: perPage,
-        include: {
-          _count: { select: { sessions: true } },
-        },
-      }),
-      prisma.event.count(),
-    ]);
+    const events = await prisma.event.findMany({
+      orderBy: { startDate: "desc" },
+      skip,
+      take: perPage,
+      include: {
+        _count: { select: { sessions: true } },
+      },
+    });
+    const total = await prisma.event.count();
 
     return NextResponse.json({
       data: events,
@@ -52,14 +50,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (new Date(startDate) >= new Date(endDate)) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      return NextResponse.json(
+        { error: "Format de date invalide" },
+        { status: 400 }
+      );
+    }
+
+    if (start >= end) {
       return NextResponse.json(
         { error: "startDate doit être antérieure à endDate" },
         { status: 400 }
       );
     }
 
-    // Génération du slug unique
     let slug = body.slug ? slugify(body.slug) : slugify(title);
     const existing = await prisma.event.findUnique({ where: { slug } });
     if (existing) slug = uniqueSlug(slug);
@@ -69,8 +76,8 @@ export async function POST(request: NextRequest) {
         title,
         description,
         slug,
-        startDate: new Date(startDate),
-        endDate: new Date(endDate),
+        startDate: start,
+        endDate: end,
         location,
         coverImage,
       },

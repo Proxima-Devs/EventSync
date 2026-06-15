@@ -1,9 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireAdmin, isSessionLive } from "@/lib/auth-utils";
+import { slugify } from "@/lib/slugify";
 import type { SessionPayload } from "@/types";
 
 type Params = { params: Promise<{ eventId: string }> };
+
+// Fonction pour générer un slug unique
+async function generateUniqueEventSessionSlug(title: string): Promise<string> {
+  let slug = slugify(title);
+  let counter = 1;
+  
+  while (true) {
+    const existing = await prisma.eventSession.findUnique({ where: { slug } });
+    if (!existing) break;
+    slug = `${slugify(title)}-${counter}`;
+    counter++;
+  }
+  
+  return slug;
+}
 
 // ── GET /api/events/[eventId]/sessions
 // Public — liste toutes les sessions d'un événement
@@ -11,6 +27,7 @@ export async function GET(request: NextRequest, { params }: Params) {
   try {
     const { eventId } = await params;
     const { searchParams } = new URL(request.url);
+    const roomSlug = searchParams.get("room");
     const roomId = searchParams.get("roomId");
 
     const event = await prisma.event.findUnique({ where: { id: eventId } });
@@ -18,10 +35,21 @@ export async function GET(request: NextRequest, { params }: Params) {
       return NextResponse.json({ error: "Événement introuvable" }, { status: 404 });
     }
 
+    let resolvedRoomId: string | undefined;
+    if (roomSlug) {
+      const room = await prisma.room.findUnique({ where: { slug: roomSlug } });
+      if (!room) {
+        return NextResponse.json({ error: "Salle introuvable" }, { status: 404 });
+      }
+      resolvedRoomId = room.id;
+    } else if (roomId) {
+      resolvedRoomId = roomId;
+    }
+
     const sessions = await prisma.eventSession.findMany({
       where: {
         eventId,
-        ...(roomId && { roomId }),
+        ...(resolvedRoomId && { roomId: resolvedRoomId }),
       },
       include: {
         room: true,
@@ -94,9 +122,12 @@ export async function POST(request: NextRequest, { params }: Params) {
       );
     }
 
+    const slug = await generateUniqueEventSessionSlug(title);
+
     const session = await prisma.eventSession.create({
       data: {
         title,
+        slug,
         description,
         startTime: new Date(startTime),
         endTime: new Date(endTime),
@@ -110,6 +141,7 @@ export async function POST(request: NextRequest, { params }: Params) {
       include: {
         room: true,
         speakers: { include: { speaker: true } },
+        _count: { select: { questions: true } },
       },
     });
 

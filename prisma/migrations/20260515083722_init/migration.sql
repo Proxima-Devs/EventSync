@@ -138,6 +138,27 @@ CREATE TABLE "question" (
     CONSTRAINT "question_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "question_reply" (
+    "id" TEXT NOT NULL,
+    "content" TEXT NOT NULL,
+    "authorName" TEXT,
+    "questionId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "question_reply_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "question_upvote" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "questionId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "question_upvote_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
 
@@ -149,6 +170,9 @@ CREATE UNIQUE INDEX "event_slug_key" ON "event"("slug");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "room_name_key" ON "room"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "question_upvote_userId_questionId_key" ON "question_upvote"("userId", "questionId");
 
 -- AddForeignKey
 ALTER TABLE "session" ADD CONSTRAINT "session_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -170,3 +194,12 @@ ALTER TABLE "session_speaker" ADD CONSTRAINT "session_speaker_speakerId_fkey" FO
 
 -- AddForeignKey
 ALTER TABLE "question" ADD CONSTRAINT "question_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "event_session"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "question_reply" ADD CONSTRAINT "question_reply_questionId_fkey" FOREIGN KEY ("questionId") REFERENCES "question"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "question_upvote" ADD CONSTRAINT "question_upvote_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "question_upvote" ADD CONSTRAINT "question_upvote_questionId_fkey" FOREIGN KEY ("questionId") REFERENCES "question"("id") ON DELETE CASCADE ON UPDATE CASCADE;

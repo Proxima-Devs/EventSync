@@ -1,0 +1,217 @@
+"use client";
+
+import { useMemo, useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
+import Link from "next/link";
+import { Search, Star } from "lucide-react";
+import { useFavorites } from "@/hooks/useFavorites";
+import { apiFetch } from "@/lib/api";
+import { SessionFavorite } from "@/types";
+
+function SessionSkeleton() {
+  return (
+    <div className="relative">
+      <div className="block rounded-2xl border border-[#1e2530] bg-surface-secondary p-5 pr-14 animate-pulse">
+        <div className="h-3.5 w-1/4 rounded-full bg-surface-skeleton mb-3" />
+        <div className="flex items-center gap-2 mb-3">
+          <div className="h-5 w-16 rounded-full bg-surface-skeleton" />
+          <div className="h-3.5 w-28 rounded-full bg-surface-skeleton" />
+          <div className="h-5 w-20 rounded-full bg-surface-skeleton" />
+        </div>
+        <div className="h-5 rounded-full bg-surface-skeleton mb-3" />
+        <div className="h-3.5 rounded-full bg-surface-skeleton w-5/6" />
+      </div>
+      <div className="absolute top-4 right-4 h-10 w-10 rounded-full bg-surface-skeleton" />
+    </div>
+  );
+}
+
+export default function FavoritesPage() {
+  const t = useTranslations("FavoritesPage");
+  const { favorites, toggle } = useFavorites();
+  const [sessions, setSessions] = useState<SessionFavorite[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [activeFilter, setActiveFilter] = useState("all");
+
+  const FILTERS = [
+    { value: "all", label: t("filter.all") },
+    { value: "live", label: t("filter.live") },
+    { value: "upcoming", label: t("filter.upcoming") },
+    { value: "past", label: t("filter.past") },
+  ];
+
+  const filteredSessions = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    const now = new Date();
+
+    return sessions.filter((session) => {
+      const searchMatch =
+        query === "" ||
+        session.title.toLowerCase().includes(query) ||
+        session.event.title.toLowerCase().includes(query) ||
+        session.speakers.some((speaker) => speaker.fullName.toLowerCase().includes(query)) ||
+        session.room?.name.toLowerCase().includes(query);
+
+      if (!searchMatch) return false;
+
+      if (activeFilter === "live") {
+        return session.isLive;
+      }
+
+      const start = new Date(session.startTime);
+      if (activeFilter === "upcoming") {
+        return start >= now;
+      }
+      if (activeFilter === "Past") {
+        return start < now;
+      }
+
+      return true;
+    });
+  }, [sessions, search, activeFilter]);
+
+  const favoritesKey = favorites.join(",");
+  useEffect(() => {
+    if (favorites.length === 0) {
+      setLoading(false);
+      return;
+    }
+    // On fetch tous les events pour retrouver les sessions favorites
+    apiFetch<{ data: { slug: string; title: string; id: string }[] }>("/api/events")
+      .then(async (res) => {
+        const all: SessionFavorite[] = [];
+        for (const event of res.data) {
+          const detail = await apiFetch<{
+            sessions: Omit<SessionFavorite, "event">[];
+          }>(`/api/events/slug/${event.slug}`);
+          for (const s of detail.sessions) {
+            if (favorites.includes(s.id)) {
+              all.push({ ...s, event: { slug: event.slug, title: event.title } });
+            }
+          }
+        }
+        setSessions(all);
+      })
+      .finally(() => setLoading(false));
+  }, [favoritesKey]);
+
+  return (
+    <main className="flex-1 px-8 py-12 max-w-3xl mx-auto w-full">
+      <h1 className="text-3xl font-black mb-2">{t("title")}</h1>
+      <p className="text-content-secondary text-sm mb-8">
+        {t("description")}
+      </p>
+
+      {favorites.length === 0 && !loading ? (
+        <div className="rounded-2xl border border-[#1e2530] bg-surface-secondary py-20 text-center text-content-muted italic text-sm">
+          {t("emptyState")} {" "}
+          <Link href="/" className="text-[#00E5FF] not-italic hover:underline">
+            {t("discoverEvents")}
+          </Link>
+        </div>
+      ) : (
+        <>
+          <div className="mb-6 flex flex-col gap-30 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-wrap gap-2 order-1 sm:order-1">
+              {FILTERS.map((filter) => (
+                <button
+                  key={filter.value}
+                  onClick={() => setActiveFilter(filter.value)}
+                  disabled={loading}
+                  className={`cursor-pointer px-4 py-2 rounded-full text-sm font-semibold border transition-all duration-200 ${activeFilter === filter.value
+                    ? "bg-[#00E5FF] border-[#00E5FF] text-black shadow-lg shadow-[#00E5FF33]"
+                    : "bg-transparent border-[#1e2530] text-content-muted hover:text-content-default hover:border-[#00E5FF44]"
+                    } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+                >
+                  {filter.label}
+                </button>
+              ))}
+            </div>
+            <div className="flex-1 min-w-0 order-2 sm:order-2">
+              <div className="relative rounded-full border border-[#1e2530] bg-surface-secondary flex items-center overflow-hidden max-w-2xl ml-auto">
+                <input
+                  type="text"
+                  placeholder={t("searchPlaceholder")}
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  disabled={loading}
+                  className="w-full bg-transparent px-4 py-3 text-sm text-content-default placeholder-content-placeholder focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                />
+                <button
+                  disabled={loading}
+                  className="inline-flex h-11 w-11 items-center justify-center text-content-default rounded-full cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+                  aria-label={t("searchPlaceholder")}
+                >
+                  <Search className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {loading ? (
+            <div className="flex flex-col gap-3">
+              <SessionSkeleton />
+              <SessionSkeleton />
+              <SessionSkeleton />
+            </div>
+          ) : filteredSessions.length === 0 ? (
+            <div className="rounded-2xl border border-[#1e2530] bg-surface-secondary py-20 text-center text-content-muted italic text-sm">
+              {t("noMatches")}
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {filteredSessions.map((session) => (
+                <div key={session.id} className="relative">
+                  <Link
+                    href={`/events/${session.event.slug}/sessions/${session.slug}`}
+                    className="block rounded-2xl border border-[#1e2530] bg-surface-secondary p-5 hover:border-[#00E5FF44] transition-colors pr-14"
+                  >
+                    <p className="text-xs text-[#00E5FF] mb-1">{session.event.title}</p>
+                    <div className="flex items-center gap-2 mb-1">
+                      {session.isLive && (
+                        <span className="text-xs bg-red-500 text-white px-2 py-0.5 rounded-full font-bold animate-pulse">
+                          LIVE
+                        </span>
+                      )}
+                      <span className="text-xs text-content-secondary">
+                        {new Date(session.startTime).toLocaleTimeString("fr-FR", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                        {" → "}
+                        {new Date(session.endTime).toLocaleTimeString("fr-FR", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                      {session.room && (
+                        <span className="text-xs text-[#00E5FF] border border-[#00E5FF33] px-2 py-0.5 rounded-full">
+                          {session.room.name}
+                        </span>
+                      )}
+                    </div>
+                    <p className="font-bold">{session.title}</p>
+                    {session.speakers.length > 0 && (
+                      <p className="text-xs text-content-secondary mt-1">
+                        {session.speakers.map((s) => s.fullName).join(", ")}
+                      </p>
+                    )}
+                  </Link>
+                  <button
+                    onClick={() => toggle(session.id)}
+                    className="absolute top-4 right-4 rounded-full bg-surface-secondary p-2 text-[#00E5FF] shadow-lg shadow-[#00E5FF33]"
+                    title="Retirer des favoris"
+                    aria-label="Retirer des favoris"
+                  >
+                    <Star className="h-5 w-5" fill="currentColor" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+    </main>
+  );
+}

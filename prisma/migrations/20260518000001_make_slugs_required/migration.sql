@@ -1,0 +1,4 @@
+-- Make slug columns NOT NULL
+ALTER TABLE "room" ALTER COLUMN "slug" SET NOT NULL;
+ALTER TABLE "speaker" ALTER COLUMN "slug" SET NOT NULL;
+ALTER TABLE "event_session" ALTER COLUMN "slug" SET NOT NULL;

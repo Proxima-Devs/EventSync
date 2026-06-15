@@ -1,0 +1,186 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
+import { apiFetch } from "@/lib/api";
+import EventSkeleton from "@/components/EventSkeleton";
+import EventCard from "@/components/EventCard";
+import { motion } from "framer-motion";
+import { Search } from "lucide-react";
+import { Event } from "@/types";
+
+type ApiResponse = {
+  data: Event[];
+  meta: { total: number; page: number; perPage: number };
+};
+
+export default function HomePage() {
+  const t = useTranslations("HomePage");
+  const FILTERS = [
+    { value: "all", label: t("allFilter") },
+    { value: "upcoming", label: t("upcomingFilter") },
+    { value: "past", label: t("pastFilter") },
+  ];
+
+  const [search, setSearch] = useState("");
+  const [submitted, setSubmitted] = useState("");
+  const [activeFilter, setActiveFilter] = useState("all");
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        setLoading(true);
+        const res = await apiFetch<ApiResponse>("/api/events");
+        setEvents(res.data);
+      } catch {
+        setError(t("errorLoad"));
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEvents();
+  }, [t]);
+
+  const filtered = events.filter((e) => {
+    const matchSearch =
+      submitted === "" ||
+      e.title.toLowerCase().includes(submitted.toLowerCase()) ||
+      (e.location ?? "").toLowerCase().includes(submitted.toLowerCase());
+
+    const now = new Date();
+    const start = new Date(e.startDate);
+
+    if (activeFilter === "upcoming") return matchSearch && start >= now;
+    if (activeFilter === "past") return matchSearch && start < now;
+    return matchSearch;
+  });
+
+  return (
+    <motion.main
+      className="flex-1 flex flex-col"
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <section className="relative flex flex-col items-center justify-center text-center px-6 pt-20 pb-16 overflow-hidden">
+        <div className="absolute inset-0 bg-linear-to-b from-[#00E5FF1A] via-transparent to-transparent pointer-events-none" />
+
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <motion.div
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.5, 0.3],
+            }}
+            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+            className="absolute -top-1/4 -left-1/4 w-1/2 h-1/2 bg-[#00E5FF33] blur-[120px] rounded-full"
+          />
+          <motion.div
+            animate={{
+              scale: [1, 1.3, 1],
+              opacity: [0.2, 0.4, 0.2],
+            }}
+            transition={{ duration: 10, repeat: Infinity, ease: "linear", delay: 1 }}
+            className="absolute -bottom-1/4 -right-1/4 w-1/2 h-1/2 bg-[#00232743] blur-[120px] rounded-full"
+          />
+        </div>
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-175 h-100 rounded-full bg-[#00E5FF08] blur-[120px]" />
+        </div>
+
+        <div className="mb-6 inline-flex items-center gap-2 border border-[#00E5FF33] bg-[#00E5FF0a] text-[#00E5FF] text-xs font-bold tracking-widest uppercase px-4 py-2 rounded-full">
+          <span>✦</span> {t("heroBadge")}
+        </div>
+
+        <h1 className="text-5xl md:text-6xl font-black leading-tight mb-4">
+          <span className="inline-block" style={{ animation: "slideInLeft 0.6s ease forwards", opacity: 0 }}>
+            {t("titlePart1")}
+          </span>{" "}
+          <span className="inline-block" style={{ animation: "slideInLeft 0.6s ease 0.2s forwards", opacity: 0 }}>
+            {t("titlePart2")}
+          </span>
+          <br />
+          <span className="text-[#00E5FF] inline-block" style={{ animation: "blurIn 0.8s ease 0.4s forwards", opacity: 0 }}>
+            {t("titleEvent")}
+          </span>{" "}
+          <span className="text-[#00E5FF] inline-block" style={{ animation: "blurIn 0.8s ease 0.6s forwards", opacity: 0 }}>
+            {t("titleExperience")}
+          </span>
+        </h1>
+
+        <p className="text-content-secondary max-w-xl mx-auto text-base mb-10 leading-relaxed">
+          {t("description")}
+        </p>
+
+        <div className="w-full max-w-xl flex rounded-full overflow-hidden border border-[#1e2530] bg-surface-secondary shadow-xl shadow-[#00E5FF08]">
+          <span className="flex items-center pl-5"><Search /></span>
+          <input
+            type="text"
+            placeholder={t("searchPlaceholder")}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && setSubmitted(search)}
+            className="flex-1 bg-transparent px-4 py-4 text-sm text-content-default placeholder-content-placeholder focus:outline-none"
+          />
+          <button
+            onClick={() => setSubmitted(search)}
+            className="cursor-pointer px-6 py-4 bg-[#00E5FF] text-black font-bold text-sm hover:bg-[#00ffff] transition-colors"
+          >
+            {t("searchButton")}
+          </button>
+        </div>
+      </section>
+
+      <section className="px-8 pb-16">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <h2 className="text-2xl font-black">{t("featuredEvents")}</h2>
+            <div className="h-0.75w-10 bg-[#00E5FF] rounded-full" />
+          </div>
+          <span className="text-content-secondary text-sm">
+            {!loading && t("eventCount", { count: filtered.length })}
+          </span>
+        </div>
+
+        <div className="flex gap-2 mb-6">
+          {FILTERS.map((filter) => (
+            <button
+              key={filter.value}
+              onClick={() => setActiveFilter(filter.value)}
+              className={`cursor-pointer px-4 py-1.5 rounded-full text-sm font-semibold border transition-all duration-200 ${activeFilter === filter.value
+                  ? "bg-[#00E5FF] border-[#00E5FF] text-black shadow-lg shadow-[#00E5FF33]"
+                  : "bg-transparent border-[#1e2530] text-content-secondary hover:text-content-default hover:border-[#00E5FF44]"
+                }`}
+            >
+              {filter.label}
+            </button>
+          ))}
+        </div>
+
+        {loading ? (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {[...Array(6)].map((_, i) => (
+              <EventSkeleton key={i} />
+            ))}
+          </div>
+        ) : error ? (
+          <div className="rounded-2xl border border-red-900 bg-red-500/10 py-12 text-center text-red-400 text-sm">
+            {error}
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="rounded-2xl border border-[#1e2530] bg-surface-secondary py-20 text-center text-content-muted italic text-sm">
+            {t("noEventsFound")}
+          </div>
+        ) : (
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {filtered.map((event) => (
+              <EventCard key={event.id} event={event} />
+            ))}
+          </div>
+        )}
+      </section>
+    </motion.main>
+  );
+}
