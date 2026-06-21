@@ -9,7 +9,6 @@ import { useSidebar } from "./sidebar-context";
 import { authClient } from "@/lib/auth-client";
 import Image from "next/image";
 import Link from "next/link";
-import type { ThemeMode } from "@/types/theme";
 
 type NavItem = { href: string; icon: React.ElementType; label: string };
 
@@ -19,9 +18,8 @@ function getNavItems(role?: string | null, t?: (key: string) => string): NavItem
             { href: "/admin/dashboard", icon: LayoutDashboard, label: t?.("nav.dashboard") ?? "Dashboard" },
             { href: "/", icon: Home, label: t?.("nav.home") ?? "Home" },
             { href: "/favorites", icon: Heart, label: t?.("nav.favorites") ?? "Favorites" },
-            { href: "/admin/events", icon: Calendar, label: t?.("nav.events") ?? "Events" },
-            { href: "/admin/speakers", icon: Users, label: t?.("nav.speakers") ?? "Speakers" },
-            { href: "/admin/rooms", icon: Building2, label: t?.("nav.rooms") ?? "Rooms" },
+            { href: "/speakers", icon: Users, label: t?.("nav.speakers") ?? "Speakers" },
+
         ];
     }
     return [
@@ -433,8 +431,8 @@ export default function Sidebar() {
                                     {item.label}
                                 </span>
                                 <span
-                                  className={`absolute left-full ml-3 px-2.5 py-1 rounded-md z-50 text-black text-xs font-bold whitespace-nowrap pointer-events-none transition-all duration-200 ${expanded ? "opacity-0 translate-x-0 invisible" : "opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0"}`}
-                                  style={{ backgroundColor: 'var(--color-primary)', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.6), 0 0 20px color-mix(in srgb, var(--color-primary) 13%)' }}
+                                    className={`absolute left-full ml-3 px-2.5 py-1 rounded-md z-50 text-black text-xs font-bold whitespace-nowrap pointer-events-none transition-all duration-200 ${expanded ? "opacity-0 translate-x-0 invisible" : "opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0"}`}
+                                    style={{ backgroundColor: 'var(--color-primary)', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.6), 0 0 20px color-mix(in srgb, var(--color-primary) 13%)' }}
                                 >
                                     {item.label}
                                 </span>
@@ -462,8 +460,8 @@ export default function Sidebar() {
                                 <Image src={user.image} alt={user.name} width={32} height={32} className="rounded-full object-cover shrink-0 ring-1 ring-white/10" />
                             ) : (
                                 <div
-                                  className="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-black text-xs font-bold ring-1 ring-white/10"
-                                  style={{ backgroundImage: 'linear-gradient(to bottom right, var(--color-primary), #0066ff)' }}
+                                    className="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-black text-xs font-bold ring-1 ring-white/10"
+                                    style={{ backgroundImage: 'linear-gradient(to bottom right, var(--color-primary), #0066ff)' }}
                                 >
                                     {initials}
                                 </div>
@@ -472,8 +470,8 @@ export default function Sidebar() {
                                 {user.name ?? user.email}
                             </span>
                             <span
-                              className={`absolute left-full ml-3 px-2.5 py-1 rounded-md z-50 text-black text-xs font-bold whitespace-nowrap pointer-events-none transition-all duration-200 ${expanded ? "opacity-0 invisible" : "opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0"}`}
-                              style={{ backgroundColor: 'var(--color-primary)', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.6), 0 0 20px color-mix(in srgb, var(--color-primary) 13%)' }}
+                                className={`absolute left-full ml-3 px-2.5 py-1 rounded-md z-50 text-black text-xs font-bold whitespace-nowrap pointer-events-none transition-all duration-200 ${expanded ? "opacity-0 invisible" : "opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0"}`}
+                                style={{ backgroundColor: 'var(--color-primary)', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.6), 0 0 20px color-mix(in srgb, var(--color-primary) 13%)' }}
                             >
                                 {user.name ?? t("auth.profile")}
                             </span>
