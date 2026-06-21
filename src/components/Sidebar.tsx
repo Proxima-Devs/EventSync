@@ -1,7 +1,7 @@
 "use client";
 
 import { useTheme } from '@/hooks/useTheme';
-import { Home, Heart, LayoutDashboard, Calendar, Users, Building2, LogOut, PanelLeft, Settings, LogIn, Trash2, X, AlertTriangle } from "lucide-react";
+import { Home, Heart, LayoutDashboard, Calendar, Users, LogOut, PanelLeft, Settings, LogIn, Trash2, X, AlertTriangle } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
