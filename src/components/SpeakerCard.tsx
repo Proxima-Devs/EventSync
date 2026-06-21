@@ -1,8 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Pencil, Trash2, Mic } from "lucide-react";
-import { motion } from "framer-motion";
+import { Mic } from "lucide-react";
 import Link from "next/link";
 import { SpeakerLinks } from "@/types";
 
@@ -18,14 +17,10 @@ interface Speaker {
 
 interface SpeakerCardProps {
   speaker: Speaker;
-  onEdit: (s: Speaker) => void;
-  onDelete: (s: Speaker) => void;
 }
 
 export function SpeakerCard({
   speaker,
-  onEdit,
-  onDelete,
 }: SpeakerCardProps) {
   const t = useTranslations("AdminSpeakersPage.speakerCard");
   const initials = speaker.fullName
@@ -50,18 +45,10 @@ export function SpeakerCard({
         </div>
       </div>
 
-      <motion.div
-        layout
-        initial={{ opacity: 0, y: 12, scale: 0.97 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95, y: -8 }}
-        transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+      <div
         className="group relative flex flex-col rounded-2xl border border-[#1e2530] bg-surface-secondary overflow-hidden hover:border-[#00E5FF30] transition-all duration-300"
         style={{
           boxShadow: "0 0 0 0 transparent",
-        }}
-        whileHover={{
-          boxShadow: "0 0 24px #00E5FF10, 0 8px 32px rgba(0,0,0,0.4)",
         }}
       >
         {/* Top neon line on hover */}
@@ -96,34 +83,7 @@ export function SpeakerCard({
             </p>
           )}
         </Link>
-
-        {/* Action bar */}
-        <div className="flex items-center gap-2 px-4 py-3 border-t border-[#1e2530] bg-surface-input">
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onEdit(speaker);
-            }}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl border border-[#1e2530] text-xs text-content-muted hover:text-content-default hover:border-[#2e3a4a] hover:bg-overlay-hover transition-all duration-200 font-semibold"
-          >
-            <Pencil size={11} />
-            {t("edit")}
-          </button>
-
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onDelete(speaker);
-            }}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl border border-[#1e2530] text-xs text-content-muted hover:text-red-400 hover:border-red-900/50 hover:bg-red-500/5 transition-all duration-200 font-semibold"
-          >
-            <Trash2 size={11} />
-            {t("delete")}
-          </button>
-        </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
