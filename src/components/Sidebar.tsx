@@ -15,10 +15,10 @@ type NavItem = { href: string; icon: React.ElementType; label: string };
 function getNavItems(role?: string | null, t?: (key: string) => string): NavItem[] {
     if (role === "ADMIN") {
         return [
-            { href: "/admin/dashboard", icon: LayoutDashboard, label: t?.("nav.dashboard") ?? "Dashboard" },
             { href: "/", icon: Home, label: t?.("nav.home") ?? "Home" },
             { href: "/favorites", icon: Heart, label: t?.("nav.favorites") ?? "Favorites" },
             { href: "/speakers", icon: Users, label: t?.("nav.speakers") ?? "Speakers" },
+            { href: "/admin/dashboard", icon: LayoutDashboard, label: t?.("nav.dashboard") ?? "Dashboard" },
 
         ];
     }
