@@ -251,10 +251,19 @@ export default function EventDetailPage() {
             </div>
           </div>
 
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href={`/events/${slug}/rooms`} className="inline-flex items-center gap-2 rounded-2xl border border-slate-800 bg-slate-950 px-5 py-3 text-sm font-semibold text-slate-200 transition hover:border-cyan-400 hover:text-white">
-              {t("seeRooms")}
-            </Link>
+          <div className="mt-8 flex flex-wrap gap-2">
+            <button
+              onClick={() => setSelectedRoom(null)}
+              className={`px-4 py-2 rounded-2xl text-sm font-semibold transition ${selectedRoom === null ? "bg-cyan-500 text-slate-950 shadow-sm shadow-cyan-500/20" : "border border-slate-700 text-slate-400 hover:text-white hover:border-slate-500"}`}>
+              {t("allRooms")}
+            </button>
+            {planRooms.map((room) => (
+              <button key={room}
+                onClick={() => setSelectedRoom(room)}
+                className={`px-4 py-2 rounded-2xl text-sm font-semibold transition ${selectedRoom === room ? "bg-cyan-500 text-slate-950 shadow-sm shadow-cyan-500/20" : "border border-slate-700 text-slate-400 hover:text-white hover:border-slate-500"}`}>
+                {room}
+              </button>
+            ))}
           </div>
 
           <section className="mt-14">
@@ -278,7 +287,7 @@ export default function EventDetailPage() {
 
             {view === "liste" ? (
               <div className="grid gap-4">
-                {event.sessions.map((session) => (
+                {event.sessions.filter((session) => !selectedRoom || session.room?.name === selectedRoom).map((session) => (
                   <Link key={session.id} href={`/events/${slug}/sessions/${session.slug}`} className="group block rounded-[1.75rem] border border-slate-800 bg-slate-950/95 p-5 transition hover:border-cyan-400/30 hover:bg-slate-900/95">
                     <div className="flex items-start gap-4">
                       <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-3xl border border-slate-800 bg-slate-900 text-slate-300">
@@ -308,20 +317,7 @@ export default function EventDetailPage() {
               </div>
             ) : (
               <div>
-                <div className="flex flex-wrap items-center justify-end gap-2 mb-6">
-                  <button
-                    onClick={() => setSelectedRoom(null)}
-                    className={`px-4 py-2 rounded-2xl text-sm font-semibold transition ${selectedRoom === null ? "bg-cyan-500 text-slate-950 shadow-sm shadow-cyan-500/20" : "border border-slate-700 text-slate-400 hover:text-white hover:border-slate-500"}`}>
-                    {t("allRooms")}
-                  </button>
-                  {planRooms.map((room) => (
-                    <button key={room}
-                      onClick={() => setSelectedRoom(room)}
-                      className={`px-4 py-2 rounded-2xl text-sm font-semibold transition ${selectedRoom === room ? "bg-cyan-500 text-slate-950 shadow-sm shadow-cyan-500/20" : "border border-slate-700 text-slate-400 hover:text-white hover:border-slate-500"}`}>
-                      {room}
-                    </button>
-                  ))}
-                </div>
+
                 <div className="rounded-3xl border border-slate-800 bg-slate-900/95 overflow-x-auto p-4">
                   <PlanningGrid
                     sessions={event.sessions}
