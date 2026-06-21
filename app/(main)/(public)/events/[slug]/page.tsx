@@ -252,10 +252,6 @@ export default function EventDetailPage() {
           </div>
 
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link href={`/events/${slug}/sessions`} className="inline-flex items-center gap-2 rounded-2xl bg-cyan-500 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400">
-              {t("allSessions")}
-              <FontAwesomeIcon icon={faChevronRight} className="text-xs" />
-            </Link>
             <Link href={`/events/${slug}/rooms`} className="inline-flex items-center gap-2 rounded-2xl border border-slate-800 bg-slate-950 px-5 py-3 text-sm font-semibold text-slate-200 transition hover:border-cyan-400 hover:text-white">
               {t("seeRooms")}
             </Link>
