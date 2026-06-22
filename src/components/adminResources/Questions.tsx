@@ -13,6 +13,9 @@ import {
   DeleteButton,
   BooleanField,
   BooleanInput,
+  NumberField,
+  ReferenceInput,
+  SelectInput,
 } from "react-admin";
 
 export const QuestionsList = (props: any) => (
@@ -23,7 +26,7 @@ export const QuestionsList = (props: any) => (
       <ReferenceField source="sessionId" reference="sessions">
         <TextField source="title" />
       </ReferenceField>
-      <TextField source="upvotes" />
+      <NumberField source="upvotes" />
       <BooleanField source="isHidden" />
       <EditButton />
       <DeleteButton />
@@ -34,8 +37,8 @@ export const QuestionsList = (props: any) => (
 export const QuestionsEdit = (props: any) => (
   <Edit {...props}>
     <SimpleForm>
-      <TextInput source="content" multiline />
-      <TextInput source="authorName" />
+      <TextInput source="content" multiline fullWidth />
+      <TextInput source="authorName" fullWidth />
       <BooleanInput source="isHidden" />
     </SimpleForm>
   </Edit>
@@ -44,9 +47,11 @@ export const QuestionsEdit = (props: any) => (
 export const QuestionsCreate = (props: any) => (
   <Create {...props}>
     <SimpleForm>
-      <TextInput source="content" />
-      <TextInput source="authorName" />
-      <TextInput source="sessionId" />
+      <TextInput source="content" multiline fullWidth />
+      <TextInput source="authorName" fullWidth />
+      <ReferenceInput source="sessionId" reference="sessions">
+        <SelectInput optionText="title" />
+      </ReferenceInput>
     </SimpleForm>
   </Create>
 );
