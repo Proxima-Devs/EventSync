@@ -9,6 +9,7 @@ import { RoomsList, RoomsEdit, RoomsCreate } from "./adminResources/Rooms";
 import { SessionsList, SessionsEdit, SessionsCreate } from "./adminResources/Sessions";
 import { QuestionsList, QuestionsEdit, QuestionsCreate } from "./adminResources/Questions";
 import { createTheme } from "@mui/material";
+import AdminLayout from "./AdminLayout";
 
 
 const darkTheme = createTheme({ 
@@ -40,7 +41,7 @@ const darkTheme = createTheme({
 
 const AdminApp = () => (
   <div style={{ height: "100vh", backgroundColor: "#0e1114" }}>
-    <Admin dataProvider={raDataProvider} dashboard={Dashboard} darkTheme={darkTheme as any} defaultTheme="dark">
+    <Admin layout={AdminLayout} dataProvider={raDataProvider} dashboard={Dashboard} darkTheme={darkTheme as any} defaultTheme="dark">
       <Resource name="events" list={EventsList} edit={EventsEdit} create={EventsCreate} />
       <Resource name="speakers" list={SpeakersList} edit={SpeakersEdit} create={SpeakersCreate} />
       <Resource name="sessions" list={SessionsList} edit={SessionsEdit} create={SessionsCreate} />
