@@ -10,14 +10,17 @@ import {
   Create,
   EditButton,
   DeleteButton,
+  ImageField,
 } from "react-admin";
+import ImageUploadInput from "./ImageUploadInput";
 
 export const SpeakersList = (props: any) => (
   <List {...props} perPage={25}>
     <Datagrid rowClick="edit">
-      <TextField source="id" />
+      <ImageField source="photo" sx={{ "& img": { width: 40, height: 40, borderRadius: "50%", objectFit: "cover" } }} />
       <TextField source="fullName" />
       <TextField source="slug" />
+      <TextField source="_count.sessions" label="Sessions" />
       <EditButton />
       <DeleteButton />
     </Datagrid>
@@ -27,9 +30,13 @@ export const SpeakersList = (props: any) => (
 export const SpeakersEdit = (props: any) => (
   <Edit {...props}>
     <SimpleForm>
-      <TextInput source="fullName" />
-      <TextInput source="photo" />
-      <TextInput source="bio" multiline />
+      <TextInput source="fullName" fullWidth />
+      <TextInput source="bio" multiline fullWidth />
+      <ImageUploadInput source="photo" label="Photo" />
+      <TextInput source="links.twitter" label="Twitter" fullWidth />
+      <TextInput source="links.linkedin" label="LinkedIn" fullWidth />
+      <TextInput source="links.github" label="GitHub" fullWidth />
+      <TextInput source="links.website" label="Site web" fullWidth />
     </SimpleForm>
   </Edit>
 );
@@ -37,9 +44,13 @@ export const SpeakersEdit = (props: any) => (
 export const SpeakersCreate = (props: any) => (
   <Create {...props}>
     <SimpleForm>
-      <TextInput source="fullName" />
-      <TextInput source="photo" />
-      <TextInput source="bio" multiline />
+      <TextInput source="fullName" fullWidth />
+      <TextInput source="bio" multiline fullWidth />
+      <ImageUploadInput source="photo" label="Photo" />
+      <TextInput source="links.twitter" label="Twitter" fullWidth />
+      <TextInput source="links.linkedin" label="LinkedIn" fullWidth />
+      <TextInput source="links.github" label="GitHub" fullWidth />
+      <TextInput source="links.website" label="Site web" fullWidth />
     </SimpleForm>
   </Create>
 );
