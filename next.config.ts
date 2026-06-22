@@ -23,6 +23,15 @@ const nextConfig : NextConfig = {
       }
     ],
   },
+  experimental: {
+    optimizePackageImports: [
+      "@mui/material",
+      "@mui/icons-material",
+      "react-admin",
+      "lucide-react",
+      "framer-motion",
+    ],
+  },
 };
 
 const withNextIntl = createNextIntlPlugin();
