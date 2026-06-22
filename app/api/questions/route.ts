@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { requireAdmin } from "@/lib/auth-utils";
 
 function parsePagination(searchParams: URLSearchParams) {
   const start = parseInt(searchParams.get("_start") ?? searchParams.get("start") ?? "0", 10);
@@ -53,7 +54,8 @@ export async function GET(request: NextRequest) {
 // ── POST /api/questions
 // Admin — crée une question (useful for admin panel)
 export async function POST(request: NextRequest) {
-  const guard = null; // no admin guard for admin UI or adjust as needed
+  const guard = await requireAdmin();
+  if (guard) return guard;
   try {
     const body = await request.json();
     const { content, authorName, sessionId } = body;
