@@ -12,16 +12,20 @@ import {
   Create,
   EditButton,
   DeleteButton,
+  NumberField,
+  ImageField,
 } from "react-admin";
+import ImageUploadInput from "./ImageUploadInput";
 
 export const EventsList = (props: any) => (
   <List {...props} perPage={25}>
     <Datagrid rowClick="edit">
-      <TextField source="id" />
+      <ImageField source="coverImage" sx={{ "& img": { width: 60, height: 40, borderRadius: 1, objectFit: "cover" } }} />
       <TextField source="title" />
       <TextField source="slug" />
-      <DateField source="startDate" showTime />
-      <DateField source="endDate" showTime />
+      <DateField source="startDate" showTime locales="fr-FR" />
+      <DateField source="endDate" showTime locales="fr-FR" />
+      <NumberField source="_count.sessions" label="Sessions" />
       <EditButton />
       <DeleteButton />
     </Datagrid>
@@ -31,12 +35,12 @@ export const EventsList = (props: any) => (
 export const EventsEdit = (props: any) => (
   <Edit {...props}>
     <SimpleForm>
-      <TextInput source="title" />
-      <TextInput source="description" multiline />
-      <TextInput source="location" />
+      <TextInput source="title" fullWidth />
+      <TextInput source="description" multiline fullWidth />
+      <TextInput source="location" fullWidth />
       <DateTimeInput source="startDate" />
       <DateTimeInput source="endDate" />
-      <TextInput source="coverImage" />
+      <ImageUploadInput source="coverImage" label="Image de couverture" />
     </SimpleForm>
   </Edit>
 );
@@ -44,12 +48,12 @@ export const EventsEdit = (props: any) => (
 export const EventsCreate = (props: any) => (
   <Create {...props}>
     <SimpleForm>
-      <TextInput source="title" />
-      <TextInput source="description" multiline />
-      <TextInput source="location" />
+      <TextInput source="title" fullWidth />
+      <TextInput source="description" multiline fullWidth />
+      <TextInput source="location" fullWidth />
       <DateTimeInput source="startDate" />
       <DateTimeInput source="endDate" />
-      <TextInput source="coverImage" />
+      <ImageUploadInput source="coverImage" label="Image de couverture" />
     </SimpleForm>
   </Create>
 );
