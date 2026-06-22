@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth-utils";
-import { slugify } from "@/lib/slugify";
+import { slugify, uniqueSlug } from "@/lib/slugify";
 import { isSessionLive } from "@/lib/auth-utils";
 import type { EventPayload } from "@/types";
 
@@ -76,6 +76,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
         return NextResponse.json({ error: "Ce slug est déjà utilisé" }, { status: 409 });
       }
     } else if (body.title && body.title !== existing.title && !body.slug) {
+      slug = uniqueSlug(slugify(body.title));
     }
 
     const updated = await prisma.event.update({
