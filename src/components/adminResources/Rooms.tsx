@@ -33,7 +33,7 @@ export const RoomsEdit = (props: any) => (
 );
 
 export const RoomsCreate = (props: any) => (
-  <Create {...props}>
+  <Create {...props} redirect="list">
     <SimpleForm>
       <TextInput source="name" />
       <TextInput source="slug" />

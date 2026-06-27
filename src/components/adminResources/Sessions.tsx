@@ -58,7 +58,7 @@ export const SessionsEdit = (props: any) => (
 );
 
 export const SessionsCreate = (props: any) => (
-  <Create {...props}>
+  <Create {...props} redirect="list">
     <SimpleForm>
       <TextInput source="title" style={{ width: "100%" }} />
       <TextInput source="description" multiline style={{ width: "100%" }} />

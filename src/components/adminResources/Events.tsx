@@ -46,7 +46,7 @@ export const EventsEdit = (props: any) => (
 );
 
 export const EventsCreate = (props: any) => (
-  <Create {...props}>
+  <Create {...props} redirect="list">
     <SimpleForm>
       <TextInput source="title" fullWidth />
       <TextInput source="description" multiline fullWidth />

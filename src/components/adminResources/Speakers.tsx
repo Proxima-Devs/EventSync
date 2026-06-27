@@ -17,7 +17,7 @@ import ImageUploadInput from "./ImageUploadInput";
 export const SpeakersList = (props: any) => (
   <List {...props} perPage={25}>
     <Datagrid rowClick="edit">
-      <ImageField source="photo" sx={{ "& img": { width: 40, height: 40, borderRadius: "50%", objectFit: "cover" } }} />
+      <ImageField source="photo" sx={{ "& img": { width: 40, height: 40, objectFit: "cover" } }} />
       <TextField source="fullName" />
       <TextField source="slug" />
       <TextField source="_count.sessions" label="Sessions" />
@@ -42,7 +42,7 @@ export const SpeakersEdit = (props: any) => (
 );
 
 export const SpeakersCreate = (props: any) => (
-  <Create {...props}>
+  <Create {...props} redirect="list">
     <SimpleForm>
       <TextInput source="fullName" fullWidth />
       <TextInput source="bio" multiline fullWidth />

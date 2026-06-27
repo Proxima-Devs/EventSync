@@ -295,7 +295,7 @@ export const QuestionsEdit = (props: any) => (
 );
 
 export const QuestionsCreate = (props: any) => (
-  <Create {...props} sx={{ "& .MuiPaper-root": { bgcolor: "transparent", boxShadow: "none" } }}>
+  <Create {...props} redirect="list" sx={{ "& .MuiPaper-root": { bgcolor: "transparent", boxShadow: "none" } }}>
     <Box sx={{ bgcolor: SURFACE, borderRadius: "14px", border: `1px solid ${BORDER}`, overflow: "hidden" }}>
       <FormHeader label="Nouvelle question" />
       <SimpleForm sx={formSx}>
