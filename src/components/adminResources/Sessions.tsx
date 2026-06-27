@@ -39,8 +39,8 @@ export const SessionsList = (props: any) => (
 export const SessionsEdit = (props: any) => (
   <Edit {...props}>
     <SimpleForm>
-      <TextInput source="title" />
-      <TextInput source="description" multiline />
+      <TextInput source="title" style={{ width: "100%" }} />
+      <TextInput source="description" multiline style={{ width: "100%" }} />
       <DateTimeInput source="startTime" />
       <DateTimeInput source="endTime" />
       <NumberInput source="capacity" />
@@ -60,8 +60,8 @@ export const SessionsEdit = (props: any) => (
 export const SessionsCreate = (props: any) => (
   <Create {...props}>
     <SimpleForm>
-      <TextInput source="title" />
-      <TextInput source="description" multiline />
+      <TextInput source="title" style={{ width: "100%" }} />
+      <TextInput source="description" multiline style={{ width: "100%" }} />
       <DateTimeInput source="startTime" />
       <DateTimeInput source="endTime" />
       <NumberInput source="capacity" />
