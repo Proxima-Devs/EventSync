@@ -15,7 +15,6 @@ import {
 export const RoomsList = (props: any) => (
   <List {...props} perPage={25}>
     <Datagrid rowClick="edit">
-      <TextField source="id" />
       <TextField source="name" />
       <TextField source="slug" />
       <EditButton />

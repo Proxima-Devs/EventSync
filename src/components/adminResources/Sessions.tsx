@@ -22,7 +22,6 @@ import {
 export const SessionsList = (props: any) => (
   <List {...props} perPage={25}>
     <Datagrid rowClick="edit">
-      <TextField source="id" />
       <TextField source="title" />
       <ReferenceField source="eventId" reference="events">
         <TextField source="title" />

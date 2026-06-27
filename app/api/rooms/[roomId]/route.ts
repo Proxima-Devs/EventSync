@@ -21,6 +21,25 @@ async function generateUniqueRoomSlug(name: string, excludeId?: string): Promise
   return slug;
 }
 
+// ── GET /api/rooms/[roomId]
+// Public — détail d'une salle
+export async function GET(_req: NextRequest, { params }: Params) {
+  try {
+    const { roomId } = await params;
+    const room = await prisma.room.findUnique({
+      where: { id: roomId },
+      include: { _count: { select: { sessions: true } } },
+    });
+    if (!room) {
+      return NextResponse.json({ error: "Salle introuvable" }, { status: 404 });
+    }
+    return NextResponse.json(room);
+  } catch (error) {
+    console.error("[GET /api/rooms/[roomId]]", error);
+    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
+  }
+}
+
 // ── PUT /api/rooms/[roomId] 
 // Admin — met à jour une salle
 export async function PUT(request: NextRequest, { params }: Params) {
