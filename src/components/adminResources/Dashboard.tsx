@@ -10,6 +10,7 @@ import QuestionIcon from "@mui/icons-material/QuestionAnswer";
 import SessionIcon from "@mui/icons-material/Schedule";
 import LiveIcon from "@mui/icons-material/LiveTv";
 import UpcomingIcon from "@mui/icons-material/TrendingUp";
+import { useNavigate, useCreatePath } from "react-admin";
 
 interface Stats {
   totals: {
@@ -62,6 +63,8 @@ const cardSx = {
 export default function Dashboard() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const createPath = useCreatePath();
 
   useEffect(() => {
     fetch("/api/admin/stats")
@@ -101,8 +104,10 @@ export default function Dashboard() {
           {statCards.map(({ key, label, icon: Icon, color }) => (
             <Grid size={{ xs: 12, sm: 6, lg: 2.4 }} key={key}>
               <Card
+                onClick={() => navigate(createPath({ type: "list", resource: key }))}
                 sx={{
                   ...cardSx,
+                  cursor: "pointer",
                   transition: "border-color 0.25s, transform 0.2s",
                   "&::before": {
                     content: '""',
@@ -166,8 +171,13 @@ export default function Dashboard() {
 }
 
 function LiveWidget({ count }: { count: number }) {
+  const navigate = useNavigate();
+  const createPath = useCreatePath();
   return (
-    <Card sx={cardSx}>
+    <Card
+      onClick={() => navigate(createPath({ type: "list", resource: "sessions" }))}
+      sx={{ ...cardSx, cursor: "pointer" }}
+    >
       <CardContent sx={{ p: "20px", "&:last-child": { pb: "20px" } }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}>
           <Box sx={{
@@ -191,8 +201,13 @@ function LiveWidget({ count }: { count: number }) {
 }
 
 function UpcomingWidget({ count }: { count: number }) {
+  const navigate = useNavigate();
+  const createPath = useCreatePath();
   return (
-    <Card sx={cardSx}>
+    <Card
+      onClick={() => navigate(createPath({ type: "list", resource: "events" }))}
+      sx={{ ...cardSx, cursor: "pointer" }}
+    >
       <CardContent sx={{ p: "20px", "&:last-child": { pb: "20px" } }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}>
           <UpcomingIcon sx={{ color: "#00E5FF", fontSize: 14 }} />
@@ -212,6 +227,8 @@ function UpcomingWidget({ count }: { count: number }) {
 }
 
 function RecentQuestionsWidget({ questions }: { questions: Stats["recentQuestions"] }) {
+  const navigate = useNavigate();
+  const createPath = useCreatePath();
   return (
     <Card sx={cardSx}>
       <CardContent sx={{ p: "20px", "&:last-child": { pb: "20px" } }}>
@@ -227,8 +244,12 @@ function RecentQuestionsWidget({ questions }: { questions: Stats["recentQuestion
             {questions.map((q, idx) => (
               <Box key={q.id} sx={{
                 py: 1.25,
+                cursor: "pointer",
                 borderBottom: idx < questions.length - 1 ? `1px solid ${BORDER}` : "none",
-              }}>
+                "&:hover": { bgcolor: `${BORDER}40` },
+              }}
+                onClick={() => navigate(createPath({ type: "edit", resource: "questions", id: q.id }))}
+              >
                 <Typography sx={{ fontSize: 13, color: TEXT_BODY, fontWeight: 500, lineHeight: 1.4 }}>
                   {q.content}
                 </Typography>
@@ -245,6 +266,8 @@ function RecentQuestionsWidget({ questions }: { questions: Stats["recentQuestion
 }
 
 function RecentEventsWidget({ events }: { events: Stats["recentEvents"] }) {
+  const navigate = useNavigate();
+  const createPath = useCreatePath();
   return (
     <Card sx={cardSx}>
       <CardContent sx={{ p: "20px", "&:last-child": { pb: "20px" } }}>
@@ -256,8 +279,12 @@ function RecentEventsWidget({ events }: { events: Stats["recentEvents"] }) {
             <Box key={e.id} sx={{
               display: "flex", alignItems: "center", gap: 1.75,
               py: 1.5,
+              cursor: "pointer",
               borderBottom: idx < events.length - 1 ? `1px solid ${BORDER}` : "none",
-            }}>
+              "&:hover": { bgcolor: `${BORDER}40` },
+            }}
+              onClick={() => navigate(createPath({ type: "edit", resource: "events", id: e.id }))}
+            >
               <Box sx={{ width: 8, height: 8, borderRadius: "50%", bgcolor: "#00E5FF", flexShrink: 0 }} />
               <Box sx={{ flex: 1 }}>
                 <Typography sx={{ fontSize: 13, color: TEXT_BODY, fontWeight: 600 }}>
