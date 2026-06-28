@@ -21,9 +21,13 @@ export async function GET(request: NextRequest) {
     const { start, take } = parsePagination(searchParams);
     const { field, order } = parseSort(searchParams);
     const sessionId = searchParams.get("sessionId");
+    const q = searchParams.get("q");
+    const isHidden = searchParams.get("isHidden");
 
     const where = {
       ...(sessionId ? { sessionId } : undefined),
+      ...(q ? { content: { contains: q, mode: 'insensitive' as const } } : undefined),
+      ...(isHidden !== null ? { isHidden: isHidden === "true" } : undefined),
     };
 
     const questions = await prisma.question.findMany({

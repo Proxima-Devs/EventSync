@@ -10,25 +10,31 @@ import { Prisma } from "@/generated/prisma/client";
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const eventId = searchParams.get("eventId"); // filtre optionnel par événement
+    const eventId = searchParams.get("eventId");
+    const q = searchParams.get("q");
+    const start = parseInt(searchParams.get("_start") ?? "0");
+    const take = parseInt(searchParams.get("_end") ?? "25") - start;
+
+    const where = {
+      ...(eventId
+        ? { sessions: { some: { session: { eventId } } } }
+        : undefined),
+      ...(q ? { fullName: { contains: q, mode: 'insensitive' as const } } : undefined),
+    };
 
     const speakers = await prisma.speaker.findMany({
-      where: eventId
-        ? {
-            sessions: {
-              some: {
-                session: { eventId },
-              },
-            },
-          }
-        : undefined,
+      where,
+      skip: Number.isNaN(start) ? 0 : start,
+      take: Number.isNaN(take) || take <= 0 ? 25 : take,
       include: {
         _count: { select: { sessions: true } },
       },
       orderBy: { fullName: "asc" },
     });
 
-    return NextResponse.json(speakers);
+    const total = await prisma.speaker.count({ where });
+
+    return NextResponse.json({ data: speakers, meta: { total } });
   } catch (error) {
     console.error("[GET /api/speakers]", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });

@@ -12,8 +12,14 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get("page") ?? "1");
     const perPage = parseInt(searchParams.get("perPage") ?? "20");
     const skip = (page - 1) * perPage;
+    const q = searchParams.get("q");
+
+    const where = {
+      ...(q ? { title: { contains: q, mode: 'insensitive' as const } } : undefined),
+    };
 
     const events = await prisma.event.findMany({
+      where,
       orderBy: { startDate: "desc" },
       skip,
       take: perPage,
@@ -21,7 +27,7 @@ export async function GET(request: NextRequest) {
         _count: { select: { sessions: true } },
       },
     });
-    const total = await prisma.event.count();
+    const total = await prisma.event.count({ where });
 
     return NextResponse.json({
       data: events,

@@ -38,10 +38,14 @@ export async function GET(request: NextRequest) {
     const { field, order } = parseSort(searchParams);
     const eventId = searchParams.get("eventId");
     const roomId = searchParams.get("roomId");
+    const speakerId = searchParams.get("speakerId");
+    const q = searchParams.get("q");
 
     const where = {
       ...(eventId ? { eventId } : undefined),
       ...(roomId ? { roomId } : undefined),
+      ...(speakerId ? { speakers: { some: { speakerId } } } : undefined),
+      ...(q ? { title: { contains: q, mode: 'insensitive' as const } } : undefined),
     };
 
     const sessions = await prisma.eventSession.findMany({

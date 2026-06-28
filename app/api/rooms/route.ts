@@ -6,15 +6,29 @@ import type { RoomPayload } from "@/types";
 
 // ── GET /api/rooms
 // Public — liste toutes les salles
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url);
+    const start = parseInt(searchParams.get("_start") ?? "0");
+    const end = parseInt(searchParams.get("_end") ?? "25");
+    const take = end - start;
+    const q = searchParams.get("q");
+
+    const where = {
+      ...(q ? { name: { contains: q, mode: 'insensitive' as const } } : undefined),
+    };
+
     const rooms = await prisma.room.findMany({
+      where,
+      skip: Number.isNaN(start) ? 0 : start,
+      take: Number.isNaN(take) || take <= 0 ? 25 : take,
       orderBy: { name: "asc" },
       include: {
         _count: { select: { sessions: true } },
       },
     });
-    return NextResponse.json(rooms);
+    const total = await prisma.room.count({ where });
+    return NextResponse.json({ data: rooms, meta: { total } });
   } catch (error) {
     console.error("[GET /api/rooms]", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
