@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth-utils";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import { supabaseAdmin } from "@/lib/supabase-admin";
+
+const BUCKET = "speaker-photos";
 
 export async function POST(request: NextRequest) {
   const guard = await requireAdmin();
@@ -32,14 +33,25 @@ export async function POST(request: NextRequest) {
     // Nom de fichier unique
     const ext = file.name.split(".").pop();
     const filename = `${crypto.randomUUID()}.${ext}`;
+    const filePath = `speakers/${filename}`;
 
-    // Dossier public/uploads/speakers
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "speakers");
-    await mkdir(uploadDir, { recursive: true });
-    await writeFile(path.join(uploadDir, filename), buffer);
+    // Upload vers Supabase Storage
+    const { error: uploadError } = await supabaseAdmin.storage
+      .from(BUCKET)
+      .upload(filePath, buffer, {
+        contentType: file.type,
+        upsert: false,
+      });
 
-    // URL publique retournée
-    return NextResponse.json({ url: `/uploads/speakers/${filename}` }, { status: 201 });
+    if (uploadError) {
+      console.error("[POST /api/upload] Supabase upload error:", uploadError);
+      return NextResponse.json({ error: "Erreur lors de l'upload" }, { status: 500 });
+    }
+
+    // URL publique
+    const { data } = supabaseAdmin.storage.from(BUCKET).getPublicUrl(filePath);
+
+    return NextResponse.json({ url: data.publicUrl }, { status: 201 });
   } catch (error) {
     console.error("[POST /api/upload]", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
