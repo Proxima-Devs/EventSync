@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth-utils";
-import { slugify } from "@/lib/slugify";
+import { slugify, uniqueSlug } from "@/lib/slugify";
 import type { SpeakerPayload } from "@/types";
 import { Prisma } from "@/generated/prisma/client";
 
@@ -41,40 +41,30 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// Fonction pour générer un slug unique
-async function generateUniqueSpeakerSlug(fullName: string): Promise<string> {
-  let slug = slugify(fullName);
-  let counter = 1;
-  
-  while (true) {
-    const existing = await prisma.speaker.findUnique({ where: { slug } });
-    if (!existing) break;
-    slug = `${slugify(fullName)}-${counter}`;
-    counter++;
-  }
-  
-  return slug;
-}
-
 // ── POST /api/speakers
 // Admin — crée un intervenant
 export async function POST(request: NextRequest) {
   const guard = await requireAdmin();
   if (guard) return guard;
 
+  let body: SpeakerPayload;
   try {
-    const body: SpeakerPayload = await request.json();
-    const { fullName, photo, bio, links } = body;
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Corps de requête invalide" }, { status: 400 });
+  }
 
-    if (!fullName || fullName.trim().length === 0) {
-      return NextResponse.json(
-        { error: "Le nom complet de l'intervenant est obligatoire" },
-        { status: 400 }
-      );
-    }
+  const { fullName, photo, bio, links } = body;
 
-    const slug = await generateUniqueSpeakerSlug(fullName);
+  if (!fullName || fullName.trim().length === 0) {
+    return NextResponse.json(
+      { error: "Le nom complet de l'intervenant est obligatoire" },
+      { status: 400 }
+    );
+  }
 
+  try {
+    const slug = slugify(fullName);
     const speaker = await prisma.speaker.create({
       data: {
         fullName: fullName.trim(),
@@ -87,6 +77,18 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(speaker, { status: 201 });
   } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      const speaker = await prisma.speaker.create({
+        data: {
+          fullName: fullName.trim(),
+          slug: uniqueSlug(slugify(fullName)),
+          photo: photo || null,
+          bio: bio?.trim() || null,
+          links: links as Prisma.InputJsonValue ?? null,
+        },
+      }).catch(() => null);
+      if (speaker) return NextResponse.json(speaker, { status: 201 });
+    }
     console.error("[POST /api/speakers]", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }

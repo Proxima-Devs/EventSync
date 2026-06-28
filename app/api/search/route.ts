@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
 
     const searchFilter = { contains: q, mode: "insensitive" as const };
 
-    const [events, sessions, speakers] = await prisma.$transaction([
+    const [events, sessions, speakers] = await Promise.all([
       // Recherche événements
       !type || type === "events"
         ? prisma.event.findMany({
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
               location: true,
             },
           })
-        : prisma.event.findMany({ where: { id: "never" }, take: 0 }),
+        : Promise.resolve([]),
 
       // Recherche sessions
       !type || type === "sessions"
@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
               room: { select: { name: true } },
             },
           })
-        : prisma.eventSession.findMany({ where: { id: "never" }, take: 0 }),
+        : Promise.resolve([]),
 
       // Recherche intervenants
       !type || type === "speakers"
@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
               bio: true,
             },
           })
-        : prisma.speaker.findMany({ where: { id: "never" }, take: 0 }),
+        : Promise.resolve([]),
     ]);
 
     return NextResponse.json({ events, sessions, speakers, query: q });

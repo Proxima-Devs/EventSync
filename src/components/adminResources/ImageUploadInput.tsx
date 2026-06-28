@@ -31,6 +31,7 @@ export default function ImageUploadInput({ source, label }: ImageUploadInputProp
       field.onChange(data.url);
     } catch (err) {
       console.error("Upload error:", err);
+      alert("Erreur lors de l'upload de l'image. Veuillez réessayer.");
     } finally {
       setUploading(false);
       if (inputRef.current) inputRef.current.value = "";

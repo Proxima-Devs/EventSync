@@ -6,21 +6,6 @@ import type { SessionPayload } from "@/types";
 
 type Params = { params: Promise<{ sessionId: string }> };
 
-// Fonction pour générer un slug unique
-async function generateUniqueEventSessionSlug(title: string, excludeId?: string): Promise<string> {
-  let slug = slugify(title);
-  let counter = 1;
-  
-  while (true) {
-    const existing = await prisma.eventSession.findUnique({ where: { slug } });
-    if (!existing || (excludeId && existing.id === excludeId)) break;
-    slug = `${slugify(title)}-${counter}`;
-    counter++;
-  }
-  
-  return slug;
-}
-
 // ── GET /api/sessions/[sessionId]
 // Public — détail d'une session avec speakers, salle, flag live
 // Accepte soit un ID soit un slug
@@ -90,9 +75,16 @@ export async function PUT(request: NextRequest, { params }: Params) {
       );
     }
 
+    if (body.startTime && body.endTime && new Date(body.startTime) >= new Date(body.endTime)) {
+      return NextResponse.json(
+        { error: "startTime doit être antérieure à endTime" },
+        { status: 400 }
+      );
+    }
+
     // Générer un nouveau slug si le titre a changé
     const slug = body.title && body.title !== existing.title 
-      ? await generateUniqueEventSessionSlug(body.title, sessionId) 
+      ? slugify(body.title)
       : existing.slug;
 
     // Transaction : mise à jour session + remplacement des speakers si fournis

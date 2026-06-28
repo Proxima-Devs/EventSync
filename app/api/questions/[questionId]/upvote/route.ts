@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getSession } from "@/lib/auth-utils";
+import { Prisma } from "@/generated/prisma/client";
 
 type Params = { params: Promise<{ questionId: string }> };
 
@@ -27,31 +28,31 @@ export async function POST(_req: NextRequest, { params }: Params) {
       return NextResponse.json({ error: "Question indisponible" }, { status: 403 });
     }
 
-    const upvote = await prisma.questionUpvote.findUnique({
-      where: {
-        userId_questionId: {
-          userId: session.user.id,
-          questionId,
+    await prisma.$transaction(async (tx) => {
+      const upvote = await tx.questionUpvote.findUnique({
+        where: {
+          userId_questionId: {
+            userId: session.user.id,
+            questionId,
+          },
         },
-      },
-    });
+      });
 
-    if (upvote) {
-      return NextResponse.json({ error: "Vous avez déjà voté pour cette question" }, { status: 409 });
-    }
+      if (upvote) {
+        throw new UniqueUpvoteError();
+      }
 
-    await prisma.$transaction([
-      prisma.questionUpvote.create({
+      await tx.questionUpvote.create({
         data: {
           userId: session.user.id,
           questionId,
         },
-      }),
-      prisma.question.update({
+      });
+      await tx.question.update({
         where: { id: questionId },
         data: { upvotes: { increment: 1 } },
-      }),
-    ]);
+      });
+    });
 
     const updated = await prisma.question.findUnique({
       where: { id: questionId },
@@ -60,9 +61,19 @@ export async function POST(_req: NextRequest, { params }: Params) {
 
     return NextResponse.json(updated);
   } catch (error) {
+    if (error instanceof UniqueUpvoteError) {
+      return NextResponse.json({ error: "Vous avez déjà voté pour cette question" }, { status: 409 });
+    }
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      return NextResponse.json({ error: "Vous avez déjà voté pour cette question" }, { status: 409 });
+    }
     console.error("[POST /api/questions/[questionId]/upvote]", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
+}
+
+class UniqueUpvoteError extends Error {
+  constructor() { super("Unique upvote"); }
 }
 
 export async function DELETE(_req: NextRequest, { params }: Params) {
@@ -78,26 +89,26 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
       return NextResponse.json({ error: "Question introuvable" }, { status: 404 });
     }
 
-    const upvote = await prisma.questionUpvote.findUnique({
-      where: {
-        userId_questionId: {
-          userId: session.user.id,
-          questionId,
+    await prisma.$transaction(async (tx) => {
+      const upvote = await tx.questionUpvote.findUnique({
+        where: {
+          userId_questionId: {
+            userId: session.user.id,
+            questionId,
+          },
         },
-      },
-    });
+      });
 
-    if (!upvote) {
-      return NextResponse.json({ error: "Vous n'avez pas voté pour cette question" }, { status: 404 });
-    }
+      if (!upvote) {
+        throw new MissingUpvoteError();
+      }
 
-    await prisma.$transaction([
-      prisma.questionUpvote.delete({ where: { id: upvote.id } }),
-      prisma.question.update({
+      await tx.questionUpvote.delete({ where: { id: upvote.id } });
+      await tx.question.update({
         where: { id: questionId },
         data: { upvotes: { decrement: 1 } },
-      }),
-    ]);
+      });
+    });
 
     const updated = await prisma.question.findUnique({
       where: { id: questionId },
@@ -106,7 +117,14 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
 
     return NextResponse.json(updated);
   } catch (error) {
+    if (error instanceof MissingUpvoteError) {
+      return NextResponse.json({ error: "Vous n'avez pas voté pour cette question" }, { status: 404 });
+    }
     console.error("[DELETE /api/questions/[questionId]/upvote]", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
+}
+
+class MissingUpvoteError extends Error {
+  constructor() { super("Missing upvote"); }
 }

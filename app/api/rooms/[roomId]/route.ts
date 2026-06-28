@@ -2,24 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth-utils";
 import { slugify } from "@/lib/slugify";
+import { Prisma } from "@/generated/prisma/client";
 import type { RoomPayload } from "@/types";
 
 type Params = { params: Promise<{ roomId: string }> };
-
-// Fonction pour générer un slug unique
-async function generateUniqueRoomSlug(name: string, excludeId?: string): Promise<string> {
-  let slug = slugify(name);
-  let counter = 1;
-  
-  while (true) {
-    const existing = await prisma.room.findUnique({ where: { slug } });
-    if (!existing || (excludeId && existing.id === excludeId)) break;
-    slug = `${slugify(name)}-${counter}`;
-    counter++;
-  }
-  
-  return slug;
-}
 
 // ── GET /api/rooms/[roomId]
 // Public — détail d'une salle
@@ -57,38 +43,50 @@ export async function PUT(request: NextRequest, { params }: Params) {
   const guard = await requireAdmin();
   if (guard) return guard;
 
+  const { roomId } = await params;
+
+  let body: RoomPayload;
   try {
-    const { roomId } = await params;
-    const body: RoomPayload = await request.json();
-    const { name } = body;
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Corps de requête invalide" }, { status: 400 });
+  }
 
-    if (!name || name.trim().length === 0) {
-      return NextResponse.json({ error: "Le nom de la salle est obligatoire" }, { status: 400 });
-    }
+  const { name } = body;
 
-    const existing = await prisma.room.findUnique({ where: { id: roomId } });
-    if (!existing) {
-      return NextResponse.json({ error: "Salle introuvable" }, { status: 404 });
-    }
+  if (!name || name.trim().length === 0) {
+    return NextResponse.json({ error: "Le nom de la salle est obligatoire" }, { status: 400 });
+  }
 
-    // Vérifier l'unicité du nouveau nom
-    const conflict = await prisma.room.findFirst({
-      where: { name: name.trim(), NOT: { id: roomId } },
-    });
-    if (conflict) {
-      return NextResponse.json({ error: "Une salle avec ce nom existe déjà" }, { status: 409 });
-    }
+  const existing = await prisma.room.findUnique({ where: { id: roomId } });
+  if (!existing) {
+    return NextResponse.json({ error: "Salle introuvable" }, { status: 404 });
+  }
 
-    // Générer un nouveau slug si le nom a changé
-    const slug = name !== existing.name ? await generateUniqueRoomSlug(name, roomId) : existing.slug;
+  const conflict = await prisma.room.findFirst({
+    where: { name: name.trim(), NOT: { id: roomId } },
+  });
+  if (conflict) {
+    return NextResponse.json({ error: "Une salle avec ce nom existe déjà" }, { status: 409 });
+  }
+
+  try {
+    const newSlug = name !== existing.name;
 
     const room = await prisma.room.update({
       where: { id: roomId },
-      data: { name: name.trim(), slug },
+      data: { name: name.trim(), slug: newSlug ? slugify(name) : existing.slug },
     });
 
     return NextResponse.json(room);
   } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      const room = await prisma.room.update({
+        where: { id: roomId },
+        data: { name: name.trim(), slug: `${slugify(name)}-${Date.now()}` },
+      }).catch(() => null);
+      if (room) return NextResponse.json(room);
+    }
     console.error("[PUT /api/rooms/[roomId]]", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }

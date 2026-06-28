@@ -9,10 +9,12 @@ function parsePagination(searchParams: URLSearchParams) {
   return { start: Number.isNaN(start) ? 0 : start, take: perPage };
 }
 
+const QUESTION_SORT_FIELDS = ["id", "content", "upvotes", "createdAt", "updatedAt"];
+
 function parseSort(searchParams: URLSearchParams) {
   const field = searchParams.get("_sort") ?? "createdAt";
   const order = (searchParams.get("_order") ?? "ASC").toLowerCase() === "desc" ? "desc" : "asc";
-  return { field, order };
+  return { field: QUESTION_SORT_FIELDS.includes(field) ? field : "createdAt", order };
 }
 
 export async function GET(request: NextRequest) {
@@ -70,8 +72,13 @@ export async function POST(request: NextRequest) {
     const session = await prisma.eventSession.findUnique({ where: { id: sessionId } });
     if (!session) return NextResponse.json({ error: "Session introuvable" }, { status: 404 });
 
+    const trimmed = content.trim();
+    if (trimmed.length > 1000) {
+      return NextResponse.json({ error: "Le contenu ne peut pas dépasser 1000 caractères" }, { status: 400 });
+    }
+
     const question = await prisma.question.create({
-      data: { content: content.trim(), authorName: authorName?.trim() || null, sessionId },
+      data: { content: trimmed, authorName: authorName?.trim() || null, sessionId },
     });
 
     return NextResponse.json(question, { status: 201 });

@@ -136,30 +136,44 @@ const raDataProvider: DataProvider = {
   },
 
   updateMany: async (resource, params) => {
-    // Fallback: send multiple update requests
-    const results = await Promise.all(
+    const results = await Promise.allSettled(
       params.ids.map((id: any) =>
         fetch(`${apiUrl}/${resource}/${id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(params.data),
-        }).then((r) => r.json())
+        }).then(async (r) => {
+          if (!r.ok) throw new Error(await r.text().catch(() => r.statusText));
+          return r.json();
+        })
       )
     );
-    return { data: results.map((r) => r.id) };
+    const data = results
+      .filter((r) => r.status === "fulfilled")
+      .map((r) => r.value.id);
+    return { data };
   },
 
   delete: async (resource, params) => {
     const url = `${apiUrl}/${resource}/${params.id}`;
     const res = await fetch(url, { method: "DELETE" });
     if (!res.ok) throw new Error(res.statusText);
-    await res.text();
     return { data: (params.previousData ?? { id: params.id }) as any };
   },
 
   deleteMany: async (resource, params) => {
-    await Promise.all(params.ids.map((id: any) => fetch(`${apiUrl}/${resource}/${id}`, { method: "DELETE" })));
-    return { data: params.ids };
+    const results = await Promise.allSettled(
+      params.ids.map((id: any) =>
+        fetch(`${apiUrl}/${resource}/${id}`, { method: "DELETE" }).then((r) => {
+          if (!r.ok) throw new Error(r.statusText);
+          return id;
+        })
+      )
+    );
+    const data = results
+      .filter((r) => r.status === "fulfilled")
+      .map((r) => r.value);
+    return { data };
   },
 };
 

@@ -31,6 +31,7 @@ export default function FavoritesPage() {
   const { favorites, toggle } = useFavorites();
   const [sessions, setSessions] = useState<SessionFavorite[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
 
@@ -63,7 +64,7 @@ export default function FavoritesPage() {
       if (activeFilter === "upcoming") {
         return start >= now;
       }
-      if (activeFilter === "Past") {
+      if (activeFilter === "past") {
         return start < now;
       }
 
@@ -77,24 +78,35 @@ export default function FavoritesPage() {
       setLoading(false);
       return;
     }
-    // On fetch tous les events pour retrouver les sessions favorites
+    setError("");
     apiFetch<{ data: { slug: string; title: string; id: string }[] }>("/api/events")
       .then(async (res) => {
+        const results = await Promise.allSettled(
+          res.data.map((event) =>
+            apiFetch<{ sessions: Omit<SessionFavorite, "event">[] }>(
+              `/api/events/slug/${event.slug}`
+            ).then((detail) => ({ event, detail }))
+          )
+        );
         const all: SessionFavorite[] = [];
-        for (const event of res.data) {
-          const detail = await apiFetch<{
-            sessions: Omit<SessionFavorite, "event">[];
-          }>(`/api/events/slug/${event.slug}`);
-          for (const s of detail.sessions) {
-            if (favorites.includes(s.id)) {
-              all.push({ ...s, event: { slug: event.slug, title: event.title } });
+        for (const result of results) {
+          if (result.status === "fulfilled") {
+            const { event, detail } = result.value;
+            for (const s of detail.sessions) {
+              if (favorites.includes(s.id)) {
+                all.push({ ...s, event: { slug: event.slug, title: event.title } });
+              }
             }
           }
         }
         setSessions(all);
+        if (results.some((r) => r.status === "rejected")) {
+          setError(t("noMatches"));
+        }
       })
+      .catch(() => setError(t("noMatches")))
       .finally(() => setLoading(false));
-  }, [favoritesKey]);
+  }, [favoritesKey, t]);
 
   return (
     <main className="flex-1 px-8 py-12 max-w-3xl mx-auto w-full">
@@ -154,6 +166,10 @@ export default function FavoritesPage() {
               <SessionSkeleton />
               <SessionSkeleton />
               <SessionSkeleton />
+            </div>
+          ) : error ? (
+            <div className="rounded-2xl border border-red-900 bg-red-500/10 py-12 text-center text-red-400 text-sm">
+              {error}
             </div>
           ) : filteredSessions.length === 0 ? (
             <div className="rounded-2xl border border-[#1e2530] bg-surface-secondary py-20 text-center text-content-muted italic text-sm">

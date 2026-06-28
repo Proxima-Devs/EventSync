@@ -1,3 +1,5 @@
+"use client";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/navigation";
@@ -93,7 +95,7 @@ export default function SessionCardSchedule(
                   return (
                     <td key={`${time}-${roomName}-${i}`}>{
                       sessionTime ? (
-                        <div className="border-1 border-[#3A4A5A] text-white rounded-lg px-5 py-2 flex flex-row justify-between m-5 " onClick={() => router.push(`/events/${slug}/sessions/${sessionTime.slug}`)}>
+                        <div className="border border-[#3A4A5A] text-white rounded-lg px-5 py-2 flex flex-row justify-between m-5 " onClick={() => router.push(`/events/${slug}/sessions/${sessionTime.slug}`)}>
                           <div>
                             <h1 className="font-bold">{sessionTime.title}</h1>
                             <p className="text-sm text-[#3A4A5A]">{sessionTime.startTime.substring(11,16)}-{sessionTime.endTime.substring(11,16)}</p>

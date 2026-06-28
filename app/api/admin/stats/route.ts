@@ -19,7 +19,7 @@ export async function GET() {
       upcomingEventsCount,
       recentQuestions,
       recentEventsRaw,
-    ] = await prisma.$transaction([
+    ] = await Promise.all([
       prisma.event.count(),
       prisma.eventSession.count(),
       prisma.speaker.count(),

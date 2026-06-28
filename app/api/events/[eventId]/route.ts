@@ -56,37 +56,49 @@ export async function PUT(request: NextRequest, { params }: Params) {
   const guard = await requireAdmin();
   if (guard) return guard;
 
+  const { eventId } = await params;
+
+  let body: Partial<EventPayload>;
   try {
-    const { eventId } = await params;
-    const body: Partial<EventPayload> = await request.json();
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Corps de requête invalide" }, { status: 400 });
+  }
 
-    const existing = await prisma.event.findUnique({ where: { id: eventId } });
-    if (!existing) {
-      return NextResponse.json({ error: "Événement introuvable" }, { status: 404 });
+  const existing = await prisma.event.findUnique({ where: { id: eventId } });
+  if (!existing) {
+    return NextResponse.json({ error: "Événement introuvable" }, { status: 404 });
+  }
+
+  if (body.slug && body.slug !== existing.slug) {
+    const slug = slugify(body.slug);
+    const conflict = await prisma.event.findFirst({
+      where: { slug, NOT: { id: eventId } },
+    });
+    if (conflict) {
+      return NextResponse.json({ error: "Ce slug est déjà utilisé" }, { status: 409 });
     }
+  }
 
-    // Si le slug change, vérifier l'unicité
-    let slug = existing.slug;
-    if (body.slug && body.slug !== existing.slug) {
-      slug = slugify(body.slug);
-      const conflict = await prisma.event.findFirst({
-        where: { slug, NOT: { id: eventId } },
-      });
-      if (conflict) {
-        return NextResponse.json({ error: "Ce slug est déjà utilisé" }, { status: 409 });
-      }
-    } else if (body.title && body.title !== existing.title && !body.slug) {
-      slug = uniqueSlug(slugify(body.title));
-    }
+  const startDate = body.startDate ? new Date(body.startDate) : undefined;
+  const endDate = body.endDate ? new Date(body.endDate) : undefined;
 
+  if (startDate && endDate && startDate >= endDate) {
+    return NextResponse.json(
+      { error: "startDate doit être antérieure à endDate" },
+      { status: 400 }
+    );
+  }
+
+  try {
     const updated = await prisma.event.update({
       where: { id: eventId },
       data: {
         ...(body.title && { title: body.title }),
         ...(body.description !== undefined && { description: body.description }),
-        ...(body.slug && { slug }),
-        ...(body.startDate && { startDate: new Date(body.startDate) }),
-        ...(body.endDate && { endDate: new Date(body.endDate) }),
+        ...(body.slug && { slug: slugify(body.slug) }),
+        ...(body.startDate && { startDate }),
+        ...(body.endDate && { endDate }),
         ...(body.location !== undefined && { location: body.location }),
         ...(body.coverImage !== undefined && { coverImage: body.coverImage }),
       },
