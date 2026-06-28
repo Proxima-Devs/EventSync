@@ -9,6 +9,11 @@ import { RoomsList, RoomsShow, RoomsEdit, RoomsCreate } from "./adminResources/R
 import { SessionsList, SessionsEdit, SessionsCreate } from "./adminResources/Sessions";
 import { QuestionsList, QuestionsEdit, QuestionsCreate } from "./adminResources/Questions";
 import { createTheme } from "@mui/material";
+import EventIcon from "@mui/icons-material/Event";
+import PeopleIcon from "@mui/icons-material/People";
+import SchoolIcon from "@mui/icons-material/School";
+import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
+import QuestionAnswerIcon from "@mui/icons-material/QuestionAnswer";
 import AdminLayout from "./AdminLayout";
 
 
@@ -42,11 +47,11 @@ const darkTheme = createTheme({
 const AdminApp = () => (
   <div style={{ height: "100vh", backgroundColor: "#0e1114" }}>
     <Admin layout={AdminLayout} dataProvider={raDataProvider} dashboard={Dashboard} darkTheme={darkTheme as any} defaultTheme="dark">
-      <Resource name="events" list={EventsList} edit={EventsEdit} create={EventsCreate} />
-      <Resource name="speakers" list={SpeakersList} edit={SpeakersEdit} create={SpeakersCreate} />
-      <Resource name="sessions" list={SessionsList} edit={SessionsEdit} create={SessionsCreate} />
-      <Resource name="rooms" list={RoomsList} show={RoomsShow} edit={RoomsEdit} create={RoomsCreate} />
-      <Resource name="questions" list={QuestionsList} edit={QuestionsEdit} create={QuestionsCreate} />
+      <Resource name="events" icon={EventIcon} list={EventsList} edit={EventsEdit} create={EventsCreate} />
+      <Resource name="speakers" icon={PeopleIcon} list={SpeakersList} edit={SpeakersEdit} create={SpeakersCreate} />
+      <Resource name="sessions" icon={SchoolIcon} list={SessionsList} edit={SessionsEdit} create={SessionsCreate} />
+      <Resource name="rooms" icon={MeetingRoomIcon} list={RoomsList} show={RoomsShow} edit={RoomsEdit} create={RoomsCreate} />
+      <Resource name="questions" icon={QuestionAnswerIcon} list={QuestionsList} edit={QuestionsEdit} create={QuestionsCreate} />
     </Admin>
   </div>
 );
