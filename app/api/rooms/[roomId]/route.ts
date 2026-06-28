@@ -28,7 +28,18 @@ export async function GET(_req: NextRequest, { params }: Params) {
     const { roomId } = await params;
     const room = await prisma.room.findUnique({
       where: { id: roomId },
-      include: { _count: { select: { sessions: true } } },
+      include: {
+        _count: { select: { sessions: true } },
+        sessions: {
+          include: {
+            event: { select: { id: true, title: true } },
+            speakers: {
+              include: { speaker: { select: { id: true, fullName: true } } },
+            },
+          },
+          orderBy: { startTime: "asc" },
+        },
+      },
     });
     if (!room) {
       return NextResponse.json({ error: "Salle introuvable" }, { status: 404 });
