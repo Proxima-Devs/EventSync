@@ -14,11 +14,19 @@ import {
   DeleteButton,
   NumberField,
   ImageField,
+  SearchInput,
+  Filter,
 } from "react-admin";
 import ImageUploadInput from "./ImageUploadInput";
 
+const EventsFilter = (props: any) => (
+  <Filter {...props}>
+    <SearchInput source="q" alwaysOn placeholder="Rechercher..." sx={{ minWidth: 250 }} />
+  </Filter>
+);
+
 export const EventsList = (props: any) => (
-  <List {...props} perPage={25}>
+  <List {...props} perPage={25} filters={<EventsFilter />}>
     <Datagrid rowClick="edit">
       <ImageField source="coverImage" sx={{ "& img": { width: 60, height: 40, borderRadius: 1, objectFit: "cover" } }} />
       <TextField source="title" />

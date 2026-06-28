@@ -13,6 +13,8 @@ import {
   BooleanInput,
   ReferenceInput,
   SelectInput,
+  SearchInput,
+  Filter,
   useRecordContext,
 } from "react-admin";
 import { Box, Typography, Chip } from "@mui/material";
@@ -94,8 +96,27 @@ function RepliesField() {
   );
 }
 
+const QuestionsFilter = (props: any) => (
+  <Filter {...props}>
+    <SearchInput 
+          source="q" 
+          alwaysOn 
+          placeholder="Rechercher..." 
+          sx={{
+            '& .MuiInputBase-root': {
+              height: 60,
+            },
+            minWidth: 300, 
+          }}
+        />
+    <ReferenceInput source="sessionId" reference="sessions" sx={{ minWidth: 200 }}>
+      <SelectInput optionText="title" sx={{ minWidth: 200 }} />
+    </ReferenceInput>
+  </Filter>
+);
+
 export const QuestionsList = (props: any) => (
-  <List {...props} perPage={25}>
+  <List {...props} perPage={25} filters={<QuestionsFilter />}>
     <Datagrid rowClick="edit">
       <TextField source="content" label="Contenu" />
       <ReferenceField source="sessionId" reference="sessions" label="Session">

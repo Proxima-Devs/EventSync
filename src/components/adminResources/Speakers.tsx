@@ -11,11 +11,19 @@ import {
   EditButton,
   DeleteButton,
   ImageField,
+  SearchInput,
+  Filter,
 } from "react-admin";
 import ImageUploadInput from "./ImageUploadInput";
 
+const SpeakersFilter = (props: any) => (
+  <Filter {...props}>
+    <SearchInput source="q" alwaysOn placeholder="Rechercher..." sx={{ minWidth: 250 }} />
+  </Filter>
+);
+
 export const SpeakersList = (props: any) => (
-  <List {...props} perPage={25}>
+  <List {...props} perPage={25} filters={<SpeakersFilter />}>
     <Datagrid rowClick="edit">
       <ImageField source="photo" sx={{ "& img": { width: 40, height: 40, objectFit: "cover" } }} />
       <TextField source="fullName" />

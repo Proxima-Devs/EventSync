@@ -13,6 +13,8 @@ import {
   DeleteButton,
   useRecordContext,
   useNavigate,
+  SearchInput,
+  Filter,
 } from "react-admin";
 import { Box, Typography, Card, CardContent } from "@mui/material";
 
@@ -97,8 +99,14 @@ function RoomDetail() {
   );
 }
 
+const RoomsFilter = (props: any) => (
+  <Filter {...props}>
+    <SearchInput source="q" alwaysOn placeholder="Rechercher..." />
+  </Filter>
+);
+
 export const RoomsList = (props: any) => (
-  <List {...props} perPage={25}>
+  <List {...props} perPage={25} filters={<RoomsFilter />}>
     <Datagrid rowClick="show">
       <TextField source="name" />
       <EditButton />

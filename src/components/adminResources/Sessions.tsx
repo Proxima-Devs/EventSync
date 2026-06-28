@@ -17,10 +17,37 @@ import {
   Create,
   EditButton,
   DeleteButton,
+  SearchInput,
+  Filter,
 } from "react-admin";
 
+const SessionsFilter = (props: any) => (
+  <Filter {...props}>
+    <SearchInput 
+      source="q" 
+      alwaysOn 
+      placeholder="Rechercher..." 
+      sx={{
+        '& .MuiInputBase-root': {
+          height: 60,
+        },
+        minWidth: 300, 
+      }}
+    />
+    <ReferenceInput source="eventId" reference="events" sx={{ minWidth: 200 }}>
+      <SelectInput optionText="title" sx={{ minWidth: 200 }} />
+    </ReferenceInput>
+    <ReferenceInput source="roomId" reference="rooms" sx={{ minWidth: 200 }}>
+      <SelectInput optionText="name" sx={{ minWidth: 200 }} />
+    </ReferenceInput>
+    <ReferenceInput source="speakerId" reference="speakers" sx={{ minWidth: 200 }}>
+      <SelectInput optionText="fullName" sx={{ minWidth: 200 }} />
+    </ReferenceInput>
+  </Filter>
+);
+
 export const SessionsList = (props: any) => (
-  <List {...props} perPage={25}>
+  <List {...props} perPage={25} filters={<SessionsFilter />}>
     <Datagrid rowClick="edit">
       <TextField source="title" />
       <ReferenceField source="eventId" reference="events">

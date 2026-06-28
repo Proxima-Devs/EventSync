@@ -21,7 +21,13 @@ const raDataProvider: DataProvider = {
     const { field, order } = params.sort || { field: "id", order: "ASC" };
     const start = (page - 1) * perPage;
     const end = page * perPage;
-    const query = `?_start=${start}&_end=${end}&_sort=${field}&_order=${order}`;
+    const filterQuery = params.filter
+      ? Object.entries(params.filter)
+          .filter(([_, v]) => v != null && v !== '')
+          .map(([k, v]) => `&${encodeURIComponent(k)}=${encodeURIComponent(String(v))}`)
+          .join('')
+      : '';
+    const query = `?_start=${start}&_end=${end}&_sort=${field}&_order=${order}${filterQuery}`;
     const url = `${apiUrl}/${resource}${query}`;
 
     const res = await fetch(url, { headers: { accept: "application/json" } });
