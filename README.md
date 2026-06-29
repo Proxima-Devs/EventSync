@@ -26,9 +26,9 @@ A full-stack web application for managing tech events, scheduling sessions with 
 | Reference | Last Name | First Name | Role |
 |---|---|---|---|
 | STD24060 | RAKOTOARISON | Irina Stéphane | Backend Developer |
-| STD24011 | RANDRIANASOLO | Antso Mendrika Hajaina | Fullstack Developer |
-| STD24093 | FENOMANANJARA | Harena Sarobidy | Fullstack Developer |
-| STD24012 | RABEMANANJARA | Nomenjanahary Yves | Fullstack Developer |
+| STD24011 | RANDRIANASOLO | Antso Mendrika Hajaina | Frontend Developer |
+| STD24093 | FENOMANANJARA | Harena Sarobidy | Frontend Developer |
+| STD24012 | RABEMANANJARA | Nomenjanahary Yves | React Admin Developer |
 
 ---
 
